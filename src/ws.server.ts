@@ -311,12 +311,11 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
         handleError(new Error(`Обработчик SYS DeleteGroup: Отсутствует ClientID или GroupID`))
         break
       }
-
       try {
-        const groupResponse = await DeleteGroup(ClientID, GroupID)
-        if (groupResponse) {
-          /* Отвечаем всем в группе */
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroup)
+        const deleteGroupResponse = await DeleteGroup(ClientID, GroupID)
+        const clientGroupResponse = await prisma.group.findUnique({ where: { GroupName: ClientID } })
+        if (deleteGroupResponse && clientGroupResponse) {
+          sendToGroup(clientGroupResponse.GroupID, deleteGroupResponse, SendOptions.ToGroup)
           leaveGroups(ws, GroupID)
         }
       } catch (error) {
@@ -331,7 +330,6 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
       if (!DevSN || !GroupID || !Status) {
         handleError(new Error(`Обработчик SYS Status: Неверный набор данных`))
       }
-
       const groupResponse = EncryptWebSocketPacket('SYS', 'Status', {
         ClientID: DevSN,
         DevSN: DevSN,

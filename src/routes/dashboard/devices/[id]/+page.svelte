@@ -427,22 +427,28 @@
             ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
         >
           {#if selectedModule}
-            <div class="m-1 flex flex-row items-center rounded-2xl p-1">
-              <div class="flex w-full flex-col items-center">
-                <a href={`/products/${selectedModule.DevID}`} class="no-underline hover:no-underline">
-                  <p class="font-semibold">{t('dashboard.device.device_sn', currentLang)}: {selectedModule.DevSN}</p>
-                </a>
-                <p>
-                  {t('dashboard.device.devfw', currentLang)}: {selectedModule.DevFW} | {t(
-                    'dashboard.device.catverfw',
-                    currentLang,
-                  )}: {selectedModule.VerFW}
+            <div class="m-1 flex flex-col items-center rounded-2xl">
+              <a href={`/products/${selectedModule.DevID}`} class="no-underline hover:no-underline">
+                <p class="font-semibold text-center">
+                  {t('dashboard.device.device_sn', currentLang)}: {selectedModule.DevSN}
                 </p>
-                <p class="text-justify text-gray-400">{selectedModule.Brief}</p>
-                <p class="text-justify font-semibold text-fuchsia-400">
-                  {StatusData?.Status.Title}: {StatusData?.Status.Message}
-                </p>
+              </a>
+              <div class="flex w-full justify-center mt-2">
+                <div class="flex w-1/3 flex-col items-center">
+                  <p>
+                    {t('dashboard.device.devfw', currentLang)}: {selectedModule.DevFW} | {t(
+                      'dashboard.device.catverfw',
+                      currentLang,
+                    )}: {selectedModule.VerFW}
+                  </p>
+                </div>
+                <div class="flex w-2/3 flex-col items-center">
+                  <p class="text-justify text-gray-400">{selectedModule.Brief}</p>
+                </div>
               </div>
+              <p class="text-justify font-semibold text-fuchsia-400">
+                {StatusData?.Status.Title}: {StatusData?.Status.Message}
+              </p>
             </div>
           {:else}
             <h5>{t('dashboard.device.selectmodule')}</h5>
