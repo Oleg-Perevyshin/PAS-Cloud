@@ -1,0 +1,136 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Таблица пользователей
+model User {
+  UserID        String          @id @unique
+  IsActivated   Boolean         @default(true)
+  IsOnline      Boolean         @default(false)
+  Role          String          @default("ADMIN")
+  EMail         String          @unique
+  Password      String
+  NickName      String          @unique
+  Avatar        String?
+  FirstName     String?         @default("")
+  LastName      String?         @default("")
+  AboutMe       String?         @default("")
+  Country       String?         @default("")
+  Region        String?         @default("")
+  City          String?         @default("")
+  Address       String?         @default("")
+  PostCode      String?         @default("")
+  PhoneNumber   String?         @default("")
+  Tags          Json[]
+
+  Devices       UserDevice[]
+  
+  AccessToken   String?         @default("")
+  RefreshToken  String?         @default("")
+
+  Created       DateTime        @default(now())
+  Updated       DateTime        @updatedAt
+
+  News          News[]          @relation
+  Groups        Group[]         @relation("UserGroups")     // Связь с чатами
+  Messages      GroupMessage[]                              // Связь с сообщениями, которые отправил пользователь
+  
+  @@map("Users")
+}
+
+model News {
+  NewsID        String          @id @unique
+  UserID        String?
+  Title         String
+  Brief         String
+  Content       String
+  ImageTitle    String?
+  ImageContent  String?
+  Published     Boolean         @default(false)
+
+  Created       DateTime        @default(now())
+  Updated       DateTime        @updatedAt
+
+  Author        User?           @relation(fields: [UserID], references: [UserID], onDelete: SetNull)
+}
+
+// Таблица экземпляров устройств
+model Device {
+  DevSN         String          @id @unique
+  DevID         String
+  DevName       String
+  DevFW         String
+  IsOnline      Boolean         @default(false)
+  
+  Users         UserDevice[]    // Обратная связь с UserDevice
+  Messages      GroupMessage[]  // Обратная связь с GroupMessage
+
+  Catalog       Catalog         @relation(fields: [DevID], references: [DevID])
+  Modules       Json?           // Список модулей в виде JSON
+  
+  @@map("Devices")
+}
+
+// Таблица устройств в каталоге
+model Catalog {
+  DevID         String          @id @unique
+  DevName       String          @default("PAS-Module")
+  Brief         String
+  Description   String
+  Icon          String
+  VerFW         String          @default("0.01")
+  Firmware      Bytes
+  Manual        Bytes
+  MetaData      Json
+  API           Bytes
+
+  Devices       Device[]
+
+  Created       DateTime        @default(now())
+  Updated       DateTime        @updatedAt
+
+  @@map("Catalog")
+}
+
+// Промежуточная таблица для связи Многие-ко-Многим между User и Device
+model UserDevice {
+  UserID        String
+  DevSN         String
+  TagID         String  
+
+  User          User            @relation(fields: [UserID], references: [UserID], onDelete: Cascade)
+  Device        Device          @relation(fields: [DevSN], references: [DevSN], onDelete: Cascade)
+
+  @@id([UserID, DevSN])
+  @@map("UserDevices")
+}
+
+// Таблица с группами
+model Group {
+  GroupID       String          @id @unique
+  GroupName     String          @unique
+
+  GroupMessages GroupMessage[]                            // Связь с сообщениями в этом чате
+  Participants  User[]          @relation("UserGroups")   // Участники чата
+}
+
+// Таблица сообщений
+model GroupMessage {
+  MessageID     String          @id @default(cuid())
+  GroupID       String
+  UserID        String?
+  DevSN         String?
+  Message       String
+
+  Created       DateTime        @default(now())
+
+  Author        User?           @relation(fields: [UserID], references: [UserID])   // Связь с пользователем
+  Device        Device?         @relation(fields: [DevSN], references: [DevSN])     // Связь с устройством
+  Group         Group           @relation(fields: [GroupID], references: [GroupID]) // Связь с чатом
+}

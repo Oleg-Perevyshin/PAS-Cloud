@@ -1,0 +1,18 @@
+# System
+.vscode
+.DS_Store
+Thumbs.db
+node_modules
+/prisma/migrations
+.env
+
+# Output
+.output
+.vercel
+/.svelte-kit
+/build
+/public
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

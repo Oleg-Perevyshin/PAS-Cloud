@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pas-cloud
+  labels:
+    app: pas-cloud
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pas-cloud
+  template:
+    metadata:
+      labels:
+        app: pas-cloud
+    spec:
+      containers:
+        - name: pas-cloud
+          image: mcmega/pas-cloud:latest
+          ports:
+            - containerPort: 2005
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: BODY_SIZE_LIMIT
+              value: '67108864'
+          resources:
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pas-cloud
+spec:
+  type: LoadBalancer # Или ClusterIP, если вам не нужен внешний доступ
+  ports:
+    - port: 80
+      targetPort: 2005
+  selector:
+    app: pas-cloud

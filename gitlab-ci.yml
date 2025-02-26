@@ -1,0 +1,30 @@
+# GitLab CI/CD
+stages:
+  - install
+  # - migrate
+  # - build
+
+# Установка зависимостей
+install-job:
+  stage: install
+  image: node:latest
+  script:
+    - npm install
+# Миграция базы данных
+# migrate-job:
+#   stage: migrate
+#   image: node:latest
+#   script:
+#     - npx prisma migrate deploy
+#     - npx prisma generate
+
+# Сборка
+# build-job:
+#   stage: build
+#   image: node:latest
+#   script:
+#     - node -v
+#     - npm -v
+#     - cp .env .env.production
+#     - npm install
+#     - npm run Build
