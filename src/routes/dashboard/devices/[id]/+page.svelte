@@ -154,15 +154,13 @@
             /* Обновляем динамические переменные */
             if (typeof ModuleConfig === 'object' && ModuleConfig !== null) {
               Object.entries(ModuleConfig).forEach(([key, value]: [string, string | number | null]) => {
-                if (key !== 'DevSN' && key !== 'DevID') {
-                  const dynamicKey = `${ModuleConfig.DevSN}_${key}`
-                  dynamicValues[dynamicKey] = value
-                  DeviceStore.update((store) => ({
-                    ...store,
-                    dynamicValues: { ...store.dynamicValues, [dynamicKey]: value },
-                  }))
-                  // console.log(`Установлено значение: ${dynamicKey} = ${value}`)
-                }
+                const dynamicKey = `${ModuleConfig.DevSN}_${key}`
+                dynamicValues[dynamicKey] = value
+                DeviceStore.update((store) => ({
+                  ...store,
+                  dynamicValues: { ...store.dynamicValues, [dynamicKey]: value },
+                }))
+                // console.log(`Установлено значение: ${dynamicKey} = ${value}`)
               })
             } else {
               console.error('ModuleConfig не является объектом или пуст')

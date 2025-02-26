@@ -35,7 +35,7 @@
   <!-- Уведомление о новых личных сообщениях -->
   <button
     class="flex cursor-pointer items-center opacity-100 transition-opacity duration-300 hover:opacity-50"
-    onclick={() => changePage('/chat')}
+    onclick={() => changePage('/dashboard/chat')}
     aria-label="Notifications"
   >
     <div class="relative">

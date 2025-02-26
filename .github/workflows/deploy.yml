@@ -1,0 +1,53 @@
+# Deploy to Server
+name: Deploy to Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Set environment variables
+        run: |
+          echo "JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "JWT_ACCESS_EXPIRE=${{ vars.JWT_ACCESS_EXPIRE }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_EXPIRE=${{ vars.JWT_REFRESH_EXPIRE }}" >> $GITHUB_ENV
+          echo "JWT_ACCESS_MAX_AGE=${{ vars.JWT_ACCESS_MAX_AGE }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_MAX_AGE=${{ vars.JWT_REFRESH_MAX_AGE }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run Build
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRODUCTION_SERVER_DEPLOY_KEY }}" > ~/.ssh/id_ed25519 || { echo "Failed to write SSH key"; exit 1; }
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H cloud.poe-gw.keenetic.pro >> ~/.ssh/known_hosts || { echo "Failed to add known hosts"; exit 1; }
+          cat ~/.ssh/known_hosts  # вывод содержимого known_hosts для отладки
+
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/id_ed25519 poe@cloud.poe-gw.keenetic.pro "echo 'SSH connection successful'"
+
+      - name: Create deploy directory
+        run: ssh -i ~/.ssh/id_ed25519 poe@cloud.poe-gw.keenetic.pro "mkdir -p ~/test"
+
+      - name: Deploy to server
+        run: |
+          rsync -r --delete --exclude=.git ./ poe@cloud.poe-gw.keenetic.pro:~/test
+          ssh -i ~/.ssh/id_ed25519 poe@cloud.poe-gw.keenetic.pro "cd ~/test && npm install --production && pm2 restart cloud_app"

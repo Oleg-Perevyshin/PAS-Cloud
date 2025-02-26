@@ -33,7 +33,7 @@ export const JoinGroup = async (ClientID: string, GroupID: string): Promise<IWeb
 
   /* Проверяем права доступа для пользователя */
   if (requesterUser !== null) {
-    const hasAccess = ['ENGINEER', 'MANAGER', 'ADMIN'].includes(requesterUser.Role)
+    const hasAccess = ['USER', 'ENGINEER', 'MANAGER', 'ADMIN'].includes(requesterUser.Role)
     if (!hasAccess) {
       throw new Error('ER_USER_FORBIDDEN')
     }
@@ -134,7 +134,7 @@ export const CreateGroup = async (
     if (!requesterUser) {
       throw new Error('ER_USER_NOT_FOUND')
     }
-    const hasAccess = ['ENGINEER', 'MANAGER', 'ADMIN'].includes(requesterUser.Role)
+    const hasAccess = ['USER', 'ENGINEER', 'MANAGER', 'ADMIN'].includes(requesterUser.Role)
     if (!hasAccess) {
       throw new Error('ER_USER_FORBIDDEN')
     }

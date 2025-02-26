@@ -4,7 +4,7 @@ import { t } from '$lib/locales/i18n'
 
 /* Роли пользователей */
 export const DEFAULT_ROLES = [
-  { id: 'USER', name: t('service.user.roles.user'), color: 'bg-white border-blue-400' },
+  { id: 'USER', name: t('service.user.roles.user'), color: 'bg-stone border-blue-400' },
   { id: 'ENGINEER', name: t('service.user.roles.engineer'), color: 'bg-white border-blue-400' },
   { id: 'MANAGER', name: t('service.user.roles.manager'), color: 'bg-white border-blue-400' },
   { id: 'ADMIN', name: t('service.user.roles.admin'), color: 'bg-white border-blue-400' },

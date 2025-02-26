@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with "sPlan" (http://www.abacom-online.de) -->
+<svg version="1.1" baseProfile="full"
+xmlns="http://www.w3.org/2000/svg"
+width="498" height="498">
+<title>3</title>
+<defs>
+<style type="text/css">
+<![CDATA[
+polyline {stroke-linecap:round; stroke-linejoin:round}
+polygon {stroke-linecap:round; stroke-linejoin:round}
+path {stroke-linecap:round; stroke-linejoin:round}
+circle {stroke-linecap:round; stroke-linejoin:round}
+]]>
+</style>
+</defs>
+<circle cx="249.00" cy="249.00" r="209.00" fill="#222" stroke="#777" stroke-width="10" />
+<circle cx="247.30" cy="245.30" r="78.33" fill="#FFF" stroke="#59f" stroke-width="15" />
+<polyline points="248.00 76.00 248.00 136.00" fill="none" stroke="#777" stroke-width="10" />
+<polyline points="278.00 106.00 218.00 106.00" fill="none" stroke="#777" stroke-width="10" />
+<polyline points="278.00 386.00 218.00 386.00" fill="none" stroke="#777" stroke-width="10" />
+<polyline points="378.00 281.00 413.36 245.64 378.00 210.29" fill="none" stroke="#59f" stroke-width="10" />
+<polyline points="118.00 282.00 82.64 246.64 118.00 211.29" fill="none" stroke="#59f" stroke-width="10" />
+</svg>

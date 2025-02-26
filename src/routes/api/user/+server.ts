@@ -31,7 +31,7 @@ export const GET: RequestHandler = async (event) => {
 
     /* Проверяем права доступа */
     const hasAccess =
-      requester_user.UserID === requested_user.UserID || ['MANAGER', 'ADMIN'].includes(requester_user.Role)
+      requester_user.UserID === requested_user.UserID || ['USER', 'ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)
     if (!hasAccess) {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }

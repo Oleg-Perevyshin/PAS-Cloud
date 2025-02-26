@@ -653,16 +653,17 @@ wss.on('connection', async (ws, req) => {
 
     /* Если это изделие - создаем/обновляем устройство в БД */
     if (ClientType === 'DevSN') {
+      if (!DevName || !DevFW) {
+        return console.error(`handleGroupConnection: Отсутствует DevName или DevFW`), false
+      }
+
       const DevSN = ValidateDevSN(ClientID)
       if (!DevSN) {
         console.error(`handleGroupConnection: Некорректный DevSN - ${ClientID}`)
         ws.close(1008, 'Invalid DevSN')
         return false
       }
-      if (!DevName || !DevFW) {
-        return console.error(`handleGroupConnection: Отсутствует DevName или DevFW`), false
-      }
-
+      
       const DevID = DevSN.substring(0, 4)
       const catalogDevID = await prisma.catalog.findUnique({
         where: { DevID },
@@ -672,7 +673,7 @@ wss.on('connection', async (ws, req) => {
       }
 
       /* Создаем/обновляем устройства в таблице device */
-      const existingDevice = await prisma.device.upsert({
+      const existingDevice = await prisma.device.upsert({         
         where: { DevSN },
         update: { DevName, DevFW, IsOnline: true },
         create: { DevSN, DevID, DevName, DevFW, IsOnline: true },

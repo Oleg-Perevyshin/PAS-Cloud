@@ -69,7 +69,6 @@ const createWebSocketStore = () => {
       socket.onopen = () => {
         console.info(`WebSocket для ${UserID} открыт`)
         update((state) => ({ ...state, socket, connected: true }))
-
         if (reconnectInterval) {
           clearInterval(reconnectInterval)
           reconnectInterval = null

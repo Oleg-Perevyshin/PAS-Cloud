@@ -139,7 +139,6 @@
           ...responseData.user,
           Devices: Array.isArray(responseData.user.Devices) ? responseData.user.Devices : [],
           Tags: Array.isArray(responseData.user.Tags) ? responseData.user.Tags : DEFAULT_TAGS,
-          IsOnline: true,
         } as IUser
         UserUpdate(UserData)
         localStorage.setItem('IsOnline', responseData.user.IsOnline.toString())
@@ -216,7 +215,6 @@
         ...responseData.user,
         Devices: Array.isArray(responseData.user.Devices) ? responseData.user.Devices : [],
         Tags: Array.isArray(responseData.user.Tags) ? responseData.user.Tags : DEFAULT_TAGS,
-        IsOnline: true,
       } as IUser
       UserUpdate(UserData)
       localStorage.setItem('IsOnline', responseData.user.IsOnline.toString())

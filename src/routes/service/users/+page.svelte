@@ -177,7 +177,9 @@
   const handleUserEdit = (user: IUser) => {
     UserDataTemp = { ...user }
     const userTempRole = UserDataTemp.Role
-    if (userTempRole === undefined) return console.error('UserDataTemp.Role - не существует')
+    if (userTempRole === undefined) {
+      return console.error('UserDataTemp.Role - не существует')
+    }
     UserUpdateTemp(user)
     selectedRole = DEFAULT_ROLES.find((opt) => opt.id === userTempRole) || null
     showModalEdit = true

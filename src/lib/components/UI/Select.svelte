@@ -75,15 +75,11 @@
 
   const selectOption = (option: IOptionUI) => {
     if (!props.disabled) {
-      console.log('Before update value:', $state.snapshot(value))
       value = option
-      console.log('After update value:', $state.snapshot(value))
       isDropdownOpen = false
       if (onUpdate) {
         onUpdate(value)
       }
-      console.log('Selected option:', $state.snapshot(option))
-      console.log('Selected value:', $state.snapshot(value))
     }
   }
 

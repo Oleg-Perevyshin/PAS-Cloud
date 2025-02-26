@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.229 13.229">
+<circle cx="6.615" cy="6.615" r="5.821" fill="#ffe" stroke="#dc2" stroke-width=".794" stroke-linecap="round" stroke-linejoin="round" paint-order="stroke fill markers"/>
+<rect ry=".436" rx=".436" y="2.699" x="5.623" height="1.983" width="1.983" style="line-height:1.25" fill="#d22" stroke="#777" stroke-width=".529" stroke-linecap="square" paint-order="stroke fill markers"/>
+<rect style="line-height:1.25" width="1.349" height="1.349" x="5.94" y="8.724" rx=".436" ry=".436" fill="#28d" stroke="#777" stroke-width=".529" stroke-linecap="square" paint-order="stroke fill markers"/>
+<rect ry=".436" rx=".436" y="7.106" x="5.94" height="1.349" width="1.349" style="line-height:1.25" fill="#5d2" stroke="#777" stroke-width=".529" stroke-linecap="square" paint-order="stroke fill markers"/>
+<rect style="line-height:1.25" width="1.349" height="1.349" x="5.94" y="5.489" rx=".436" ry=".436" fill="#f81" stroke="#777" stroke-width=".529" stroke-linecap="square" paint-order="stroke fill markers"/>
+<g fill="none" stroke="#777" stroke-width=".265" stroke-linecap="round">
+<path d="M3.098 6.24H4.83M3.098 5.432H4.83M3.098 7.047H4.83"/>
+<g><path d="M8.4 6.24h1.73M8.4 5.432h1.73M8.4 7.047h1.73"/></g>
+</g>
+</svg>
