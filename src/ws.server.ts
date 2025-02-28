@@ -774,18 +774,46 @@ wss.on('connection', async (ws, req) => {
         const json = buffer.slice(startIndex, endIndex + 1)
         try {
           const parsedData = JSON.parse(json)
-          const receivedData = new Uint8Array(parsedData.Data)
-
-          if (!(receivedData instanceof Uint8Array) || !parsedData.Data) {
-            throw new Error('Данные не являются Uint8Array')
+          const base64Data = parsedData.Data
+          if (typeof base64Data !== 'string') {
+            throw new Error('Данные не являются строкой Base64')
           }
 
-          /* Расшифровываем пакета */
-          const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
+          /* Декодирование строки Base64 в массив байтов */
+          const binaryString = atob(base64Data)
+          const byteNumbers = new Uint8Array(binaryString.length);
+
+          for (let i = 0; i < binaryString.length; i++) {
+            byteNumbers[i] = binaryString.charCodeAt(i)
+          }
+
+          const receivedData = new Uint8Array(byteNumbers);
+
+          if (!(receivedData instanceof Uint8Array) || !base64Data) {
+            throw new Error('Данные не являются Uint8Array');
+          }
+
+          /* Расшифровываем пакет */
+          const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket;
           if (!decryptedPacket) {
-            console.log('Неверный пакет данных')
-            return
+            console.log('Неверный пакет данных');
+            return;
           }
+
+          // const receivedData = new Uint8Array(parsedData.Data)
+
+          // // console.log('Client:', parsedData)
+
+          // if (!(receivedData instanceof Uint8Array) || !parsedData.Data) {
+          //   throw new Error('Данные не являются Uint8Array')
+          // }
+
+          // /* Расшифровываем пакета */
+          // const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
+          // if (!decryptedPacket) {
+          //   console.log('Неверный пакет данных')
+          //   return
+          // }
 
           const { HEADER, ARGUMENT, VALUE } = decryptedPacket
           console.log('Client:', HEADER, ARGUMENT, VALUE)

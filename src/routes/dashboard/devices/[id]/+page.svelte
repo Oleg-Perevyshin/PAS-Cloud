@@ -48,12 +48,6 @@
   /* Динамические переменные */
   let dynamicValues: { [key: string]: string | number | boolean | null } = $state({})
 
-  interface IModuleList {
-    DevSN: string
-    DevName: string
-    DevFW: string
-  }
-
   onMount(() => {
     /* Подписки на состояние */
     const subscriptions = {
@@ -180,7 +174,7 @@
   })
 
   /* Запрашиваем данные обо всех модулях в изделии из БД */
-  const getDevicesAPI = async (moduleList: IModuleList[]): Promise<boolean> => {
+  const getDevicesAPI = async (moduleList: Array<{ DevSN: string; DevName: string; DevFW: string }>): Promise<boolean> => {
     LoaderStore.set(true)
     try {
       /* Проверка наличия модулей в списке */
