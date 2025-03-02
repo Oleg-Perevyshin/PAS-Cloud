@@ -20,15 +20,7 @@
     onSaveEdit?: (news: INews, published: boolean) => void
   }
 
-  let {
-    isExpand = {},
-    isAbilityEdit = false,
-    currentLang,
-    newsList = [],
-    onDelete,
-    onEdit,
-    onSaveEdit,
-  }: Props = $props()
+  let { isExpand = {}, isAbilityEdit = false, currentLang, newsList = [], onDelete, onEdit, onSaveEdit }: Props = $props()
 
   let currentTheme: string | undefined = $state()
   let renderedContents: string[] = $state([])
@@ -77,9 +69,7 @@
 <!-- Разметка компонента -->
 {#each newsList as news, index}
   <div class={`flex w-full flex-grow flex-col items-center justify-start`}>
-    <div
-      class={`m-2 mb-4 w-full overflow-hidden rounded-2xl border ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
-    >
+    <div class={`m-2 mb-4 w-full overflow-hidden rounded-2xl border ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
       <div
         class={`mb-2 flex flex-row items-center justify-between border-b px-4
         ${news.Published ? (currentTheme === 'light' ? 'bg-fuchsia-200' : 'bg-violet-700') : 'bg-gray-400'}`}
@@ -123,19 +113,13 @@
           <div class="m-2">
             <div class="text-justify text-sm">
               {#if news.ImageContent}
-                <div
-                  class="float-right mb-2 ml-4 flex h-40 w-40 items-center justify-center overflow-hidden rounded-2xl border border-gray-400"
-                >
+                <div class="float-right mb-2 ml-4 flex h-40 w-40 items-center justify-center overflow-hidden rounded-2xl border border-gray-400">
                   <button
                     onclick={() => {
                       selectedImage = `data:image/png;base64,${news.ImageContent}`
                     }}
                   >
-                    <img
-                      src={`data:image/png;base64,${news.ImageContent}`}
-                      alt="ImageContent"
-                      class="h-full w-full object-cover"
-                    />
+                    <img src={`data:image/png;base64,${news.ImageContent}`} alt="ImageContent" class="h-full w-full object-cover" />
                   </button>
                 </div>
               {/if}

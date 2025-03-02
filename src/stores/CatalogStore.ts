@@ -3,8 +3,8 @@ import { writable } from 'svelte/store'
 import type { ICatalogDevice } from './Interfaces'
 
 const DefaultCatalog: ICatalogDevice = {
-  DevID: '0000',
-  DevName: 'PAS-Device',
+  CatalogID: '0000',
+  CatalogName: 'PAS-Device',
   Brief: '',
   Description: '',
   Icon: '',
@@ -42,30 +42,27 @@ export const DeviceListClear = () => {
 /**
  * Удаление устрорйства из CatalogStore
  */
-export const RemoveDeviceFromStore = (DevID: string) => {
-  CatalogListStore.update((currentDeviceList) => currentDeviceList.filter((device) => device.DevID !== DevID))
+export const RemoveDeviceFromStore = (CatalogID: string) => {
+  CatalogListStore.update((currentDeviceList) => currentDeviceList.filter((device) => device.CatalogID !== CatalogID))
 }
 
-/**
- * Функция для добавления или обновления устройства в CatalogStore
- */
+/* Функция для добавления или обновления устройства в CatalogStore */
 export const CatalogUpsertDevice = (device: Partial<ICatalogDevice>) => {
   CatalogListStore.update((currentDeviceList) => {
-    /* Удаляем все дубликаты по DevID */
-    const uniqueDeviceList = currentDeviceList.filter(
-      (d, index, self) => index === self.findIndex((t) => t.DevID === d.DevID),
-    )
-
-    const existingIndex = uniqueDeviceList.findIndex((d) => d.DevID === device.DevID)
+    const uniqueDeviceList = currentDeviceList.filter((d, index, self) => index === self.findIndex((t) => t.CatalogID === d.CatalogID))
+    const existingIndex = uniqueDeviceList.findIndex((d) => d.CatalogID === device.CatalogID)
     if (existingIndex !== -1) {
       /* Устройство существует - обновляем */
-      return uniqueDeviceList.map((d, index) => (index === existingIndex ? { ...d, ...device } : d))
+      const updatedDeviceList = uniqueDeviceList.map((d, index) => (index === existingIndex ? { ...d, ...device } : d))
+      CatalogStore.set({ ...updatedDeviceList[existingIndex] })
+      return updatedDeviceList
     } else {
       /* Устройства нет - добавляем как новое */
       const newDevice: ICatalogDevice = {
         ...DefaultCatalog,
         ...device,
       }
+      CatalogStore.set(newDevice)
       return [...uniqueDeviceList, newDevice]
     }
   })

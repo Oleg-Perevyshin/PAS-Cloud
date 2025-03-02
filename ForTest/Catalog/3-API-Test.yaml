@@ -1,0 +1,22 @@
+DevID: FFFF
+DevSN:
+DevName: WiFi Module
+Description: Basic WiFi Module
+DevFW:
+UIBlocks:
+  - BlockID: WebSettings
+    Label: Web Settings
+    Description: General Web Settings
+    Parameters:
+      - ParamID: WebAccess
+        Label: Web Access
+        Description: Access to Web Interface
+        UIComponents:
+          - Type: Input
+            UiID: WebUser
+            Label: User Name
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: WebUser
+              Variables: [WebUser]

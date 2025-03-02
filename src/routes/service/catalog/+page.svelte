@@ -29,7 +29,7 @@
 
   let currentLang: string | undefined = $state()
   let currentTheme: string | undefined = $state()
-  let currentEditDevice: ICatalogDevice | null = $state(null)
+  let currentDevice: ICatalogDevice | null = $state(null)
   let catalogDeviceList: ICatalogDevice[] = $state([])
   let UserData: IUser | undefined = $state()
 
@@ -38,7 +38,7 @@
     const subscriptions = {
       Language: Language.subscribe((value) => (currentLang = value)),
       Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
-      Catalog: CatalogStore.subscribe(() => (currentEditDevice = get(CatalogStore))),
+      Catalog: CatalogStore.subscribe(() => (currentDevice = get(CatalogStore))),
       CatalogList: CatalogListStore.subscribe((value) => (catalogDeviceList = value || [])),
       User: UserStore.subscribe((value) => (UserData = value)),
     }
@@ -55,19 +55,19 @@
   /**
    * СОЗДАНИЕ / РЕДАКТИРОВАНИЕ УСТРОЙСТВА В КАТАЛОГЕ
    */
-  const editDevice = (DevID: string) => {
-    currentEditDevice = get(CatalogListStore).find((device) => device.DevID === DevID) || null
-    if (currentEditDevice) {
-      CatalogStore.set(currentEditDevice)
+  const editDevice = (CatalogID: string) => {
+    currentDevice = get(CatalogListStore).find((device) => device.CatalogID === CatalogID) || null
+    if (currentDevice) {
+      CatalogStore.set(currentDevice)
       isEditing = true
       showEditorModal = true
     }
   }
   const createDevice = () => {
     CatalogDeviceDefault()
-    currentEditDevice = {
-      DevID: '0000',
-      DevName: 'PAS-Device',
+    currentDevice = {
+      CatalogID: '0000',
+      CatalogName: 'PAS-Device',
       Brief: '',
       Description: '',
       Icon: '',
@@ -89,7 +89,7 @@
   }
 
   const saveDevice = async (updatedDevice: ICatalogDevice) => {
-    if (!updatedDevice || !updatedDevice.DevID) {
+    if (!updatedDevice || !updatedDevice.CatalogID) {
       return addMessage(t('service.catalog.save_no_data'))
     }
 
@@ -99,6 +99,7 @@
         formData.append(key, value)
       }
     })
+
     try {
       const responseData = await API_CatalogUpdateDevice(formData)
       if (!responseData?.catalog) {
@@ -158,16 +159,15 @@
   /* УДАЛЕНИЕ УСТРОЙСТВА ИЗ КАТАЛОГА */
   let showModalDelete = $state(false)
   const handleDeleteDevice = (device: ICatalogDevice) => {
-    currentEditDevice = device
+    currentDevice = device
     showModalDelete = true
   }
   const confirmDeleteDevice = async () => {
-    if (currentEditDevice?.DevID === undefined)
-      return console.error('Ошибка confirmDeleteDevice - currentEditDevice.DevID не существует')
+    if (currentDevice?.CatalogID === undefined) return console.error('Ошибка confirmDeleteDevice - currentDevice.CatalogID не существует')
     try {
-      const responseData = await API_CatalogDeleteDevice(currentEditDevice.DevID)
+      const responseData = await API_CatalogDeleteDevice(currentDevice.CatalogID)
       if (responseData?.status.code == 200) {
-        RemoveDeviceFromStore(currentEditDevice.DevID)
+        RemoveDeviceFromStore(currentDevice.CatalogID)
       }
       showModalDelete = false
     } catch (error) {
@@ -184,17 +184,14 @@
     querySearch = ''
     LoaderStore.set(true)
     try {
-      const responseData = await SmartRequest(
-        `/api/catalog_list?${cursor ? `cursor=${cursor}` : 'cursor=null'}&quantity=${quantity}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
-          },
-          credentials: 'include',
+      const responseData = await SmartRequest(`/api/catalog_list?${cursor ? `cursor=${cursor}` : 'cursor=null'}&quantity=${quantity}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
         },
-      )
+        credentials: 'include',
+      })
 
       /* Проверяем, список устройств должен быть массивом */
       const catalog = responseData?.catalog_list
@@ -209,7 +206,7 @@
 
       /* Обновляем курсор, если были получены новые устройства */
       if (catalog.length > 0) {
-        cursor = catalog[catalog.length - 1].DevID || null
+        cursor = catalog[catalog.length - 1].CatalogID || null
       } else {
         cursor = null
       }
@@ -230,7 +227,7 @@
 
   /* СОРТИРОВКА ДАННЫХ В ТАБЛИЦЕ */
   let currentSortField: keyof ICatalogDevice | null = $state(null)
-  let sortDirection: { [key: string]: 'asc' | 'desc' } = $state({ DevID: 'asc', DevName: 'asc' })
+  let sortDirection: { [key: string]: 'asc' | 'desc' } = $state({ CatalogID: 'asc', CatalogName: 'asc' })
   const sortDevices = (field: keyof ICatalogDevice) => {
     const sortedDevices = [...catalogDeviceList]
 
@@ -241,16 +238,16 @@
       sortDirection[field] = 'asc'
     }
 
-    /* Сортировка по полю DevID с учетом HEX */
+    /* Сортировка по полю CatalogID с учетом HEX */
     sortedDevices.sort((a, b) => {
       let aValue, bValue
 
-      if (field === 'DevID') {
+      if (field === 'CatalogID') {
         /* Преобразуем HEX в числовое значение для сравнения */
         aValue = parseInt(a[field], 16)
         bValue = parseInt(b[field], 16)
       } else {
-        /* Для других полей (например, DevName) */
+        /* Для других полей (например, CatalogName) */
         aValue = typeof a[field] === 'string' ? a[field].toLowerCase() : String(a[field] ?? '')
         bValue = typeof b[field] === 'string' ? b[field].toLowerCase() : String(b[field] ?? '')
 
@@ -281,24 +278,14 @@
 </script>
 
 <!-- Модуль работы с каталогом -->
-{#if UserData?.Role && ['MANAGER', 'ADMIN'].includes(UserData.Role)}
+{#if UserData?.IsOnline && UserData?.Role && ['MANAGER', 'ADMIN'].includes(UserData.Role)}
   <div class="flex h-full flex-col overflow-hidden">
     <!-- Модуль поиска по каталогу -->
     <div class="sticky top-0">
       <h2>{t('service.catalog.title', currentLang)}</h2>
       <div class="flex w-full items-center justify-center">
-        <Button
-          onClick={getDeviceList}
-          label={t('common.update', currentLang)}
-          props={{ bgColor: 'bg-blue-200' }}
-          className="m-8 w-48 rounded-2xl"
-        />
-        <Input
-          id="search"
-          props={{ autocomplete: 'on', maxLength: 64 }}
-          bind:value={querySearch}
-          className="flex-grow mx-4 min-w-72"
-        />
+        <Button onClick={getDeviceList} label={t('common.update', currentLang)} props={{ bgColor: 'bg-blue-200' }} className="m-8 w-48 rounded-2xl" />
+        <Input id="search" props={{ autocomplete: 'on', maxLength: 64 }} bind:value={querySearch} className="flex-grow mx-4 min-w-72" />
         <Button
           onClick={handleDevicesSearch}
           label={t('common.search', currentLang)}
@@ -326,18 +313,18 @@
         <button
           class={`cursor-pointer border-r border-b border-gray-400 p-2 font-semibold
           ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-700'}`}
-          onclick={() => sortDevices('DevID')}
+          onclick={() => sortDevices('CatalogID')}
         >
-          {t('catalog.devid', currentLang)}
-          {currentSortField === 'DevID' ? (sortDirection.DevID === 'asc' ? '▲' : '▼') : ''}
+          {t('catalog.id', currentLang)}
+          {currentSortField === 'CatalogID' ? (sortDirection.CatalogID === 'asc' ? '▲' : '▼') : ''}
         </button>
         <button
           class={`cursor-pointer border-r border-b border-gray-400 p-2 font-semibold
           ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-700'}`}
-          onclick={() => sortDevices('DevName')}
+          onclick={() => sortDevices('CatalogName')}
         >
-          {t('catalog.devname', currentLang)}
-          {currentSortField === 'DevName' ? (sortDirection.DevName === 'asc' ? '▲' : '▼') : ''}
+          {t('catalog.name', currentLang)}
+          {currentSortField === 'CatalogName' ? (sortDirection.CatalogName === 'asc' ? '▲' : '▼') : ''}
         </button>
         <div class="border-r border-b border-gray-400 p-2 font-semibold">{t('catalog.verfw', currentLang)}</div>
         <div class="border-r border-b border-gray-400 p-2 font-semibold">
@@ -364,17 +351,17 @@
             </div>
             <a
               class="flex h-full flex-shrink-0 cursor-pointer flex-col items-center justify-center border-r border-gray-400 p-2 hover:underline"
-              href={`/products/${device.DevID}`}>{device.DevID}</a
+              href={`/products/${device.CatalogID}`}>{device.CatalogID}</a
             >
             <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
-              {device.DevName}
+              {device.CatalogName}
             </div>
             <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
-              {device.VerFW}
+              <p>{device.VerFW}</p>
             </div>
             <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
               <Button
-                onClick={() => editDevice(device.DevID)}
+                onClick={() => editDevice(device.CatalogID)}
                 label={t('common.edit', currentLang)}
                 props={{ bgColor: 'bg-green-200' }}
                 className="m-1 w-48 rounded-2xl"
@@ -403,10 +390,10 @@
 {/if}
 
 <!-- Модальное окно подтверждения удаления устройства из каталога -->
-{#if currentLang && currentEditDevice}
+{#if currentLang && currentDevice}
   <ConfirmDelete
     show={showModalDelete}
-    item={currentEditDevice?.DevID}
+    item={currentDevice?.CatalogID}
     {currentLang}
     onConfirm={confirmDeleteDevice}
     onCancel={() => (showModalDelete = false)}
@@ -415,12 +402,5 @@
 
 <!-- Модальное окно для создания/редактирования устройства -->
 {#if showEditorModal && currentLang && currentTheme}
-  <CatalogAddEdit
-    {currentEditDevice}
-    {currentLang}
-    {currentTheme}
-    {isEditing}
-    onCancel={cancelDevice}
-    onSave={saveDevice}
-  />
+  <CatalogAddEdit {currentDevice} {currentLang} {currentTheme} {isEditing} onCancel={cancelDevice} onSave={saveDevice} />
 {/if}

@@ -51,13 +51,7 @@
   }
 </script>
 
-<div
-  class="relative inline-block"
-  role="button"
-  tabindex="0"
-  onmouseenter={handleMouseEnter}
-  onmouseleave={handleMouseLeave}
->
+<div class="relative inline-block" role="button" tabindex="0" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave}>
   <div
     id="language-button"
     class="m-1 flex cursor-pointer items-center justify-center rounded-full text-2xl duration-300 hover:shadow-xl"
@@ -77,12 +71,7 @@
       <ul class="list-none p-2">
         {#each LOCALES as lang (lang.code)}
           <li class="cursor-pointer rounded-lg p-2 transition duration-300 hover:shadow-lg">
-            <button
-              class="flex items-center"
-              onclick={() => switchLanguage(lang.code)}
-              aria-label={`Switch to ${lang.name}`}
-              role="menuitem"
-            >
+            <button class="flex items-center" onclick={() => switchLanguage(lang.code)} aria-label={`Switch to ${lang.name}`} role="menuitem">
               <lang.component class="h-6 w-6" />
               <span class="pl-4">{lang.name}</span>
             </button>

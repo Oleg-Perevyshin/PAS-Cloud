@@ -7,14 +7,17 @@ import DOMPurify from 'dompurify'
  * @param dateString - строка с датой и временем
  * @returns форматированная строка ДД.ММ.ГГГГ - ЧЧ:ММ
  */
-export const FormatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const year = date.getFullYear()
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${day}.${month}.${year}\n${hours}:${minutes}`
+export const FormatDate = (dateString: string | undefined): string => {
+  if (dateString) {
+    const date = new Date(dateString)
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${day}.${month}.${year}\n${hours}:${minutes}`
+  }
+  return ''
 }
 
 /** Проверка серийного номера
@@ -134,11 +137,7 @@ export const RenderMarkdown = async (text: string) => {
  * @param value - данные
  * @returns - Uint8Array | null
  */
-export const EncryptWebSocketPacket = (
-  header: string,
-  argument: string,
-  value: object,
-): { Data: Uint8Array } | null => {
+export const EncryptWebSocketPacket = (header: string, argument: string, value: object): { Data: Uint8Array } | null => {
   if (!header || !argument || typeof value !== 'object') {
     return console.error('EncryptWebSocketPacket: Неверные входные данные'), null
   }

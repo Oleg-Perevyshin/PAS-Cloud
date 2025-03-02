@@ -11,9 +11,7 @@ const isTokenUnique = async (token: string, isRefreshToken: boolean = false): Pr
     })
     return usersWithSameToken.length === 0
   } catch (error) {
-    throw new Error(
-      `ERR isTokenUnique: Ошибка проверки токенов на уникальность: ${error instanceof Error ? error.message : error}`,
-    )
+    throw new Error(`ERR isTokenUnique: Ошибка проверки токенов на уникальность: ${error instanceof Error ? error.message : error}`)
   }
 }
 

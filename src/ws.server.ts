@@ -4,15 +4,7 @@ import type { Server } from 'http'
 import { prisma } from './lib/Prisma'
 import { EncryptWebSocketPacket, DecryptWebSocketPacket, ValidateDevSN } from './lib/utils/Common'
 import { parse } from 'url'
-import {
-  JoinGroup,
-  GetGroupList,
-  CreateGroup,
-  DeleteGroup,
-  SetMessage,
-  GetMessages,
-  DeleteMessage,
-} from './lib/utils/WebSocket'
+import { JoinGroup, GetGroupList, CreateGroup, DeleteGroup, SetMessage, GetMessages, DeleteMessage } from './lib/utils/WebSocket'
 import type { ILeaveGroup, IWebSocketPacket, IWebSocketPacketMain } from './stores/Interfaces'
 
 /**
@@ -42,12 +34,7 @@ enum SendOptions {
 }
 
 /* Отправка пакета в группы */
-const sendToGroup = (
-  GroupID: string,
-  message: { Data: Uint8Array } | null,
-  option: SendOptions,
-  requester?: WebSocket,
-) => {
+const sendToGroup = (GroupID: string, message: { Data: Uint8Array } | null, option: SendOptions, requester?: WebSocket) => {
   if (!message?.Data) {
     return console.warn(`sendToGroup Нет сообщения для передачи`)
   }
@@ -173,9 +160,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
       /* Подключаемся к указанной группе */
       try {
         const createGroupResponsePacket = await JoinGroup(ClientID, GroupID)
-        const createGroupResponse = DecryptWebSocketPacket(
-          new Uint8Array(createGroupResponsePacket.Data),
-        ) as IWebSocketPacket
+        const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(createGroupResponsePacket.Data)) as IWebSocketPacket
 
         if (createGroupResponse && createGroupResponse.VALUE && 'GroupID' in createGroupResponse.VALUE) {
           const groupID = createGroupResponse.VALUE.GroupID as string
@@ -661,7 +646,7 @@ wss.on('connection', async (ws, req) => {
         ws.close(1008, 'Invalid DevSN')
         return false
       }
-      
+
       const DevID = DevSN.substring(0, 4)
       const catalogDevID = await prisma.catalog.findUnique({
         where: { DevID },
@@ -671,7 +656,7 @@ wss.on('connection', async (ws, req) => {
       }
 
       /* Создаем/обновляем устройства в таблице device */
-      const existingDevice = await prisma.device.upsert({         
+      const existingDevice = await prisma.device.upsert({
         where: { DevSN },
         update: { DevName, DevFW, IsOnline: true },
         create: { DevSN, DevID, DevName, DevFW, IsOnline: true },
@@ -759,8 +744,8 @@ wss.on('connection', async (ws, req) => {
       /* Добавляем новые данные в буфер */
       buffer += data.toString()
 
-      if (buffer.length > 4 * 1024 * 1024) {
-        // 4MB
+      if (buffer.length > 1 * 1024 * 1024) {
+        // 1MB
         return console.error('Переполнение буфера, сброс'), (buffer = '')
       }
 
@@ -778,42 +763,29 @@ wss.on('connection', async (ws, req) => {
           if (typeof base64Data !== 'string') {
             throw new Error('Данные не являются строкой Base64')
           }
-
           /* Декодирование строки Base64 в массив байтов */
           const binaryString = atob(base64Data)
-          const byteNumbers = new Uint8Array(binaryString.length);
-
+          const byteNumbers = new Uint8Array(binaryString.length)
           for (let i = 0; i < binaryString.length; i++) {
             byteNumbers[i] = binaryString.charCodeAt(i)
           }
-
-          const receivedData = new Uint8Array(byteNumbers);
-
+          const receivedData = new Uint8Array(byteNumbers)
           if (!(receivedData instanceof Uint8Array) || !base64Data) {
-            throw new Error('Данные не являются Uint8Array');
-          }
-
-          /* Расшифровываем пакет */
-          const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket;
-          if (!decryptedPacket) {
-            console.log('Неверный пакет данных');
-            return;
+            throw new Error('Данные не являются Uint8Array')
           }
 
           // const receivedData = new Uint8Array(parsedData.Data)
-
           // // console.log('Client:', parsedData)
-
           // if (!(receivedData instanceof Uint8Array) || !parsedData.Data) {
           //   throw new Error('Данные не являются Uint8Array')
           // }
 
-          // /* Расшифровываем пакета */
-          // const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
-          // if (!decryptedPacket) {
-          //   console.log('Неверный пакет данных')
-          //   return
-          // }
+          /* Расшифровываем пакет */
+          const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
+          if (!decryptedPacket) {
+            console.log('Неверный пакет данных')
+            return
+          }
 
           const { HEADER, ARGUMENT, VALUE } = decryptedPacket
           console.log('Client:', HEADER, ARGUMENT, VALUE)

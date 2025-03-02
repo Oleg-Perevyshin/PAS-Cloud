@@ -27,9 +27,7 @@
 </script>
 
 <div class="editorModal bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black">
-  <div
-    class={`flex h-auto w-[55rem] flex-col overflow-auto rounded-2xl p-5 text-center ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
-  >
+  <div class={`flex h-auto w-[55rem] flex-col overflow-auto rounded-2xl p-5 text-center ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
     <h2>
       {currentEditNews ? t('dashboard.news.title_edit', currentLang) : t('dashboard.news.title_create', currentLang)}
     </h2>
@@ -41,11 +39,7 @@
           onclick={() => openFileDialog('ImageTitle')}
         >
           {#if $NewsStore.ImageTitle}
-            <img
-              src={`data:image/png;base64,${$NewsStore.ImageTitle}`}
-              alt="ImageTitle"
-              class="h-full w-full object-cover"
-            />
+            <img src={`data:image/png;base64,${$NewsStore.ImageTitle}`} alt="ImageTitle" class="h-full w-full object-cover" />
           {/if}
         </button>
         <input
@@ -94,11 +88,7 @@
           onclick={() => openFileDialog('ImageContent')}
         >
           {#if $NewsStore.ImageContent}
-            <img
-              src={`data:image/png;base64,${$NewsStore.ImageContent}`}
-              alt="ImageContent"
-              class="h-full w-full object-cover"
-            />
+            <img src={`data:image/png;base64,${$NewsStore.ImageContent}`} alt="ImageContent" class="h-full w-full object-cover" />
           {/if}
         </button>
         <input

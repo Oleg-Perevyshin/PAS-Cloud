@@ -39,6 +39,7 @@ const statusResponse: Record<string, StatusResponse> = {
   ER_DEVICE_NOT_FOUND_IN_CATALOG: { code: 600, messageKey: 'err.dev_not_found' },
   ER_DELETE_DEVICE_FROM_CATALOG: { code: 600, messageKey: 'err.dev_delete' },
   ER_INSUFFICIENT_DATA_TO_CREATE_DEVICE: { code: 600, messageKey: 'err.dev_data' },
+  ER_INVALID_CATALOG_ID: { code: 600, messageKey: 'err.catalog_id' },
   ER_INVALID_FILE_TYPE: { code: 600, messageKey: 'err.file_type' },
   ER_FILE_SAVE: { code: 600, messageKey: 'err.core_file_save' },
   ER_FILE_CORE_EMPTY: { code: 600, messageKey: 'err.core_file_empty' },

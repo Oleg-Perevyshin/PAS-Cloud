@@ -1,14 +1,7 @@
 // $lib/utils/API.ts
 import { SmartRequest } from './SmartRequest'
 import { addMessage } from '../../stores/MessageStore'
-import {
-  UserStore,
-  UserUpdate,
-  UserStoreTemp,
-  UserUpdateTemp,
-  UserUpsertDevice,
-  UserUpsertDeviceTemp,
-} from '../../stores'
+import { UserStore, UserUpdate, UserStoreTemp, UserUpdateTemp, UserUpsertDevice, UserUpsertDeviceTemp } from '../../stores'
 import type { IUser, INews, IUserTemp } from '../../stores/Interfaces'
 import { ValidateDevSN } from './Common'
 import { DEFAULT_TAGS } from '../../enums'
@@ -400,17 +393,14 @@ export const API_UserAddEditNews = async (UserNews: INews) => {
  */
 export const API_NewsList = async (UserID: string) => {
   try {
-    const responseData = await SmartRequest(
-      UserID ? `${API_ROUTES.NEWS_LIST}?UserID=${UserID}` : API_ROUTES.NEWS_LIST,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
-        },
-        credentials: 'include',
+    const responseData = await SmartRequest(UserID ? `${API_ROUTES.NEWS_LIST}?UserID=${UserID}` : API_ROUTES.NEWS_LIST, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
       },
-    )
+      credentials: 'include',
+    })
 
     if (responseData?.status.message) {
       addMessage(responseData.status.message)
@@ -486,9 +476,9 @@ export const API_CatalogUpdateDevice = async (DeviceData: FormData) => {
  * Создание/Редактирование устройства в каталоге
  * @param DeviceData - полный пакет данных об устройстве
  */
-export const API_CatalogDevice = async (DevID: string) => {
+export const API_CatalogDevice = async (CatalogID: string, VerFW: string) => {
   try {
-    const responseData = await SmartRequest(`${API_ROUTES.CATALOG_GET_DEVICE}?DevID=${DevID}`, {
+    const responseData = await SmartRequest(`${API_ROUTES.CATALOG_GET_DEVICE}?CatalogID=${CatalogID}&VerFW=${VerFW}`, {
       method: 'GET',
       headers: {
         'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
@@ -511,7 +501,7 @@ export const API_CatalogDevice = async (DevID: string) => {
  * Удаление устройства из каталога
  * @param DevID - идентификатор устройства
  */
-export const API_CatalogDeleteDevice = async (DevID: string) => {
+export const API_CatalogDeleteDevice = async (DevID: string, VerFW: string) => {
   try {
     const responseData = await SmartRequest(`${API_ROUTES.CATALOG_DELETE_DEVICE}`, {
       method: 'DELETE',
@@ -519,7 +509,7 @@ export const API_CatalogDeleteDevice = async (DevID: string) => {
         'Content-Type': 'application/json',
         'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
       },
-      body: JSON.stringify({ DevID: DevID }),
+      body: JSON.stringify({ DevID, VerFW }),
       credentials: 'include',
     })
 

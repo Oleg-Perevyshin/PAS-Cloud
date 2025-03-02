@@ -39,6 +39,7 @@ export const GET: RequestHandler = async (event) => {
         Avatar: boolean
         FirstName: boolean
         LastName: boolean
+        Department: boolean
         AboutMe: boolean
         Country: boolean
         Region: boolean
@@ -67,6 +68,7 @@ export const GET: RequestHandler = async (event) => {
         Avatar: true,
         FirstName: true,
         LastName: true,
+        Department: true,
         AboutMe: true,
         Country: true,
         Region: true,

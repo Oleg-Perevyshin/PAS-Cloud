@@ -4,16 +4,7 @@
   import { t, Language } from '$lib/locales/i18n'
   import { UserStore, UserStoreTemp, ThemeStore } from '../../../stores'
   import type { IUser, INews } from '../../../stores/Interfaces'
-  import {
-    NewsStore,
-    NewsListStore,
-    NewsUpsert,
-    NewsListClear,
-    NewsClear,
-    RemoveNewsFromStore,
-    addMessage,
-    LoaderStore,
-  } from '../../../stores'
+  import { NewsStore, NewsListStore, NewsUpsert, NewsListClear, NewsClear, RemoveNewsFromStore, addMessage, LoaderStore } from '../../../stores'
   import { API_UserAddEditNews, API_NewsList, API_UserDeleteNews } from '$lib/utils/API'
   import { HandleImageUpload } from '$lib/utils/Common'
   import { get } from 'svelte/store'
@@ -188,15 +179,7 @@
 
     <div class="flex flex-col items-center justify-start overflow-y-auto">
       {#if currentLang}
-        <NewsList
-          {newsList}
-          {currentLang}
-          {isExpand}
-          isAbilityEdit={true}
-          onDelete={deleteNews}
-          onEdit={editNews}
-          onSaveEdit={saveNews}
-        />
+        <NewsList {newsList} {currentLang} {isExpand} isAbilityEdit={true} onDelete={deleteNews} onEdit={editNews} onSaveEdit={saveNews} />
       {/if}
     </div>
   </div>
@@ -204,12 +187,5 @@
 
 <!-- Модальное окно для редактирования новости -->
 {#if showEditorModal && currentLang && currentTheme}
-  <NewsEditorModal
-    {currentEditNews}
-    {currentLang}
-    {currentTheme}
-    {HandleImageUpload}
-    onCancel={cancelNews}
-    onSave={saveNews}
-  />
+  <NewsEditorModal {currentEditNews} {currentLang} {currentTheme} {HandleImageUpload} onCancel={cancelNews} onSave={saveNews} />
 {/if}

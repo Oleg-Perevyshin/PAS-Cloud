@@ -35,6 +35,7 @@ export interface IUser {
   Role: UserRole                          // Роль пользователя
   FirstName: string                       // Имя пользователя
   LastName: string                        // Фамилия пользователя
+  Department: string                      // Подразделение
   AboutMe: string                         // О пользователе
   Country: string                         // Страна
   Region: string                          // Регион
@@ -43,7 +44,7 @@ export interface IUser {
   PostCode: string                        // Почтовый индекс
   PhoneNumber: string                     // Номер телефона
   IsActivated: boolean                    // Статус активации пользователя
-  Tags: Array<{ id: string; name: string; color: string }> // Теги пользователя
+  Tags: { id: string; name: string; color: string }[] // Теги пользователя
   Devices: IUserDevice[]                  // Устройства, привязанные к пользователю
   IsOnline: boolean                       // Статус входа пользователя
   Created?: string                        // Дата создания пользователя (опционально)
@@ -58,6 +59,7 @@ export interface IUserTemp {
   Role: UserRole                          // Роль пользователя
   FirstName: string                       // Имя пользователя
   LastName: string                        // Фамилия пользователя
+  Department: string                      // Подразделение
   AboutMe: string                         // О пользователе
   Country: string                         // Страна
   Region: string                          // Регион
@@ -66,7 +68,7 @@ export interface IUserTemp {
   PostCode: string                        // Почтовый индекс
   PhoneNumber: string                     // Номер телефона
   IsActivated: boolean                    // Статус активации пользователя
-  Tags: Array<{ id: string; name: string; color: string }> // Теги пользователя
+  Tags: { id: string; name: string; color: string }[] // Теги пользователя
   Devices: IUserDevice[]                  // Устройства, привязанные к пользователю
   IsOnline: boolean                       // Статус входа пользователя
   Created?: string                        // Дата создания пользователя (опционально)
@@ -95,18 +97,24 @@ export interface IUserDevice {
 
 /* КАТАЛОГ: Интерфейс устройства из каталога */
 export interface ICatalogDevice {
-  DevID: string                           // Уникальный идентификатор изделия / модуля
-  DevName: string                         // Имя изделия / модуля (имя по умолчанию из каталога)
+  CatalogID: string                       // Уникальный идентификатор изделия / модуля
+  CatalogName: string                     // Имя изделия / модуля (имя по умолчанию из каталога)
   Brief: string                           // Краткое описание
-  Description: string                     // Подробное описание
+  Description: string                     // Подробное описание текущего устройства (с учетом версии прошивки)
   Icon: string                            // Иконка
-  VerFW: string                           // Текущая версия прошивки на сервере
+  VerFW: string                           // Последняя версия прошивки на сервере
+  Created?: string                        // Дата создания устройство
+  Updated?: string                        // Дата изменения устройство
+  Versions?: {                            // Все существующие версии прошивок на сервере
+    VerFW?: string                        // Версия прошивки
+    Description?: string                  // Подробное описание
+    Created?: string                      // Дата создания
+    Updated?: string                      // Дата последнего обновления
+  }[] | []
   MetaData?: string                       // Мета данные о прошивке
   Firmware: File | null,                  // Прошивки
   Manual: File | null,                    // Руководство пользователя
-  API: File | IDeviceModule | null,    // API
-  Created?: string                        // Дата создания
-  Updated?: string                        // Дата последнего обновления
+  API: File | IDeviceModule | null,       // API
 }
 
 

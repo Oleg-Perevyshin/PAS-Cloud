@@ -6,6 +6,23 @@ import { ResponseManager } from '$lib/utils/ResponseManager'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
 import { FormatDate } from '$lib/utils/Common'
 
+/* Определяем интерфейс для устройства с массивом версий */
+interface CatalogDeviceWithVersions {
+  CatalogID: string
+  CatalogName: string
+  Brief: string
+  Icon: string
+  VerFW: string
+  Created: Date
+  Updated: Date
+  Versions?: {
+    VerFW: string
+    Description: string
+    Created: Date
+    Updated: Date
+  }[]
+}
+
 export const GET: RequestHandler = async (event) => {
   /* Получаем язык, проверяем токены запросившего пользователя и активацию аккаунте */
   const { lang, requester_user, status } = await ValidateUser(event)
@@ -16,37 +33,28 @@ export const GET: RequestHandler = async (event) => {
   /* Обрабатываем запрос */
   try {
     /* Проверяем права доступа */
-    const hasAccess = ['ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)
+    const hasAccess = ['USER', 'ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)
     if (!hasAccess) {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }
 
     /* Формируем пакеты с устройствами с учетом пагинации */
+    const quantity = Math.max(Number(event.url.searchParams.get('quantity')) || 10, 1)
     const startCursor = event.url.searchParams.get('startCursor')
     const endCursor = event.url.searchParams.get('endCursor')
     const cursorDevID = event.url.searchParams.get('cursor')
     const actualCursorID = cursorDevID === 'null' ? null : cursorDevID
-    const quantity = Math.max(Number(event.url.searchParams.get('quantity')) || 10, 1)
 
     /* Определяем тип для queryOptions */
-    const queryOptions: Prisma.CatalogFindManyArgs = {
+    const whereConditions: Prisma.CatalogDeviceWhereInput = {}
+    const queryOptions: Prisma.CatalogDeviceFindManyArgs = {
       take: quantity,
-      orderBy: { DevID: 'asc' },
-      select: {
-        DevID: true,
-        DevName: true,
-        Brief: true,
-        Description: true,
-        Icon: true,
-        VerFW: true,
-        MetaData: true,
-        Created: true,
-        Updated: true,
-      },
+      where: whereConditions,
+      orderBy: { CatalogID: 'asc' },
+      include: { Versions: true },
     }
 
     /* Если передан диапазон, добавляем условия для фильтрации */
-    const whereConditions: Prisma.CatalogWhereInput = {}
     const devIDFilter: Prisma.StringFilter = {}
 
     if (startCursor) {
@@ -56,7 +64,7 @@ export const GET: RequestHandler = async (event) => {
       devIDFilter.lte = endCursor
     }
     if (Object.keys(devIDFilter).length > 0) {
-      whereConditions.DevID = devIDFilter
+      whereConditions.CatalogID = devIDFilter
     }
     if (Object.keys(whereConditions).length > 0) {
       queryOptions.where = whereConditions
@@ -64,31 +72,54 @@ export const GET: RequestHandler = async (event) => {
 
     /* Если курсор установлен, пропускаем текущее устройство */
     if (actualCursorID) {
-      queryOptions.cursor = { DevID: actualCursorID }
+      queryOptions.cursor = { CatalogID: actualCursorID }
       queryOptions.skip = 1
     }
 
     /* Читаем данные из базы данных согласно опций queryOptions */
-    const devices = await prisma.catalog.findMany(queryOptions)
+    const devices = (await prisma.catalogDevice.findMany({
+      ...queryOptions,
+      include: { Versions: true },
+    })) as CatalogDeviceWithVersions[]
     if (!devices) {
       return new Response(JSON.stringify(ResponseManager('ER_GET_CATALOG', lang)), { status: 500 })
     }
 
-    /* Обрабатываем каждое устройство и форматируем даты */
-    const formattedDevices = devices.map((device) => ({
-      DevID: device.DevID,
-      DevName: device.DevName,
-      Brief: device.Brief,
-      Description: device.Description,
-      Icon: device.Icon,
-      VerFW: device.VerFW,
-      MetaData: device.MetaData,
-      Created: FormatDate(device.Created.toISOString()),
-      Updated: FormatDate(device.Updated.toISOString()),
-    }))
+    /* Обрабатываем каждое устройство и находим последнюю версию прошивки */
+    const formattedDevices = await Promise.all(
+      devices.map(async (device) => {
+        /* Получаем все версии для данного устройства */
+        const versions = device.Versions || []
+
+        /* Находим последнюю версию */
+        const latestVersion = versions.reduce((latest, current) => {
+          const num1 = parseFloat(current.VerFW)
+          const num2 = parseFloat(latest)
+          return num1 > num2 ? current.VerFW : latest
+        }, '0.0')
+
+        return {
+          CatalogID: device.CatalogID,
+          CatalogName: device.CatalogName,
+          Brief: device.Brief,
+          Description: versions.find((version) => version.VerFW === latestVersion)?.Description || '',
+          Icon: device.Icon,
+          VerFW: latestVersion,
+          Versions:
+            versions.map((version) => ({
+              VerFW: version.VerFW,
+              Description: version.Description,
+              Created: FormatDate(version.Created.toISOString()),
+              Updated: FormatDate(version.Updated.toISOString()),
+            })) || [],
+          Created: FormatDate(device.Created.toISOString()),
+          Updated: FormatDate(device.Updated.toISOString()),
+        }
+      }),
+    )
 
     /* Определяем курсор и формируем ответ */
-    const newCursor = formattedDevices.length > 0 ? formattedDevices[formattedDevices.length - 1].DevID : null
+    const newCursor = formattedDevices.length > 0 ? formattedDevices[formattedDevices.length - 1].CatalogID : null
     const responseData = { catalog_list: formattedDevices, cursor: newCursor }
     return new Response(JSON.stringify(ResponseManager('OK_GET_CATALOG', lang, responseData)), { status: 200 })
   } catch (error) {

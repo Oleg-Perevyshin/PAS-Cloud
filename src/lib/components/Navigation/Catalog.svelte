@@ -121,11 +121,7 @@
     />
 
     <!-- Кнопки подменю -->
-    <div
-      bind:this={submenuRef}
-      class="flex w-full flex-col overflow-hidden transition-all duration-500"
-      style="max-height: {submenuHeight};"
-    >
+    <div bind:this={submenuRef} class="flex w-full flex-col overflow-hidden transition-all duration-500" style="max-height: {submenuHeight};">
       {#each buttons.filter((button) => UserData?.Role && button.role.includes(UserData.Role)) as button}
         <div class="mb-1">
           <Button

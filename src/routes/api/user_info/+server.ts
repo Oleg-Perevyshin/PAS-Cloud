@@ -27,8 +27,7 @@ export const GET: RequestHandler = async (event) => {
     }
 
     /* Проверяем права доступа */
-    const hasAccess =
-      requester_user.UserID === requested_user.UserID || ['ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)
+    const hasAccess = requester_user.UserID === requested_user.UserID || ['ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)
     if (!hasAccess) {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }
@@ -45,6 +44,7 @@ export const GET: RequestHandler = async (event) => {
       Avatar: requested_user.Avatar,
       FirstName: requested_user.FirstName,
       LastName: requested_user.LastName,
+      Department: requested_user.Department,
       AboutMe: requested_user.AboutMe,
       Country: '',
       Region: '',

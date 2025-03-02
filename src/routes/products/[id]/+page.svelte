@@ -3,19 +3,18 @@
   import { onMount } from 'svelte'
   import { t, Language } from '$lib/locales/i18n'
   import { page } from '$app/stores'
-  import type { IUser, ICatalogDevice } from '../../../stores/Interfaces'
+  import type { IUser, ICatalogDevice, IOptionUI } from '../../../stores/Interfaces'
   import { LoaderStore, ThemeStore, UserStore, CatalogUpsertDevice } from '../../../stores'
   import { API_CatalogDevice } from '$lib/utils/API'
   import { RenderMarkdown } from '$lib/utils/Common'
+  import Select from '$lib/components/UI/Select.svelte'
 
-  const DevID = $page.params.id
+  const CatalogID = $page.params.id
 
-  /**
-   * Подписки
-   */
   let currentLang: string | undefined = $state()
   let currentTheme: string | undefined = $state()
   let UserData: IUser | undefined = $state()
+  let SelectedVerFWs: IOptionUI | null = $state(null)
 
   let product: ICatalogDevice | null = $state(null)
   let renderedDescription: string = $state('') /* Отрендеренное описание */
@@ -28,7 +27,7 @@
     }
 
     /* Запрос списка устройств */
-    getCatalogDevice()
+    getCatalogDevice('')
 
     /* Очистка подписок и обработчиков событий */
     return () => {
@@ -37,15 +36,18 @@
   })
 
   /* Получение данных об устройствте */
-  const getCatalogDevice = async () => {
+  const getCatalogDevice = async (VerFW: string) => {
     LoaderStore.set(true)
     try {
-      const responseData = await API_CatalogDevice(DevID)
+      const responseData = await API_CatalogDevice(CatalogID, VerFW)
       if (!responseData?.catalog) {
         throw new Error('Invalid Response Data')
       }
       CatalogUpsertDevice(responseData.catalog)
       product = responseData.catalog
+
+      const matchedVersion = product.Versions?.find((version) => version.VerFW === product?.VerFW)
+      SelectedVerFWs = matchedVersion ? { id: matchedVersion.VerFW || '', name: matchedVersion.VerFW || 'Unknown Version', color: '' } : null
 
       /* Рендерим Markdown после загрузки продукта */
       if (product) {
@@ -69,7 +71,7 @@
    */
   const downloadFile = async (type: 'Firmware' | 'Manual' | 'API') => {
     try {
-      const response = await fetch(`/api/catalog_file?DevID=${DevID}&TypeData=${type}`)
+      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&TypeData=${type}`)
       if (!response.ok) {
         throw new Error('Ошибка получения файла: ' + response.statusText)
       }
@@ -78,11 +80,11 @@
       const a = document.createElement('a')
       a.href = url
       if (type === 'Firmware') {
-        a.download = `${product?.DevID}-Core.bin`
+        a.download = `${product?.CatalogID}-Core.bin`
       } else if (type === 'Manual') {
-        a.download = `${product?.DevID}-Manual.pdf`
+        a.download = `${product?.CatalogID}-Manual.pdf`
       } else if (type === 'API') {
-        a.download = `${product?.DevID}-API.yaml`
+        a.download = `${product?.CatalogID}-API.yaml`
       } else {
         console.error('Неизвестный тип данных для скачивания')
       }
@@ -107,9 +109,7 @@
       <div class="sticky flex h-full w-[95%] flex-col md:h-[12rem] md:flex-row">
         <!-- Иконка -->
         <div class="flex h-36 w-36 flex-shrink-0 items-center justify-center">
-          <button
-            class="flex h-full w-full cursor-pointer items-center justify-center rounded-2xl border border-gray-400 bg-white p-2"
-          >
+          <button class="flex h-full w-full cursor-pointer items-center justify-center rounded-2xl border border-gray-400 bg-white p-2">
             <img src={product.Icon} alt="Device Icon" class="h-full w-full object-cover" />
           </button>
         </div>
@@ -120,31 +120,45 @@
           <div class="mb-2 grid grid-cols-2 gap-2 rounded-2xl border border-gray-400 md:grid-cols-4">
             <div class="flex flex-col">
               <p class="block font-semibold">{t('products.category', currentLang)}</p>
-              <p>{product.DevID[0]}</p>
+              <p>{product.CatalogID[0]}</p>
             </div>
             <div class="flex flex-col">
               <p class="block font-semibold">{t('products.type', currentLang)}</p>
-              <p>{product.DevID[1]}</p>
+              <p>{product.CatalogID[1]}</p>
             </div>
             <div class="flex flex-col">
               <p class="block font-semibold">{t('products.model', currentLang)}</p>
-              <p>{product.DevID[2]}</p>
+              <p>{product.CatalogID[2]}</p>
             </div>
             <div class="flex flex-col">
               <p class="block font-semibold">{t('products.revision', currentLang)}</p>
-              <p>{product.DevID[3]}</p>
+              <p>{product.CatalogID[3]}</p>
             </div>
           </div>
 
           <!-- Имя устройства и версия прошивки -->
-          <div class="mb-2 grid grid-cols-1 gap-2 md:grid-cols-4">
+          <div class="mb-2 grid grid-cols-4 items-center gap-2">
             <div class="col-span-3 flex flex-col rounded-2xl border border-gray-400">
               <p class="block font-semibold">{t('products.devname', currentLang)}</p>
-              <p>{product.DevName}</p>
+              <p>{product.CatalogName}</p>
             </div>
             <div class="flex flex-col rounded-2xl border border-gray-400">
-              <p class="block font-semibold">{t('products.verfw', currentLang)}</p>
-              <p>{product.VerFW}</p>
+              <Select
+                id="VerFWs"
+                label={t('products.verfw', currentLang)}
+                props={{ currentLang: currentLang }}
+                options={product.Versions?.map((version) => ({
+                  id: version.VerFW || '',
+                  name: version.VerFW || '',
+                  color: '',
+                }))}
+                value={SelectedVerFWs}
+                onUpdate={(VerFW) => {
+                  if (VerFW) {
+                    getCatalogDevice(VerFW.name)
+                  }
+                }}
+              />
             </div>
           </div>
 
@@ -152,7 +166,7 @@
           <div class="grid grid-cols-1 justify-items-center gap-2 md:grid-cols-3">
             <p class="col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 bg-yellow-300 p-2 px-4">
               <a
-                href={`/api/catalog_file?DevID=${DevID}&TypeData=Manual`}
+                href={`/api/catalog_file?CatalogID=${CatalogID}&TypeData=Manual&VerFW=${SelectedVerFWs?.name}`}
                 class="!text-blue-600 hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"

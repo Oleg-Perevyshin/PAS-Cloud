@@ -53,12 +53,7 @@
 
           /* Проверка наличия сообщений в группе */
           const lastResponse = state.lastResponse
-          if (
-            lastResponse &&
-            lastResponse.HEADER === 'OK!' &&
-            lastResponse.ARGUMENT === 'GroupMessages' &&
-            'HasMore' in lastResponse.VALUE
-          ) {
+          if (lastResponse && lastResponse.HEADER === 'OK!' && lastResponse.ARGUMENT === 'GroupMessages' && 'HasMore' in lastResponse.VALUE) {
             hasMoreMessages = Boolean(lastResponse.VALUE.HasMore) || false
           }
 
@@ -73,10 +68,7 @@
     if (defaultGroup) {
       selectedGroup = {
         id: defaultGroup.GroupID,
-        name:
-          defaultGroup.GroupName === UserData?.UserID
-            ? t('group.personal', currentLang)
-            : t('group.error_personal', currentLang),
+        name: defaultGroup.GroupName === UserData?.UserID ? t('group.personal', currentLang) : t('group.error_personal', currentLang),
         color: currentTheme === 'light' ? 'bg-yellow-200 !border-yellow-200' : 'bg-yellow-800 !border-yellow-800',
       }
     }
@@ -197,14 +189,13 @@
   }
 </script>
 
-
 {#if UserData?.Role && ['ENGINEER', 'MANAGER', 'ADMIN'].includes(UserData.Role)}
   <div class="flex h-full flex-col items-center overflow-hidden">
     {#if currentLang}
       <h2>{t('dashboard.chat.title', currentLang)}</h2>
 
       <!-- Блок работы с группами (обновить список, выбрать и подключиться, обновить сообщения) -->
-      <div class="flex-row m-2 flex w-full flex-nowrap items-end justify-center p-2">
+      <div class="m-2 flex w-full flex-row flex-nowrap items-end justify-center p-2">
         <Select
           label={t('dashboard.chat.selectchat', currentLang)}
           options={groups.map((group) => ({
@@ -215,36 +206,20 @@
                 : group.FirstName && group.LastName
                   ? `${group.FirstName} ${group.LastName}`
                   : group.GroupName,
-            color:
-              group.GroupName === UserData?.UserID ? 'bg-yellow-200 !border-yellow-200' : 'bg-lime-200 !border-lime-200',
+            color: group.GroupName === UserData?.UserID ? 'bg-yellow-200 !border-yellow-200' : 'bg-lime-200 !border-lime-200',
           }))}
           value={selectedGroup}
           onUpdate={(value: IOptionUI | null) => joinToGroup(value)}
           className="m-2 w-1/2"
           props={{ currentLang: currentLang }}
         />
-        <Button
-          label={'Получить сообщения'}
-          props={{ bgColor: 'bg-green-300' }}
-          onClick={getMessages}
-          className="m-2 w-64 rounded-2xl"
-        />
+        <Button label={'Получить сообщения'} props={{ bgColor: 'bg-green-300' }} onClick={getMessages} className="m-2 w-64 rounded-2xl" />
       </div>
 
       <!-- Блок создания группы -->
       <div class="m-2 flex w-full flex-row flex-nowrap items-center justify-center p-2">
-        <Input
-          id="InputChatName"
-          props={{ autocomplete: 'on', maxLength: 32 }}
-          className="flex-grow w-full m-1 border"
-          bind:value={groupName}
-        />
-        <Button
-          onClick={createGroup}
-          label={t('common.create', currentLang)}
-          props={{ bgColor: 'bg-blue-200' }}
-          className="m-1 w-48 rounded-2xl"
-        />
+        <Input id="InputChatName" props={{ autocomplete: 'on', maxLength: 32 }} className="flex-grow w-full m-1 border" bind:value={groupName} />
+        <Button onClick={createGroup} label={t('common.create', currentLang)} props={{ bgColor: 'bg-blue-200' }} className="m-1 w-48 rounded-2xl" />
       </div>
 
       <!-- Блок создания сообщения и отправки -->
@@ -270,12 +245,7 @@
       </div>
 
       <!-- Блок всех сообщений -->
-      <div
-        class="flex h-full w-full flex-1 flex-col overflow-y-auto"
-        id="messageContainer"
-        onscroll={handleScroll}
-        bind:this={container}
-      >
+      <div class="flex h-full w-full flex-1 flex-col overflow-y-auto" id="messageContainer" onscroll={handleScroll} bind:this={container}>
         {#each MessageList as message, index}
           <div
             class={`m-2 flex flex-col rounded-2xl border p-2

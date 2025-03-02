@@ -51,10 +51,7 @@
 </script>
 
 {#if userData}
-  <button
-    class="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black"
-    onclick={handleBackgroundClick}
-  >
+  <button class="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black" onclick={handleBackgroundClick}>
     <div
       class={`flex max-h-[50vh] max-w-[50vw] flex-col overflow-auto rounded-2xl p-5 text-center
       ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
@@ -63,9 +60,7 @@
       <div class="m-1 flex items-center justify-center p-2">
         {#if userData.Avatar}
           <div class="flex h-48 w-48 flex-shrink-0 items-center justify-center">
-            <div
-              class="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-gray-400 bg-white"
-            >
+            <div class="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-gray-400 bg-white">
               <img src={`data:image/png;base64,${userData.Avatar}`} alt="avatar" class="h-full w-full object-cover" />
             </div>
           </div>
@@ -73,6 +68,7 @@
         <div class="ml-8 flex flex-col items-start">
           <p><strong>{t('common.dynamic.name', currentLang)}</strong> {userData.LastName} {userData.FirstName}</p>
           <p><strong>{t('common.dynamic.nickname', currentLang)}</strong> {userData.NickName}</p>
+          <p><strong>{t('common.dynamic.department', currentLang)}</strong> {userData.Department}</p>
           <p><strong>{t('common.dynamic.email', currentLang)}</strong> {userData.EMail}</p>
           <p><strong>{t('common.dynamic.tel', currentLang)}</strong> {userData.PhoneNumber}</p>
           <p>

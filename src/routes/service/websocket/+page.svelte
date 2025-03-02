@@ -56,12 +56,7 @@
 
           /* Проверка наличия сообщений в группе */
           const lastResponse = state.lastResponse
-          if (
-            lastResponse &&
-            lastResponse.HEADER === 'OK!' &&
-            lastResponse.ARGUMENT === 'GroupMessages' &&
-            'HasMore' in lastResponse.VALUE
-          ) {
+          if (lastResponse && lastResponse.HEADER === 'OK!' && lastResponse.ARGUMENT === 'GroupMessages' && 'HasMore' in lastResponse.VALUE) {
             hasMoreMessages = Boolean(lastResponse.VALUE.HasMore) || false
           }
 
@@ -76,10 +71,7 @@
     if (defaultGroup) {
       selectedGroup = {
         id: defaultGroup.GroupID,
-        name:
-          defaultGroup.GroupName === UserData?.UserID
-            ? t('group.personal', currentLang)
-            : t('group.error_personal', currentLang),
+        name: defaultGroup.GroupName === UserData?.UserID ? t('group.personal', currentLang) : t('group.error_personal', currentLang),
         color: currentTheme === 'light' ? 'bg-yellow-200 !border-yellow-200' : 'bg-yellow-800 !border-yellow-800',
       }
     }
@@ -265,12 +257,7 @@
 
     <!-- Блок создания группы -->
     <div class="m-2 flex w-full flex-row flex-nowrap items-center justify-center p-2">
-      <Input
-        id="InputChatName"
-        props={{ autocomplete: 'on', maxLength: 32 }}
-        className="flex-grow w-full m-1 border"
-        bind:value={groupName}
-      />
+      <Input id="InputChatName" props={{ autocomplete: 'on', maxLength: 32 }} className="flex-grow w-full m-1 border" bind:value={groupName} />
       <Button
         onClick={createGroup}
         label={t('common.create', currentLang)}
@@ -324,12 +311,7 @@
     </div>
 
     <!-- Блок всех сообщений -->
-    <div
-      class="flex h-full w-full flex-1 flex-col overflow-y-auto"
-      id="messageContainer"
-      onscroll={handleScroll}
-      bind:this={container}
-    >
+    <div class="flex h-full w-full flex-1 flex-col overflow-y-auto" id="messageContainer" onscroll={handleScroll} bind:this={container}>
       {#each MessageList as message, index}
         <div
           class={`relative m-2 flex flex-col rounded-2xl border

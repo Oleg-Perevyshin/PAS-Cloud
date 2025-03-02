@@ -287,12 +287,7 @@ const createWebSocketStore = () => {
           const uniqueGroups = new Set(state.groupList.map((group) => group.GroupID))
           if (Array.isArray(GroupList) && GroupList.length > 0) {
             GroupList.forEach((group: IGroup) => {
-              if (
-                typeof group === 'object' &&
-                group !== null &&
-                'GroupID' in group &&
-                typeof (group as IGroup).GroupID === 'string'
-              ) {
+              if (typeof group === 'object' && group !== null && 'GroupID' in group && typeof (group as IGroup).GroupID === 'string') {
                 uniqueGroups.add((group as IGroup).GroupID)
               }
             })
@@ -484,7 +479,15 @@ const createWebSocketStore = () => {
       if (state.socket && state.socket.readyState === WebSocket.OPEN) {
         const wsPackage = EncryptWebSocketPacket(header, argument, value)
         if (wsPackage) {
-          state.socket.send(JSON.stringify({ Data: Array.from(wsPackage.Data) }))
+          const base64Data = btoa(String.fromCharCode(...new Uint8Array(wsPackage.Data)))
+
+          const base64Size = base64Data.length
+          const arraySize = wsPackage.Data.byteLength
+          console.info(`Размер данных Base64: ${base64Size} символов`)
+          console.info(`Размер массива: ${arraySize} байт`)
+          
+          state.socket.send(JSON.stringify({ Data: base64Data }))
+          // state.socket.send(JSON.stringify({ Data: Array.from(wsPackage.Data) }))
           console.info(`Client:`, { HEADER: header, ARGUMENT: argument, VALUE: value })
         }
       } else {

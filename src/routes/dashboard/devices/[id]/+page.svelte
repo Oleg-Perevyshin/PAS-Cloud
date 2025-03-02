@@ -14,7 +14,7 @@
     IReqModuleList,
     IReqModuleConfig,
     IWebSocketValueStatus,
-    IUIComponentHandler
+    IUIComponentHandler,
   } from '../../../../stores/Interfaces'
   import { LoaderStore, ThemeStore, UserStore, WebSocketStore, DeviceStore } from '../../../../stores'
   import { API_CatalogDevice } from '$lib/utils/API'
@@ -423,17 +423,14 @@
           {#if selectedModule}
             <div class="m-1 flex flex-col items-center rounded-2xl">
               <a href={`/products/${selectedModule.DevID}`} class="no-underline hover:no-underline">
-                <p class="font-semibold text-center">
+                <p class="text-center font-semibold">
                   {t('dashboard.device.device_sn', currentLang)}: {selectedModule.DevSN}
                 </p>
               </a>
-              <div class="flex w-full justify-center mt-2">
+              <div class="mt-2 flex w-full justify-center">
                 <div class="flex w-1/3 flex-col items-center">
                   <p>
-                    {t('dashboard.device.devfw', currentLang)}: {selectedModule.DevFW} | {t(
-                      'dashboard.device.catverfw',
-                      currentLang,
-                    )}: {selectedModule.VerFW}
+                    {t('dashboard.device.devfw', currentLang)}: {selectedModule.DevFW} | {t('dashboard.device.catverfw', currentLang)}: {selectedModule.VerFW}
                   </p>
                 </div>
                 <div class="flex w-2/3 flex-col items-center">
@@ -470,8 +467,7 @@
                   ${isExpandedBlock[`${selectedModule.DevSN}_${blockIndex}`] ? 'rounded-t-2xl' : 'rounded-2xl'}
                 `}
                     onclick={() => {
-                      isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`] =
-                        !isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`]
+                      isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`] = !isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`]
                     }}
                   >
                     <h4>{block.Label}</h4>
@@ -504,10 +500,7 @@
                             {#each parameter.UIComponents as component}
                               <!-- Содержимое блока с настройками и UI компонентами -->
                               {#if isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`]}
-                                <div
-                                  class={`flex w-full flex-col items-center justify-center last:mb-4`}
-                                  transition:slide={{ duration: 300 }}
-                                >
+                                <div class={`flex w-full flex-col items-center justify-center last:mb-4`} transition:slide={{ duration: 300 }}>
                                   {#if component.Type === 'Paragraph'}
                                     <Paragraph
                                       id={component.UiID}

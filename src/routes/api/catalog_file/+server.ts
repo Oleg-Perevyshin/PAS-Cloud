@@ -1,11 +1,11 @@
 // src/routes/api/catalog_file/+server.ts
 /**
  * Компонент, который возвращает файлы в зависимости от запроса
- * Путь запроса: /api/catalog_file?DevID=0000&TypeData=Manual - запрос от пользователя на получение 0000-Manual.pdf
- * Путь запроса: /api/catalog_file?DevID=0000&TypeData=Firmware - запрос от пользователя на получение 0000-Firmware.bin
- * Путь запроса: /api/catalog_file?DevID=0000&TypeData=API - запрос от устройства на получение API
+ * Путь запроса: /api/catalog_file?CatalogID=0000&TypeData=Manual&VerFW=0.1 - запрос от пользователя на получение 0000-Manual.pdf
+ * Путь запроса: /api/catalog_file?CatalogID=0000&TypeData=Firmware - запрос от пользователя на получение 0000-Firmware.bin
+ * Путь запроса: /api/catalog_file?CatalogID=0000&TypeData=API - запрос от устройства на получение API
  * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&TypeData=MetaData - запрос от устройства на получение мета данных
- * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&TypeData=Firmware - запрос от устройства на получение прошивки
+ * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&TypeData=Firmware&VerFW=0.3 - запрос от устройства на получение прошивки
  */
 
 import type { RequestHandler } from '@sveltejs/kit'
@@ -20,10 +20,11 @@ export const GET: RequestHandler = async (event) => {
 
   try {
     /* Получаем параметры запроса и проверяем на наличие */
-    let devID = event.url.searchParams.get('DevID')
+    let CatalogID = event.url.searchParams.get('CatalogID')
     const devSNParam = event.url.searchParams.get('DevSN')
     const typeDataParam = event.url.searchParams.get('TypeData')
-    if (!typeDataParam || (!devSNParam && !devID)) {
+    const VerFWParam = event.url.searchParams.get('VerFW')
+    if (!typeDataParam || (!devSNParam && !CatalogID)) {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
@@ -33,42 +34,55 @@ export const GET: RequestHandler = async (event) => {
       if (devSNParam) {
         const DevSN = ValidateDevSN(devSNParam)
         if (DevSN) {
-          devID = DevSN.substring(0, 4)
+          CatalogID = DevSN.substring(0, 4)
         } else {
           return new Response(JSON.stringify(ResponseManager('ER_USER_UNAUTHORIZED', lang)), { status: 401 })
         }
       }
     } else if (requester_user) {
       /* Проверяем права доступа */
-      const hasAccess = ['MANAGER', 'ADMIN'].includes(requester_user.Role)
+      const hasAccess = ['ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)
       if (!hasAccess) {
         return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
       }
     }
 
-    /* Если DevID не установлен (нет в запросе и нет серийного номера), возвращаем ошибку */
-    if (!devID) {
+    /* Если CatalogID не установлен (нет в запросе и нет серийного номера), возвращаем ошибку */
+    if (!CatalogID) {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
     /* Читаем данные о конкретном устройстве из базы данных */
-    const device = await prisma.catalog.findUnique({
-      where: { DevID: devID },
-      select: {
-        DevID: true,
-        DevName: true,
-        Brief: true,
-        Description: true,
-        Icon: true,
-        VerFW: true,
-        Firmware: true,
-        Manual: true,
-        MetaData: true,
-        API: true,
-      },
+    const device = await prisma.catalogDevice.findUnique({
+      where: { CatalogID },
+      include: { Versions: true },
     })
     if (!device) {
       return new Response(JSON.stringify(ResponseManager('ER_DEVICE_NOT_FOUND_IN_CATALOG', lang)), { status: 404 })
+    }
+
+    let selectedVersion = null
+    if (VerFWParam) {
+      selectedVersion = await prisma.catalogVersion.findUnique({
+        where: { DeviceID_VerFW: { DeviceID: device.CatalogID, VerFW: VerFWParam } },
+      })
+    }
+
+    /* Если версия не указана или не найдена, находим последнюю доступную версию */
+    if (!selectedVersion) {
+      const versions = await prisma.catalogVersion.findMany({
+        where: { DeviceID: device.CatalogID },
+      })
+      if (versions.length > 0) {
+        selectedVersion = versions.reduce((latest, current) => {
+          const currentVersion = parseFloat(current.VerFW)
+          const latestVersion = parseFloat(latest.VerFW || '0.0')
+          return currentVersion > latestVersion ? current : latest
+        })
+      }
+    }
+    if (!selectedVersion) {
+      return new Response(JSON.stringify(ResponseManager('ER_VERSION_NOT_FOUND', lang)), { status: 404 })
     }
 
     let fileBuffer: Buffer | string | null = null
@@ -77,39 +91,39 @@ export const GET: RequestHandler = async (event) => {
 
     /* Обработка типа данных */
     if (typeDataParam === 'Firmware') {
-      if (!device.Firmware) {
+      if (!selectedVersion.Firmware) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
-      fileBuffer = Buffer.from(device.Firmware)
-      fileName = `${device.DevID}-Firmware.bin`
+      fileBuffer = Buffer.from(selectedVersion.Firmware)
+      fileName = `${device.CatalogID}-Firmware.bin`
       contentType = 'application/octet-stream'
     } else if (typeDataParam === 'Manual') {
-      if (!device.Manual) {
+      if (!selectedVersion.Manual) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
-      fileBuffer = Buffer.from(device.Manual)
-      fileName = `${device.DevID}-Manual.pdf`
+      fileBuffer = Buffer.from(selectedVersion.Manual)
+      fileName = `${device.CatalogID}-Manual.pdf`
       contentType = 'application/pdf'
     } else if (typeDataParam === 'MetaData') {
-      if (!device.MetaData) {
+      if (!selectedVersion.MetaData) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
-      fileBuffer = Buffer.from(JSON.stringify(device.MetaData))
-      fileName = `${device.DevID}-MetaData.json`
+      fileBuffer = Buffer.from(JSON.stringify(selectedVersion.MetaData))
+      fileName = `${device.CatalogID}-MetaData.json`
       contentType = 'application/json'
     } else if (typeDataParam === 'API') {
-      if (!device.API) {
+      if (!selectedVersion.API) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
-      fileBuffer = Buffer.from(device.API);
-      fileName = `${device.DevID}-API.yaml`;
+      fileBuffer = Buffer.from(selectedVersion.API)
+      fileName = `${device.CatalogID}-API.yaml`
       contentType = 'application/x-yaml'
     } else if (typeDataParam === 'Icon') {
       if (!device.Icon) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(device.Icon)
-      fileName = `${device.DevID}-Icon.svg`
+      fileName = `${device.CatalogID}-Icon.svg`
       contentType = 'image/svg+xml'
     } else {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })

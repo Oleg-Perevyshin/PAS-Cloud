@@ -96,8 +96,7 @@
     LoaderStore.set(true)
     try {
       await API_UserAddDevice(UserData.UserID, serial_number, selectedTagAdd.id, true)
-      selectedTags =
-        UserData?.Devices.map((device) => UserData?.Tags.find((tag) => tag.id === device.TagID) || null) || []
+      selectedTags = UserData?.Devices.map((device) => UserData?.Tags.find((tag) => tag.id === device.TagID) || null) || []
       serial_number = ''
       getDeviceList(true)
     } catch (error) {
@@ -224,9 +223,7 @@
     <!-- Блок отображения устройств -->
     <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-400">
       <!-- Тело блока устройств -->
-      <div
-        class={`flex flex-grow flex-col items-center justify-start overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
-      >
+      <div class={`flex flex-grow flex-col items-center justify-start overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}>
         <div class="mx-auto flex flex-wrap items-start justify-center p-2">
           {#if UserData && filteredDevices && filteredDevices.length > 0}
             {#each filteredDevices as device, index}
@@ -246,21 +243,14 @@
                   class={`flex h-16 items-start justify-between rounded-t-xl ${device.IsOnline ? 'cursor-pointer' : 'pointer-events-none'}`}
                 >
                   <div class="mt-2 ml-2 flex h-14 w-14 flex-shrink-0 items-center justify-center">
-                    <img
-                      src={device.CatIcon}
-                      alt="Device Icon"
-                      class="h-full w-full object-cover"
-                      style="object-fit: contain;"
-                    />
+                    <img src={device.CatIcon} alt="Device Icon" class="h-full w-full object-cover" style="object-fit: contain;" />
                   </div>
                   <div class="mt-2 mr-2 flex flex-col items-end justify-end">
                     <h5 class={`text-right underline ${device.IsOnline ? '' : 'text-gray-500'}`}>{device.DevName}</h5>
                     {#if device.IsOnline === false}
                       <p class="font-bold text-red-400 no-underline hover:no-underline focus:no-underline">OffLine</p>
                     {:else}
-                      <p class="font-bold text-emerald-400 no-underline hover:no-underline focus:no-underline">
-                        OnLine
-                      </p>
+                      <p class="font-bold text-emerald-400 no-underline hover:no-underline focus:no-underline">OnLine</p>
                     {/if}
                   </div>
                 </a>

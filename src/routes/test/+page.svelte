@@ -89,19 +89,9 @@
 
   <div class="flex flex-row">
     <Input id="testInputHeader" bind:value={packHeader} props={{ autocomplete: 'on', maxLength: 8 }} className="m-1" />
-    <Input
-      id="testInputArgument"
-      bind:value={packArgument}
-      props={{ autocomplete: 'on', maxLength: 16 }}
-      className="m-1"
-    />
+    <Input id="testInputArgument" bind:value={packArgument} props={{ autocomplete: 'on', maxLength: 16 }} className="m-1" />
     <Input id="testInputValue" bind:value={packValue} props={{ autocomplete: 'on', maxLength: 32 }} className="m-1" />
-    <Button
-      onClick={testCrypto}
-      label="Отправить"
-      props={{ bgColor: 'bg-lime-300' }}
-      className="m-1 w-40 rounded-2xl"
-    />
+    <Button onClick={testCrypto} label="Отправить" props={{ bgColor: 'bg-lime-300' }} className="m-1 w-40 rounded-2xl" />
   </div>
 
   <br />

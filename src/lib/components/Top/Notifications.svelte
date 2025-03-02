@@ -41,9 +41,7 @@
     <div class="relative">
       <IconNotifications width="3rem" height="3rem" />
       {#if newPersonalMessages.length > 0}
-        <span
-          class="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white"
-        >
+        <span class="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
           {newPersonalMessages.length}
         </span>
       {/if}

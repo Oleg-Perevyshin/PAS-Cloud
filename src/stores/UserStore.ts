@@ -11,6 +11,7 @@ const DefaultUser: IUser = {
   Role: '',
   FirstName: '',
   LastName: '',
+  Department: '',
   AboutMe: '',
   Country: '',
   Region: '',

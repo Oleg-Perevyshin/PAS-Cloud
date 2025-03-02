@@ -8,8 +8,8 @@ import { FormatDate } from '$lib/utils/Common'
 
 /* Определяем интерфейс для устройства */
 interface CandidateDevice {
-  DevID: string
-  DevName: string
+  CatalogID: string
+  CatalogName: string
   Brief: string
   Description: string
   Icon: string
@@ -36,8 +36,8 @@ export const POST: RequestHandler = async (event) => {
     /* Извлекаем все данные из запроса */
     const formData = await event.request.formData()
     const candidate_device = {
-      DevID: formData.get('DevID') as string,
-      DevName: formData.get('DevName') as string,
+      CatalogID: formData.get('CatalogID') as string,
+      CatalogName: formData.get('CatalogName') as string,
       Brief: formData.get('Brief') as string,
       Description: formData.get('Description') as string,
       Icon: formData.get('Icon') as string,
@@ -49,8 +49,8 @@ export const POST: RequestHandler = async (event) => {
 
     /* Проверяем наличия всех данных об устройстве */
     const requiredFields: (keyof CandidateDevice)[] = [
-      'DevID',
-      'DevName',
+      'CatalogID',
+      'CatalogName',
       'Brief',
       'Description',
       'Icon',
@@ -67,80 +67,146 @@ export const POST: RequestHandler = async (event) => {
       }
     }
 
-    /* Проверка типов для Firmware и Manual */
-    if (
-      !(candidate_device.Firmware instanceof File) ||
-      !(candidate_device.Manual instanceof File) ||
-      !(candidate_device.API instanceof File)
-    ) {
+    /* Проверка формата CatalogID */
+    const catalogIdRegex = /^[0-9A-F]{4}$/
+    if (!catalogIdRegex.test(candidate_device.CatalogID)) {
+      return new Response(JSON.stringify(ResponseManager('ER_INVALID_CATALOG_ID', lang)), { status: 400 })
+    }
+
+    /* Проверка типов для Firmware, Manual и API */
+    if (!(candidate_device.Firmware instanceof File) || !(candidate_device.Manual instanceof File) || !(candidate_device.API instanceof File)) {
       return new Response(JSON.stringify(ResponseManager('ER_INVALID_FILE_TYPE', lang)), { status: 400 })
     }
 
-    /* Функция для преобразования файла в Buffer */
+    /* Преобразуем файлы в Buffer */
     const fileToBuffer = async (file: File): Promise<Buffer> => {
       const arrayBuffer = await file.arrayBuffer()
-      return Buffer.from(arrayBuffer) // Преобразование в Buffer
+      return Buffer.from(arrayBuffer)
     }
-    /* Преобразуем файлы в Bytes */
     const firmwareBytes = await fileToBuffer(candidate_device.Firmware as File)
     const manualBytes = await fileToBuffer(candidate_device.Manual as File)
     const apiBytes = await fileToBuffer(candidate_device.API as File)
 
-    /* Вычисляем CRC32 для прошивки */
-    const crc32Hash = crc32(firmwareBytes)
-
-    /* Создаем объекта MetaData */
+    /* Создаем объект MetaData */
     const metaData = {
-      DevID: candidate_device.DevID,
+      CatalogID: candidate_device.CatalogID,
       VerFW: candidate_device.VerFW,
-      CRC32: crc32Hash,
+      CRC32: crc32(firmwareBytes),
     }
 
-    /* Сохраняем данные об устройстве в базу данных */
-    const device = await prisma.catalog.upsert({
-      where: { DevID: candidate_device.DevID },
-      create: {
-        DevID: candidate_device.DevID,
-        DevName: candidate_device.DevName,
+    /* Извлекаем текущее устройство из базы данных */
+    let device = await prisma.catalogDevice.findUnique({
+      where: { CatalogID: candidate_device.CatalogID },
+      include: { Versions: true },
+    })
+    let versionDevice = null
+    if (device) {
+      /* Работа с существующим устройством */
+      const existingVersion = device.Versions.find((ver) => ver.VerFW === candidate_device.VerFW)
+      if (existingVersion) {
+        /* Обновляем существующую версию для существующего устройства */
+        versionDevice = await prisma.catalogVersion.update({
+          where: { DeviceID_VerFW: { DeviceID: device.CatalogID, VerFW: candidate_device.VerFW } },
+          data: {
+            Description: candidate_device.Description,
+            Firmware: firmwareBytes,
+            Manual: manualBytes,
+            API: apiBytes,
+            MetaData: metaData,
+          },
+        })
+      } else {
+        /* Создаем новую версию для существующего устройства */
+        versionDevice = await prisma.catalogVersion.create({
+          data: {
+            VerFW: candidate_device.VerFW,
+            Description: candidate_device.Description,
+            Firmware: firmwareBytes,
+            Manual: manualBytes,
+            API: apiBytes,
+            MetaData: metaData,
+            CatalogDevice: { connect: { CatalogID: device.CatalogID } },
+          },
+        })
+      }
+    } else {
+      /* Создаем новое устройство с новой версией */
+      const newDevice = await prisma.catalogDevice.create({
+        data: {
+          CatalogID: candidate_device.CatalogID,
+          CatalogName: candidate_device.CatalogName,
+          Brief: candidate_device.Brief,
+          Icon: candidate_device.Icon,
+          VerFW: candidate_device.VerFW,
+        },
+      })
+      if (!newDevice) {
+        return new Response(JSON.stringify(ResponseManager('ER_EDIT_DEVICE', lang)), { status: 500 })
+      }
+
+      versionDevice = await prisma.catalogVersion.create({
+        data: {
+          VerFW: candidate_device.VerFW,
+          Description: candidate_device.Description,
+          Firmware: firmwareBytes,
+          Manual: manualBytes,
+          API: apiBytes,
+          MetaData: metaData,
+          CatalogDevice: { connect: { CatalogID: candidate_device.CatalogID } },
+        },
+      })
+    }
+    if (!versionDevice) {
+      return new Response(JSON.stringify(ResponseManager('ER_EDIT_DEVICE', lang)), { status: 500 })
+    }
+
+    /* Обновляем данные об устройстве после изменений */
+    device = await prisma.catalogDevice.findUnique({
+      where: { CatalogID: candidate_device.CatalogID },
+      include: { Versions: true },
+    })
+
+    /* Получаем все версии для обновления последней версии в CatalogDevice */
+    const allVersions = device && device.Versions ? device.Versions.map((ver) => ver.VerFW) : []
+    const latestVerFW = allVersions.length > 0 ? allVersions.sort((a, b) => b.localeCompare(a))[0] : '0.0'
+
+    /* Обновляем данные об устройстве в базе данных */
+    device = await prisma.catalogDevice.update({
+      where: { CatalogID: candidate_device.CatalogID },
+      data: {
+        CatalogName: candidate_device.CatalogName,
         Brief: candidate_device.Brief,
-        Description: candidate_device.Description,
         Icon: candidate_device.Icon,
-        VerFW: candidate_device.VerFW,
-        Firmware: firmwareBytes,
-        Manual: manualBytes,
-        API: apiBytes,
-        MetaData: metaData,
+        VerFW: latestVerFW,
       },
-      update: {
-        DevName: candidate_device.DevName,
-        Brief: candidate_device.Brief,
-        Description: candidate_device.Description,
-        Icon: candidate_device.Icon,
-        VerFW: candidate_device.VerFW,
-        Firmware: firmwareBytes,
-        Manual: manualBytes,
-        API: apiBytes,
-        MetaData: metaData,
-      },
+      include: { Versions: true },
     })
     if (!device) {
       return new Response(JSON.stringify(ResponseManager('ER_EDIT_DEVICE', lang)), { status: 500 })
     }
 
+    console.log(`Устройство ${device?.CatalogID} обновлено, последняя версия ${latestVerFW}`)
+
     /* Создаем объект ответа без Firmware, Manual и API */
     const responseData = {
       catalog: {
-        DevID: device.DevID,
-        DevName: device.DevName,
+        CatalogID: device.CatalogID,
+        CatalogName: device.CatalogName,
         Brief: device.Brief,
-        Description: device.Description,
+        Description: versionDevice.Description,
         Icon: device.Icon,
-        VerFW: device.VerFW,
-        MetaData: device.MetaData,
+        VerFW: latestVerFW,
+        Versions: device.Versions.map((ver) => ({
+          VerFW: ver.VerFW,
+          Description: ver.Description,
+          Created: FormatDate(ver.Created.toISOString()),
+          Updated: FormatDate(ver.Updated.toISOString()),
+        })),
         Created: FormatDate(device.Created.toISOString()),
         Updated: FormatDate(device.Updated.toISOString()),
       },
     }
+
     return new Response(JSON.stringify(ResponseManager('OK_EDIT_DEVICE', lang, responseData)), { status: 201 })
   } catch (error) {
     console.error('Ошибка catalog_edit', error)

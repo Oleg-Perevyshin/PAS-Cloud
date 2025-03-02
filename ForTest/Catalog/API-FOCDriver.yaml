@@ -1,383 +1,383 @@
-DevID: "4444"
-DevSN: ""
-DevName: "BLDC Driver"
-Description: "Basic Gimbal"
-DevFW: ""
+DevID: '4444'
+DevSN: ''
+DevName: 'BLDC Driver'
+Description: 'Basic Gimbal'
+DevFW: ''
 UIBlocks:
-  - Label: "BLDC Driver"
-    BlockID: "driver"
-    Description: "6PWM driver of BLDC motor MP6540HA"
+  - Label: 'BLDC Driver'
+    BlockID: 'driver'
+    Description: '6PWM driver of BLDC motor MP6540HA'
     Parameters:
-      - ParamID: "voltageParameters"
-        Label: "Voltage"
-        Description: "Configuration for BLDC Driver (Voltage)"
+      - ParamID: 'voltageParameters'
+        Label: 'Voltage'
+        Description: 'Configuration for BLDC Driver (Voltage)'
         UIComponents:
-          - Type: "Paragraph"
-            UiID: "VoltagePowerSupply"
-            Label: "Voltage power supply"
-            ClassName: "w-64"
-          - Type: "Input"
-            UiID: "VoltageLimit"
-            Label: "Voltage limit"
-            ClassName: "w-64"
+          - Type: 'Paragraph'
+            UiID: 'VoltagePowerSupply'
+            Label: 'Voltage power supply'
+            ClassName: 'w-64'
+          - Type: 'Input'
+            UiID: 'VoltageLimit'
+            Label: 'Voltage limit'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Button"
-            UiID: "SaveDriver"
-            Label: "Save"
-            ClassName: "m-2 border border-gray-500 rounded-2xl"
+              Action: 'none'
+          - Type: 'Button'
+            UiID: 'SaveDriver'
+            Label: 'Save'
+            ClassName: 'm-2 border border-gray-500 rounded-2xl'
             EventHandler:
-              Action: "saveButton"
-              Header: "SET"
-              Argument: "driver"
+              Action: 'saveButton'
+              Header: 'SET'
+              Argument: 'driver'
               Variables:
-                - "VoltageLimit"
+                - 'VoltageLimit'
 
-  - Label: "BLDC Motor"
-    BlockID: "motor"
-    Description: "BLDC motor DC-3514C"
+  - Label: 'BLDC Motor'
+    BlockID: 'motor'
+    Description: 'BLDC motor DC-3514C'
     Parameters:
-      - ParamID: "VelocityControl"
-        Label: "Velocity Control"
-        Description: "PID regulator and low pass filter of Velocity control"
+      - ParamID: 'VelocityControl'
+        Label: 'Velocity Control'
+        Description: 'PID regulator and low pass filter of Velocity control'
         UIComponents:
-          - Type: "Input"
-            UiID: "PIDVelocity_P"
-            Label: "Kp"
-            ClassName: "w-64"
+          - Type: 'Input'
+            UiID: 'PIDVelocity_P'
+            Label: 'Kp'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDVelocity_I"
-            Label: "Ki"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDVelocity_I'
+            Label: 'Ki'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDVelocity_D"
-            Label: "Kd"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDVelocity_D'
+            Label: 'Kd'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDVelocity_OutputRamp"
-            Label: "Output ramp, V/T"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDVelocity_OutputRamp'
+            Label: 'Output ramp, V/T'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDVelocity_Limit"
-            Label: "Output limit, U"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDVelocity_Limit'
+            Label: 'Output limit, U'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "LPFVelocity_Tf"
-            Label: "Time constant"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'LPFVelocity_Tf'
+            Label: 'Time constant'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Button"
-            UiID: "SaveMotorPIDVelocity"
-            Label: "Save"
-            ClassName: "m-2 border border-gray-500 rounded-2xl"
+              Action: 'none'
+          - Type: 'Button'
+            UiID: 'SaveMotorPIDVelocity'
+            Label: 'Save'
+            ClassName: 'm-2 border border-gray-500 rounded-2xl'
             EventHandler:
-              Action: "saveButton"
-              Header: "SET"
-              Argument: "motor"
+              Action: 'saveButton'
+              Header: 'SET'
+              Argument: 'motor'
               Variables:
-                - "PIDVelocity_P"
-                - "PIDVelocity_I"
-                - "PIDVelocity_D"
-                - "PIDVelocity_OutputRamp"
-                - "PIDVelocity_Limit"
-                - "LPFVelocity_Tf"
+                - 'PIDVelocity_P'
+                - 'PIDVelocity_I'
+                - 'PIDVelocity_D'
+                - 'PIDVelocity_OutputRamp'
+                - 'PIDVelocity_Limit'
+                - 'LPFVelocity_Tf'
 
-      - ParamID: "PositionControl"
-        Label: "Position Control"
-        Description: "PID regulator and low pass filter of Position control"
+      - ParamID: 'PositionControl'
+        Label: 'Position Control'
+        Description: 'PID regulator and low pass filter of Position control'
         UIComponents:
-          - Type: "Input"
-            UiID: "PIDPosition_P"
-            Label: "Kp"
-            ClassName: "w-64"
+          - Type: 'Input'
+            UiID: 'PIDPosition_P'
+            Label: 'Kp'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDPosition_I"
-            Label: "Ki"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDPosition_I'
+            Label: 'Ki'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDPosition_D"
-            Label: "Kd"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDPosition_D'
+            Label: 'Kd'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDPosition_OutputRamp"
-            Label: "Output ramp, V/T"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDPosition_OutputRamp'
+            Label: 'Output ramp, V/T'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PIDPosition_Limit"
-            Label: "Output limit, U"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PIDPosition_Limit'
+            Label: 'Output limit, U'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "LPFPosition_Tf"
-            Label: "Time constant"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'LPFPosition_Tf'
+            Label: 'Time constant'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Button"
-            UiID: "SaveMotorPIDPosition"
-            Label: "Save"
-            ClassName: "m-2 border border-gray-500 rounded-2xl"
+              Action: 'none'
+          - Type: 'Button'
+            UiID: 'SaveMotorPIDPosition'
+            Label: 'Save'
+            ClassName: 'm-2 border border-gray-500 rounded-2xl'
             EventHandler:
-              Action: "saveButton"
-              Header: "SET"
-              Argument: "motor"
+              Action: 'saveButton'
+              Header: 'SET'
+              Argument: 'motor'
               Variables:
-                - "PIDPosition_P"
-                - "PIDPosition_I"
-                - "PIDPosition_D"
-                - "PIDPosition_OutputRamp"
-                - "PIDPosition_Limit"
-                - "LPFPosition_Tf"
+                - 'PIDPosition_P'
+                - 'PIDPosition_I'
+                - 'PIDPosition_D'
+                - 'PIDPosition_OutputRamp'
+                - 'PIDPosition_Limit'
+                - 'LPFPosition_Tf'
 
-      - ParamID: "ElectricalParameters"
-        Label: "Electrical Parameters"
-        Description: "Electrical parameters of BLDC motor"
+      - ParamID: 'ElectricalParameters'
+        Label: 'Electrical Parameters'
+        Description: 'Electrical parameters of BLDC motor'
         UIComponents:
-          - Type: "Input"
-            UiID: "PhaseResistance"
-            Label: "Phase resistance"
-            ClassName: "w-64"
+          - Type: 'Input'
+            UiID: 'PhaseResistance'
+            Label: 'Phase resistance'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PolePairs"
-            Label: "Pole pairs"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PolePairs'
+            Label: 'Pole pairs'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "RatingKV"
-            Label: "Rating KV"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'RatingKV'
+            Label: 'Rating KV'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "PhaseInductance"
-            Label: "Phase inductance"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'PhaseInductance'
+            Label: 'Phase inductance'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "VoltageLimit"
-            Label: "Voltage limit"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'VoltageLimit'
+            Label: 'Voltage limit'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "CurrentLimit"
-            Label: "Current limit"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'CurrentLimit'
+            Label: 'Current limit'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Input"
-            UiID: "VelocityLimit"
-            Label: "Velocity limit"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Input'
+            UiID: 'VelocityLimit'
+            Label: 'Velocity limit'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Button"
-            UiID: "SaveMotorElectricalParameters"
-            Label: "Save"
-            ClassName: "m-2 border border-gray-500 rounded-2xl"
+              Action: 'none'
+          - Type: 'Button'
+            UiID: 'SaveMotorElectricalParameters'
+            Label: 'Save'
+            ClassName: 'm-2 border border-gray-500 rounded-2xl'
             EventHandler:
-              Action: "saveButton"
-              Header: "SET"
-              Argument: "motor"
+              Action: 'saveButton'
+              Header: 'SET'
+              Argument: 'motor'
               Variables:
-                - "PhaseResistance"
-                - "PolePairs"
-                - "RatingKV"
-                - "PhaseInductance"
-                - "VoltageLimit"
-                - "CurrentLimit"
-                - "VelocityLimit"
+                - 'PhaseResistance'
+                - 'PolePairs'
+                - 'RatingKV'
+                - 'PhaseInductance'
+                - 'VoltageLimit'
+                - 'CurrentLimit'
+                - 'VelocityLimit'
 
-      - ParamID: "MotionControl"
-        Label: "Motion Control"
-        Description: "PWM type modulation and motion control type"
+      - ParamID: 'MotionControl'
+        Label: 'Motion Control'
+        Description: 'PWM type modulation and motion control type'
         UIComponents:
-          - Type: "Select"
-            UiID: "FOCModulation"
-            Label: "FOC modulation"
-            ClassName: "w-64"
+          - Type: 'Select'
+            UiID: 'FOCModulation'
+            Label: 'FOC modulation'
+            ClassName: 'w-64'
             Options:
-              - id: "0"
-                name: "SinePWM"
-                color: "bg-stone-400"
-              - id: "1"
-                name: "SpaceVectorPWM"
-                color: "bg-orange-400"
+              - id: '0'
+                name: 'SinePWM'
+                color: 'bg-stone-400'
+              - id: '1'
+                name: 'SpaceVectorPWM'
+                color: 'bg-orange-400'
             EventHandler:
-              Action: "none"
-          - Type: "Select"
-            UiID: "ControlMode"
-            Label: "Control mode"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Select'
+            UiID: 'ControlMode'
+            Label: 'Control mode'
+            ClassName: 'w-64'
             Options:
-              - id: "0"
-                name: "ANGLE"
-                color: "bg-stone-400"
-              - id: "1"
-                name: "VELOCITY"
-                color: "bg-orange-400"
+              - id: '0'
+                name: 'ANGLE'
+                color: 'bg-stone-400'
+              - id: '1'
+                name: 'VELOCITY'
+                color: 'bg-orange-400'
             EventHandler:
-              Action: "none"
-          - Type: "Button"
-            UiID: "SaveMotorMotionControl"
-            Label: "Save"
-            ClassName: "m-2 border border-gray-500 rounded-2xl"
+              Action: 'none'
+          - Type: 'Button'
+            UiID: 'SaveMotorMotionControl'
+            Label: 'Save'
+            ClassName: 'm-2 border border-gray-500 rounded-2xl'
             EventHandler:
-              Action: "saveButton"
-              Header: "SET"
-              Argument: "motor"
+              Action: 'saveButton'
+              Header: 'SET'
+              Argument: 'motor'
               Variables:
-                - "FOCModulation"
-                - "ControlMode"
+                - 'FOCModulation'
+                - 'ControlMode'
 
-      - ParamID: "AdditionalOptions"
-        Label: "Additional Options"
-        Description: "Additional Options for BLDC Motor"
+      - ParamID: 'AdditionalOptions'
+        Label: 'Additional Options'
+        Description: 'Additional Options for BLDC Motor'
         UIComponents:
-          - Type: "Input"
-            UiID: "SensorOffset"
-            Label: "Magnitometr zero offset, degree"
-            ClassName: "w-64"
+          - Type: 'Input'
+            UiID: 'SensorOffset'
+            Label: 'Magnitometr zero offset, degree'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Select"
-            UiID: "SensorDirection"
-            Label: "Magnitometr direction"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Select'
+            UiID: 'SensorDirection'
+            Label: 'Magnitometr direction'
+            ClassName: 'w-64'
             Options:
-              - id: "0"
-                name: "CCW"
-                color: "bg-stone-400"
-              - id: "1"
-                name: "CW"
-                color: "bg-orange-400"
+              - id: '0'
+                name: 'CCW'
+                color: 'bg-stone-400'
+              - id: '1'
+                name: 'CW'
+                color: 'bg-orange-400'
             EventHandler:
-              Action: "none"
-          - Type: "Paragraph"
-            UiID: "MechanicalAngleRotation"
-            Label: "Mechanical angle rotation, degree"
-            ClassName: "w-64"
-          - Type: "Button"
-            UiID: "SaveMotorAdditionalOptions"
-            Label: "Save"
-            ClassName: "m-2 border border-gray-500 rounded-2xl"
+              Action: 'none'
+          - Type: 'Paragraph'
+            UiID: 'MechanicalAngleRotation'
+            Label: 'Mechanical angle rotation, degree'
+            ClassName: 'w-64'
+          - Type: 'Button'
+            UiID: 'SaveMotorAdditionalOptions'
+            Label: 'Save'
+            ClassName: 'm-2 border border-gray-500 rounded-2xl'
             EventHandler:
-              Action: "saveButton"
-              Header: "SET"
-              Argument: "motor"
+              Action: 'saveButton'
+              Header: 'SET'
+              Argument: 'motor'
               Variables:
-                - "SensorOffset"
-                - "SensorDirection"
+                - 'SensorOffset'
+                - 'SensorDirection'
 
-  - Label: "Magnetometer"
-    BlockID: "Magnetometer"
-    Description: "Magnetic Encoder MT6835"
+  - Label: 'Magnetometer'
+    BlockID: 'Magnetometer'
+    Description: 'Magnetic Encoder MT6835'
     Parameters:
-      - ParamID: "MagnetometerParameters"
-        Label: "Magnetometer parameters"
-        Description: "Parameters of magnetometr MT6835"
+      - ParamID: 'MagnetometerParameters'
+        Label: 'Magnetometer parameters'
+        Description: 'Parameters of magnetometr MT6835'
         UIComponents:
-          - Type: "Input"
-            UiID: "ZeroPosition"
-            Label: "Zero position"
-            ClassName: "w-64"
+          - Type: 'Input'
+            UiID: 'ZeroPosition'
+            Label: 'Zero position'
+            ClassName: 'w-64'
             EventHandler:
-              Action: "none"
-          - Type: "Select"
-            UiID: "AutocalFreq"
-            Label: "Rotation speed for auto calibration, RPM"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Select'
+            UiID: 'AutocalFreq'
+            Label: 'Rotation speed for auto calibration, RPM'
+            ClassName: 'w-64'
             Options:
-              - id: "0"
-                name: "3200≤Speed<6400"
-                color: "bg-stone-400"
-              - id: "1"
-                name: "1600≤Speed<3200"
-                color: "bg-orange-400"
-              - id: "2"
-                name: "800≤Speed<1600"
-                color: "bg-red-400"
-              - id: "3"
-                name: "400≤Speed<800"
-                color: "bg-green-400"
-              - id: "4"
-                name: "200≤Speed<400"
-                color: "bg-green-400"
-              - id: "5"
-                name: "100≤Speed<200"
-                color: "bg-green-400"
-              - id: "6"
-                name: "50≤Speed<100"
-                color: "bg-green-400"
-              - id: "7"
-                name: "25≤Speed<50"
-                color: "bg-green-400"
+              - id: '0'
+                name: '3200≤Speed<6400'
+                color: 'bg-stone-400'
+              - id: '1'
+                name: '1600≤Speed<3200'
+                color: 'bg-orange-400'
+              - id: '2'
+                name: '800≤Speed<1600'
+                color: 'bg-red-400'
+              - id: '3'
+                name: '400≤Speed<800'
+                color: 'bg-green-400'
+              - id: '4'
+                name: '200≤Speed<400'
+                color: 'bg-green-400'
+              - id: '5'
+                name: '100≤Speed<200'
+                color: 'bg-green-400'
+              - id: '6'
+                name: '50≤Speed<100'
+                color: 'bg-green-400'
+              - id: '7'
+                name: '25≤Speed<50'
+                color: 'bg-green-400'
             EventHandler:
-              Action: "none"
-          - Type: "Select"
-            UiID: "Bandwidth"
-            Label: "MT6835’s system bandwidth"
-            ClassName: "w-64"
+              Action: 'none'
+          - Type: 'Select'
+            UiID: 'Bandwidth'
+            Label: 'MT6835’s system bandwidth'
+            ClassName: 'w-64'
             Options:
-              - id: "0"
-                name: "System Bandwidth Baseline"
-                color: "bg-stone-400"
-              - id: "1"
-                name: "Baseline x 2"
-                color: "bg-orange-400"
-              - id: "2"
-                name: "Baseline x 4"
-                color: "bg-red-400"
-              - id: "3"
-                name: "Baseline x 8"
-                color: "bg-green-400"
-              - id: "4"
-                name: "Baseline x 16"
-                color: "bg-green-400"
-              - id: "5"
-                name: "Baseline x 32"
-                color: "bg-green-400"
-              - id: "6"
-                name: "Baseline x 64"
-                color: "bg-green-400"
-              - id: "7"
-                name: "Baseline x 128"
-                color: "bg-green-400"
+              - id: '0'
+                name: 'System Bandwidth Baseline'
+                color: 'bg-stone-400'
+              - id: '1'
+                name: 'Baseline x 2'
+                color: 'bg-orange-400'
+              - id: '2'
+                name: 'Baseline x 4'
+                color: 'bg-red-400'
+              - id: '3'
+                name: 'Baseline x 8'
+                color: 'bg-green-400'
+              - id: '4'
+                name: 'Baseline x 16'
+                color: 'bg-green-400'
+              - id: '5'
+                name: 'Baseline x 32'
+                color: 'bg-green-400'
+              - id: '6'
+                name: 'Baseline x 64'
+                color: 'bg-green-400'
+              - id: '7'
+                name: 'Baseline x 128'
+                color: 'bg-green-400'
             EventHandler:
-              Action: "none"
-          - Type: "Button"
-            UiID: "SaveMagnetometerParameters"
-            Label: "Save"
-            ClassName: "m-2 border border-gray-500 rounded-2xl"
+              Action: 'none'
+          - Type: 'Button'
+            UiID: 'SaveMagnetometerParameters'
+            Label: 'Save'
+            ClassName: 'm-2 border border-gray-500 rounded-2xl'
             EventHandler:
-              Action: "saveButton"
-              Header: "SET"
-              Argument: "motor"
+              Action: 'saveButton'
+              Header: 'SET'
+              Argument: 'motor'
               Variables:
-                - "ZeroPosition"
-                - "AutocalFreq"
-                - "Bandwidth"
+                - 'ZeroPosition'
+                - 'AutocalFreq'
+                - 'Bandwidth'

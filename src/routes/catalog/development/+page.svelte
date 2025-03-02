@@ -4,15 +4,7 @@
   import { get } from 'svelte/store'
   import { t, Language } from '$lib/locales/i18n'
   import type { ICatalogDevice, IUser } from '../../../stores/Interfaces'
-  import {
-    ThemeStore,
-    CatalogListStore,
-    DeviceListClear,
-    UserStore,
-    LoaderStore,
-    addMessage,
-    CatalogUpsertDevice,
-  } from '../../../stores'
+  import { ThemeStore, CatalogListStore, DeviceListClear, UserStore, LoaderStore, addMessage, CatalogUpsertDevice } from '../../../stores'
   import { SmartRequest } from '$lib/utils/SmartRequest'
   import DeviceList from '$lib/components/Catalog/DeviceList.svelte'
   import Input from '$lib/components/UI/Input.svelte'
@@ -96,17 +88,14 @@
     LoaderStore.set(true)
     try {
       let responseData = null
-      responseData = await SmartRequest(
-        `/api/catalog_list?startCursor=${startCursor}&endCursor=${endCursor}&cursor=${cursor}&quantity=${quantity}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
-          },
-          credentials: 'include',
+      responseData = await SmartRequest(`/api/catalog_list?startCursor=${startCursor}&endCursor=${endCursor}&cursor=${cursor}&quantity=${quantity}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
         },
-      )
+        credentials: 'include',
+      })
 
       /* Проверяем, список устройств должен быть массивом */
       const catalog = responseData?.catalog_list
@@ -152,12 +141,7 @@
     <!-- Модуль поиска по каталогу -->
     <div class="sticky top-0">
       <div class="flex w-full items-center justify-center">
-        <Input
-          id="search"
-          props={{ autocomplete: 'on', maxLength: 64 }}
-          bind:value={querySearch}
-          className="flex-grow mx-4 min-w-72"
-        />
+        <Input id="search" props={{ autocomplete: 'on', maxLength: 64 }} bind:value={querySearch} className="flex-grow mx-4 min-w-72" />
         <Button
           onClick={handleDevicesSearch}
           label={t('common.search', currentLang)}

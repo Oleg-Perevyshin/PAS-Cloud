@@ -1,8 +1,8 @@
 DevID: FFFF
-DevSN: 
+DevSN:
 DevName: WiFi Module
 Description: Basic WiFi Module
-DevFW: 
+DevFW:
 UIBlocks:
   - BlockID: WebSettings
     Label: Web Settings
@@ -32,7 +32,7 @@ UIBlocks:
             UiID: WebHttpMode
             Label: HTTP Protocol
             Description: Protocol
-            ClassName: 
+            ClassName:
             Options:
               - id: 0
                 name: http
@@ -134,15 +134,15 @@ UIBlocks:
           - Type: ButtonGroup
             UiID: StaIPMode
             Label: STA IP Mode
-            Description: 
-            ClassName: 
+            Description:
+            ClassName:
             Options:
               - id: 0
                 name: Dynamic
-                color: 
+                color:
               - id: 1
                 name: Static
-                color: 
+                color:
             EventHandler:
               Action: updateValue
               Header: SET

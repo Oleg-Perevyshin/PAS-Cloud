@@ -1,5 +1,4 @@
 // src/routes/api/catalog_delete/+server.ts
-
 import type { RequestHandler } from '@sveltejs/kit'
 import { prisma } from '$lib/Prisma'
 import { Prisma } from '@prisma/client'
@@ -20,57 +19,41 @@ export const DELETE: RequestHandler = async (event) => {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }
 
-    /* Получаем DevID для удаления */
-    const { DevID } = await event.request.json()
+    /* Получаем DevID и VerFW для удаления */
+    const { DevID, VerFW } = await event.request.json()
     if (!DevID) {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
-    /* Удаляем устройство у всех пользователей */
-    try {
-      await prisma.userDevice.deleteMany({
-        where: {
-          Device: { DevID },
-        },
-      })
-    } catch (error) {
-      console.error('catalog_delete Ошибка удаления устройства у пользователей', error)
-      return new Response(JSON.stringify(ResponseManager('ER_USER_DELETE_DEVICES', lang)), { status: 500 })
+    if (VerFW) {
+      await prisma.catalogVersion.deleteMany({ where: { DeviceID: DevID, VerFW } })
+      console.info(`Удалена версия ${VerFW} устройства`)
+    } else {
+      await prisma.catalogVersion.deleteMany({ where: { DeviceID: DevID } })
+      console.info('Удалены все версии устройства')
     }
+
+    /* Удаляем устройство у всех пользователей */
+    await prisma.userDevice.deleteMany({ where: { Device: { DevID } } })
+    console.info('Устройство удалено у всех пользователей')
 
     /* Находим устройства по DevID, чтобы получить DevSN */
-    let deviceSNs = []
-    try {
-      const devices = await prisma.device.findMany({ where: { DevID } })
-      deviceSNs = devices.map((device) => device.DevSN)
-    } catch (error) {
-      console.error('catalog_delete Ошибка при поиске устройства', error)
-      return new Response(JSON.stringify(ResponseManager('ER_FIND_DEVICE', lang)), { status: 500 })
-    }
+    const devices = await prisma.device.findMany({ where: { DevID } })
+    const deviceSNs = devices.map((device) => device.DevSN)
 
     /* Удаляем устройство из таблицы Devices */
-    try {
-      for (const devSN of deviceSNs) {
-        await prisma.device.delete({ where: { DevSN: devSN } })
-      }
-    } catch (error) {
-      console.error('catalog_delete Ошибка удаления устройства из таблицы Devices', error)
-      return new Response(JSON.stringify(ResponseManager('ER_DELETE_DEVICE_FROM_DEVICES', lang)), { status: 500 })
-    }
+    await prisma.device.deleteMany({ where: { DevSN: { in: deviceSNs } } })
+    console.info('Устройство удалено из таблицы Devices')
 
     /* Удаляем устройство из каталога */
-    try {
-      await prisma.catalog.delete({ where: { DevID } })
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return new Response(JSON.stringify(ResponseManager('ER_DEVICE_NOT_FOUND_IN_CATALOG', lang)), { status: 404 })
-      }
-      console.error('catalog_delete Ошибка удаления устройства из таблицы Catalog', error)
-      return new Response(JSON.stringify(ResponseManager('ER_DELETE_DEVICE_FROM_CATALOG', lang)), { status: 500 })
-    }
+    await prisma.catalogDevice.deleteMany({ where: { CatalogID: DevID } })
+    console.info('Устройство полностью удалено')
 
     return new Response(JSON.stringify(ResponseManager('OK_DELETE_DEVICE_FROM_CATALOG', lang)), { status: 200 })
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+      return new Response(JSON.stringify(ResponseManager('ER_FOREIGN_KEY_CONSTRAINT', lang)), { status: 400 })
+    }
     console.log('catalog_delete Ошибка удаления устройства', error)
     return new Response(JSON.stringify(ResponseManager('ER_DELETE_DEVICE_FROM_CATALOG', lang)), { status: 500 })
   }

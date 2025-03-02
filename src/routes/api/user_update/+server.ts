@@ -37,8 +37,7 @@ export const PATCH: RequestHandler = async (event) => {
     }
 
     /* Проверяем права доступа */
-    const hasAccess =
-      requester_user.UserID === requested_user.UserID || ['MANAGER', 'ADMIN'].includes(requester_user.Role)
+    const hasAccess = requester_user.UserID === requested_user.UserID || ['MANAGER', 'ADMIN'].includes(requester_user.Role)
     if (!hasAccess) {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }
@@ -60,6 +59,7 @@ export const PATCH: RequestHandler = async (event) => {
         Avatar: body.Avatar,
         FirstName: body.FirstName,
         LastName: body.LastName,
+        Department: body.Department,
         AboutMe: body.AboutMe,
         Country: body.Country,
         Region: body.Region,
@@ -68,7 +68,7 @@ export const PATCH: RequestHandler = async (event) => {
         PostCode: body.PostCode,
         PhoneNumber: body.PhoneNumber,
         IsActivated: body.IsActivated,
-        Tags: { set: body.Tags },
+        Tags: body.Tags,
       },
       include: {
         Devices: true,

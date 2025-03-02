@@ -37,8 +37,7 @@ export const PATCH: RequestHandler = async (event) => {
     }
 
     /* Проверяем права доступа */
-    const hasAccess =
-      requester_user.UserID === requested_user.UserID || ['MANAGER', 'ADMIN'].includes(requester_user.Role)
+    const hasAccess = requester_user.UserID === requested_user.UserID || ['MANAGER', 'ADMIN'].includes(requester_user.Role)
     if (!hasAccess) {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }

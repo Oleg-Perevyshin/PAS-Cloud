@@ -10,11 +10,7 @@ import { Prisma } from '@prisma/client'
  * @returns {Promise<string>} - возвращает уникальный идентификатор
  * @throws {Error} - если не удается сгенерировать уникальный идентификатор за 100 попыток
  */
-export async function GenerateUniqueID(
-  model: 'news' | 'user' | 'group' | 'chat_message',
-  blocks: number,
-  charsPerBlock: number,
-): Promise<string> {
+export async function GenerateUniqueID(model: 'news' | 'user' | 'group' | 'chat_message', blocks: number, charsPerBlock: number): Promise<string> {
   const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   let attempts = 0
   let newID: string

@@ -83,9 +83,7 @@
 </script>
 
 <!-- Разметка компонента layout -->
-<div
-  class={`mx-auto flex h-screen max-w-screen-2xl flex-col justify-between ${currentTheme} transition-all duration-500`}
->
+<div class={`mx-auto flex h-screen max-w-screen-2xl flex-col justify-between ${currentTheme} transition-all duration-500`}>
   <!-- Header -->
   <div
     class={`m-2 mt-4 mr-4 ml-4 flex h-20 items-center justify-between rounded-xl p-1
@@ -106,9 +104,7 @@
     <Navigation />
 
     <!-- Основной контент с модальным окном загрузчика -->
-    <main
-      class={`relative m-2 mr-4 flex-1 overflow-hidden rounded-xl p-4 ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-800'}`}
-    >
+    <main class={`relative m-2 mr-4 flex-1 overflow-hidden rounded-xl p-4 ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-800'}`}>
       {@render children_render?.()}
       <Loader show={loading} />
 

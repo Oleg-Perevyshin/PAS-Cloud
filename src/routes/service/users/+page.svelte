@@ -6,7 +6,7 @@
   import { goto } from '$app/navigation'
   import { SmartRequest } from '$lib/utils/SmartRequest'
   import { UserStore, UserStoreTemp, ThemeStore, UserUpdateTemp, UserClearTemp } from '../../../stores'
-  import type { IUser, IOptionUI } from '../../../stores/Interfaces'
+  import type { IUser, IOptionUI, IUserTemp } from '../../../stores/Interfaces'
   import { addMessage, LoaderStore } from '../../../stores'
   import { API_UserUpdate, API_UserDelete, API_UserAddDevice, API_ROUTES } from '$lib/utils/API'
   import { HandleImageUpload } from '$lib/utils/Common'
@@ -19,19 +19,17 @@
   import TextArea from '$lib/components/UI/TextArea.svelte'
   import IconProfile from '$lib/appIcons/MenuDashboardProfile.svelte'
 
-  /**
-   * Подписки
-   */
+  /* Подписки */
   let currentLang: string | undefined = $state()
   let UserData: IUser | undefined = $state()
-  let UserDataTemp: IUser | undefined = $state()
+  let UserDataTemp: IUserTemp | undefined = $state()
   let currentTheme: string | undefined = $state()
   onMount(() => {
     /* Подписки */
     const unsubscribe = {
       language: Language.subscribe((value) => (currentLang = value)),
-      userStore: UserStore.subscribe((value) => (UserData = value)),
-      userStoreTemp: UserStoreTemp.subscribe((value) => (UserDataTemp = value)),
+      user: UserStore.subscribe((value) => (UserData = value)),
+      userTemp: UserStoreTemp.subscribe((value) => (UserDataTemp = value)),
       theme: ThemeStore.subscribe((value) => (currentTheme = value)),
     }
 
@@ -44,9 +42,7 @@
     }
   })
 
-  /**
-   * ПОЛУЧЕНИЕ СПИСКА ПОЛЬЗОВАТЕЛЕЙ (с авто пагинацией)
-   */
+  /* ПОЛУЧЕНИЕ СПИСКА ПОЛЬЗОВАТЕЛЕЙ (с авто пагинацией) */
   let container: HTMLElement | null = $state(null)
   let cursor: string | null = null
   const quantity: number = 15
@@ -81,9 +77,10 @@
         Password: user.Password || '',
         NickName: user.NickName,
         Avatar: user.Avatar,
-        Role: user.Role || 'USER',
+        Role: user.Role,
         FirstName: user.FirstName,
         LastName: user.LastName,
+        Department: user.Department,
         AboutMe: user.AboutMe,
         Country: user.Country,
         Region: user.Region,
@@ -118,9 +115,7 @@
     }
   }
 
-  /**
-   * Активация аккаунта пользователя
-   */
+  /* Активация аккаунта пользователя */
   const handleUserActDeactivation = async (UserID: string) => {
     const user = user_list.find((u) => u.UserID === UserID)
     if (!user?.UserID) return console.error(`handleUserActDeactivation ${UserID} - не существует`)
@@ -139,9 +134,7 @@
     }
   }
 
-  /**
-   * Удаление аккаунта пользователя
-   */
+  /* Удаление профиля пользователя */
   let showModalDelete = $state(false)
   const handleUserDelete = (user: IUser) => {
     UserDataTemp = user
@@ -169,12 +162,10 @@
     }
   }
 
-  /**
-   * Редактирование профиля пользователя
-   */
+  /* Редактирование профиля пользователя */
   let selectedRole: IOptionUI | null = $state(null)
   let showModalEdit = $state(false)
-  const handleUserEdit = (user: IUser) => {
+  const handleUserEdit = (user: IUserTemp) => {
     UserDataTemp = { ...user }
     const userTempRole = UserDataTemp.Role
     if (userTempRole === undefined) {
@@ -208,9 +199,7 @@
     UserClearTemp()
   }
 
-  /**
-   * Поиск профиля в базе данных
-   */
+  /* Поиск профиля в базе данных */
   let querySearch = $state('')
   const handleUsersSearch = async () => {
     if (!querySearch) {
@@ -241,9 +230,10 @@
         Password: user.Password || '',
         NickName: user.NickName,
         Avatar: user.Avatar,
-        Role: user.Role || 'USER',
+        Role: user.Role,
         FirstName: user.FirstName,
         LastName: user.LastName,
+        Department: user.Department,
         AboutMe: user.AboutMe,
         Country: user.Country,
         Region: user.Region,
@@ -271,9 +261,7 @@
     }
   }
 
-  /**
-   * Добавление устройства в профиль пользователя
-   */
+  /* Добавление устройства в профиль пользователя */
   let serial_number = $state('')
   let selectedTag: IOptionUI | null = $state(null)
   const handleAddDevice = async () => {
@@ -293,9 +281,7 @@
   /* Активный Tab по умолчанию */
   let activeTab = $state('main')
 
-  /**
-   * Состояние и функции для сортировки
-   */
+  /* Состояние и функции для сортировки */
   let currentSortField: keyof IUser | null = $state(null)
   let sortDirection: { [key: string]: 'asc' | 'desc' } = $state({
     NickName: 'asc',
@@ -331,20 +317,14 @@
 </script>
 
 <!-- Модуль работы с пользователями -->
-{#if UserData?.Role && ['MANAGER', 'ADMIN'].includes(UserData.Role)}
+{#if UserData?.IsOnline && UserData?.Role && ['MANAGER', 'ADMIN'].includes(UserData.Role)}
   <div class="flex h-full flex-col overflow-hidden">
     <!-- Поиск по БД и ручной запрос списка пользователей -->
     <div class="sticky top-0 z-10">
       <h2>{t('service.user.title', currentLang)}</h2>
       <label for="search" class="mt-4 block">{t('service.user.title.search', currentLang)}</label>
       <div class="flex w-full items-center justify-center">
-        <Input
-          id="search"
-          props={{ autocomplete: 'on', maxLength: 64 }}
-          type="text"
-          bind:value={querySearch}
-          className="flex-grow mx-4 min-w-72"
-        />
+        <Input id="search" props={{ autocomplete: 'on', maxLength: 64 }} type="text" bind:value={querySearch} className="flex-grow mx-4 min-w-72" />
         <Button
           onClick={handleUsersSearch}
           label={t('common.search', currentLang)}
@@ -395,17 +375,10 @@
         onscroll={handleScroll}
       >
         {#each user_list as user}
-          <div
-            class="grid grid-cols-5 items-center border-b border-gray-400"
-            style="grid-template-columns: 10rem 10rem 20rem 15rem 1fr;"
-          >
+          <div class="grid grid-cols-5 items-center border-b border-gray-400" style="grid-template-columns: 10rem 10rem 20rem 15rem 1fr;">
             <div class="flex flex-shrink-0 items-center justify-center overflow-hidden border-r border-gray-400 p-2">
               <div class="flex h-32 w-32 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
-                <img
-                  src={`data:image/png;base64,${user.Avatar}`}
-                  alt="User Avatar"
-                  class="m-2 h-full w-full object-cover"
-                />
+                <img src={`data:image/png;base64,${user.Avatar}`} alt="User Avatar" class="m-2 h-full w-full object-cover" />
               </div>
             </div>
             <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
@@ -536,11 +509,7 @@
                 }}
               >
                 {#if UserDataTemp.Avatar}
-                  <img
-                    src={`data:image/png;base64,${UserDataTemp.Avatar}`}
-                    alt="avatar"
-                    class="h-full w-full object-cover"
-                  />
+                  <img src={`data:image/png;base64,${UserDataTemp.Avatar}`} alt="avatar" class="h-full w-full object-cover" />
                 {/if}
               </button>
               <input
@@ -601,6 +570,13 @@
               label={t('service.user.lastname', currentLang)}
               className="w-96"
               bind:value={UserDataTemp.LastName}
+            />
+            <Input
+              id="department"
+              props={{ autocomplete: 'off', maxLength: 64 }}
+              label={t('service.user.department', currentLang)}
+              className="w-96"
+              bind:value={UserDataTemp.Department}
             />
             <TextArea
               id="Description"
@@ -693,12 +669,7 @@
               {#each UserDataTemp.Tags as tag, index}
                 <div class="mb-2 flex w-full items-center justify-center">
                   <p class="mx-2 h-8 w-8 cursor-not-allowed rounded-2xl {tag.color}"></p>
-                  <Input
-                    id={tag.name}
-                    props={{ maxLength: 20 }}
-                    bind:value={UserDataTemp.Tags[index].name}
-                    className="mx-2 w-70"
-                  />
+                  <Input id={tag.name} props={{ maxLength: 20 }} bind:value={UserDataTemp.Tags[index].name} className="mx-2 w-70" />
                 </div>
               {/each}
             {/if}
@@ -709,15 +680,9 @@
       <!-- Устройства -->
       {#if activeTab === 'devices' && UserDataTemp}
         <div class="flex flex-col flex-wrap justify-center gap-4 md:flex-row">
-          <label for="add_device" class="mb-1 block font-semibold">{t('service.user.title_devices', currentLang)}</label
-          >
+          <label for="add_device" class="mb-1 block font-semibold">{t('service.user.title_devices', currentLang)}</label>
           <div class="flex w-full items-center justify-center">
-            <Input
-              id="add_device"
-              props={{ autocomplete: 'on', maxLength: 64 }}
-              bind:value={serial_number}
-              className="flex-grow mx-4 w-96"
-            />
+            <Input id="add_device" props={{ autocomplete: 'on', maxLength: 64 }} bind:value={serial_number} className="flex-grow mx-4 w-96" />
             <Select
               id="Tag"
               options={UserDataTemp.Tags}
@@ -748,13 +713,9 @@
         </div>
       {/if}
 
+      <!-- Кнопки -->
       <div class="mt-auto mb-4 flex justify-center">
-        <Button
-          onClick={cancelEdit}
-          label={t('common.cancel', currentLang)}
-          props={{ bgColor: 'bg-red-200' }}
-          className="m-2 w-60 rounded-2xl"
-        />
+        <Button onClick={cancelEdit} label={t('common.cancel', currentLang)} props={{ bgColor: 'bg-red-200' }} className="m-2 w-60 rounded-2xl" />
         <Button
           onClick={saveUserChanges}
           label={t('common.save', currentLang)}

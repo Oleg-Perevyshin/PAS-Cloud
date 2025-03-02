@@ -81,11 +81,7 @@ export const JoinGroup = async (ClientID: string, GroupID: string): Promise<IWeb
  * @param UserID - идентификатор пользователя
  * @param  - имя группы
  */
-export const CreateGroup = async (
-  UserID: string | null,
-  DeviceID: string | null,
-  GroupName: string | null,
-): Promise<IWebSocketPacketMain> => {
+export const CreateGroup = async (UserID: string | null, DeviceID: string | null, GroupName: string | null): Promise<IWebSocketPacketMain> => {
   if (!GroupName) {
     const packet = EncryptWebSocketPacket('ER!', 'CreateGroup', {
       ClientID: UserID || DeviceID,
@@ -179,9 +175,7 @@ export const CreateGroup = async (
  * Получение списка всех групп в БД
  * @param UserID - идентификатор пользователя
  */
-export const GetGroupList = async (
-  ClientID: string,
-): Promise<IWebSocketPacketMain | { GroupID: string; GroupName: string }[]> => {
+export const GetGroupList = async (ClientID: string): Promise<IWebSocketPacketMain | { GroupID: string; GroupName: string }[]> => {
   /* Если это системный пользователь, сразу возвращаем список групп */
   if (ClientID === 'SYSTEM_WS_USER') {
     return await prisma.group.findMany({
@@ -362,10 +356,7 @@ export const SetMessage = async (
   }
 
   /* Сохраняем сообщение в БД */
-  const messageString = [
-    Argument ? Argument : null,
-    typeof Message === 'object' ? JSON.stringify(Message) : Message || null,
-  ]
+  const messageString = [Argument ? Argument : null, typeof Message === 'object' ? JSON.stringify(Message) : Message || null]
     .filter(Boolean)
     .join(' | ')
   const newMessage = await prisma.groupMessage.create({
@@ -419,12 +410,7 @@ export const SetMessage = async (
  * @param cursor - курсок на сообщение
  * @param limit - количество сообщений
  */
-export const GetMessages = async (
-  UserID: string,
-  GroupID: string,
-  cursor?: string | null,
-  limit: number = 10,
-): Promise<IWebSocketPacketMain> => {
+export const GetMessages = async (UserID: string, GroupID: string, cursor?: string | null, limit: number = 10): Promise<IWebSocketPacketMain> => {
   /* Проверяем пользователя и права доступа */
   const requesterUser = await prisma.user.findUnique({
     where: { UserID },
@@ -440,10 +426,7 @@ export const GetMessages = async (
   /* Проверяем, существует ли группа */
   const existingGroup = await prisma.group.findFirst({
     where: {
-      OR: [
-        { GroupID: GroupID },
-        { GroupName: GroupID },
-      ],
+      OR: [{ GroupID: GroupID }, { GroupName: GroupID }],
     },
   })
   if (!existingGroup) {
