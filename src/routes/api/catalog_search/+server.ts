@@ -13,8 +13,7 @@ export const GET: RequestHandler = async (event) => {
   }
   try {
     /* Проверяем права доступа */
-    const hasAccess = ['ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)
-    if (!hasAccess) {
+    if (requester_user && !['ENGINEER', 'MANAGER', 'ADMIN'].includes(requester_user.Role)) {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }
 
@@ -76,7 +75,7 @@ export const GET: RequestHandler = async (event) => {
     }
 
     /* Читаем данные из базы данных согласно опций queryOptions */
-    const devices = await prisma.catalog.findMany(queryOptions)
+    const devices = await prisma.catalogDevice.findMany(queryOptions)
     if (!devices) {
       return new Response(JSON.stringify(ResponseManager('ER_CATALOG_SEARCH', lang)), { status: 500 })
     }

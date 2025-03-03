@@ -137,7 +137,7 @@ export const RenderMarkdown = async (text: string) => {
  * @param value - данные
  * @returns - Uint8Array | null
  */
-export const EncryptWebSocketPacket = (header: string, argument: string, value: object): { Data: Uint8Array } | null => {
+export const EncryptWebSocketPacket = (header: string, argument: string, value: object): Uint8Array | null => {
   if (!header || !argument || typeof value !== 'object') {
     return console.error('EncryptWebSocketPacket: Неверные входные данные'), null
   }
@@ -183,9 +183,7 @@ export const EncryptWebSocketPacket = (header: string, argument: string, value: 
   finalPacket.set(encryptedData, 1)
   finalPacket[encryptedData.length + 1] = crcValue & 0xff
 
-  // console.log(`Server EncryptWebSocketPacket: ${finalPacket}`)
-
-  return { Data: finalPacket }
+  return finalPacket
 }
 
 /**
@@ -239,6 +237,7 @@ export const DecryptWebSocketPacket = (encryptedPacket: Uint8Array): object | nu
   /* Расшифровка данных */
   const decryptedData = cryptData(receivedEncryptedData, receivedCrc)
   const calcCrcValue = crc16ModBus(decryptedData)
+
   if (calcCrcValue !== receivedCrc) {
     return console.error('DecryptWebSocketPacket: Неверная контрольная сумма'), null
   }
@@ -246,8 +245,6 @@ export const DecryptWebSocketPacket = (encryptedPacket: Uint8Array): object | nu
   /* Получение исходного JSON пакета */
   const decoder = new TextDecoder()
   const jsonString = decoder.decode(decryptedData)
-
-  // console.log(`Server DecryptWebSocketPacket: ${jsonString}`)
 
   try {
     return JSON.parse(jsonString)

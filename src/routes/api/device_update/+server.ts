@@ -44,7 +44,7 @@ export const PATCH: RequestHandler = async (event) => {
 
     /* Извлекаем DevID из серийного номера и проверяем, существует ли устройство в каталоге */
     const DevID = DevSN.split('-')[0]
-    const catalogDevice = await prisma.catalog.findUnique({ where: { DevID } })
+    const catalogDevice = await prisma.catalogDevice.findUnique({ where: { CatalogID: DevID } })
     if (!catalogDevice) {
       return new Response(JSON.stringify(ResponseManager('ER_DEVICE_NOT_FOUND_IN_CATALOG', lang)), { status: 404 })
     }
@@ -85,11 +85,11 @@ export const PATCH: RequestHandler = async (event) => {
     /* Формируем ответ с данными об обновленном устройстве */
     const response = {
       DevSN: updatedUserDevice.DevSN,
-      DevID: updatedUserDevice.Device.Catalog.DevID,
+      DevID: updatedUserDevice.Device.Catalog.CatalogID,
       DevName: updatedUserDevice.Device.DevName,
       DevFW: updatedUserDevice.Device.DevFW,
       TagID: updatedUserDevice.TagID,
-      CatDevName: updatedUserDevice.Device.Catalog.DevName,
+      CatDevName: updatedUserDevice.Device.Catalog.CatalogName,
       CatBrief: updatedUserDevice.Device.Catalog.Brief,
       CatDescription: updatedUserDevice.Device.Catalog.Description,
       CatIcon: updatedUserDevice.Device.Catalog.Icon,

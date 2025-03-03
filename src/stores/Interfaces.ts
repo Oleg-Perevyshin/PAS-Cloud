@@ -255,10 +255,6 @@ export interface IDeleteMessage {
   MessageID: string
 }
 
-/* Интерфейс шифрованного пакета */
-export interface IWebSocketPacketMain {
-  Data: Uint8Array
-}
 /* Интерфейс расшифрованного и разобранного пакета */
 export interface IWebSocketPacket {
   HEADER: string

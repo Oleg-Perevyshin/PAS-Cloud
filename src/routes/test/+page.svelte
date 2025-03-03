@@ -5,7 +5,7 @@
   import Input from '$lib/components/UI/Input.svelte'
   import Button from '$lib/components/UI/Button.svelte'
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
-  import type { IWebSocketPacket, IOptionUI, IWebSocketPacketMain } from '../../stores/Interfaces'
+  import type { IWebSocketPacket, IOptionUI } from '../../stores/Interfaces'
 
   import { EncryptWebSocketPacket, DecryptWebSocketPacket } from '$lib/utils/Common'
 
@@ -44,8 +44,8 @@
       return console.error('Ошибка содержимого поля Value')
     }
 
-    const EncryptResponse = EncryptWebSocketPacket(packHeader, packArgument, parsedValue) as IWebSocketPacketMain
-    const DecryptResponse = DecryptWebSocketPacket(new Uint8Array(EncryptResponse.Data)) as IWebSocketPacket
+    const EncryptResponse = EncryptWebSocketPacket(packHeader, packArgument, parsedValue) as Uint8Array
+    const DecryptResponse = DecryptWebSocketPacket(new Uint8Array(EncryptResponse)) as IWebSocketPacket
 
     console.info('Encrypt Data:', EncryptResponse)
     console.info('Decrypt Data:', DecryptResponse)

@@ -48,12 +48,12 @@ export const GET: RequestHandler = async (event) => {
     /* Формируем ответ с данными об устройствах пользователя */
     const devices = userDevices.map((ud) => ({
       DevSN: ud.DevSN,
-      DevID: ud.Device.Catalog.DevID,
+      DevID: ud.Device.Catalog.CatalogID,
       DevName: ud.Device.DevName,
       DevFW: ud.Device.DevFW,
       TagID: ud.TagID,
       IsOnline: ud.Device.IsOnline,
-      CatDevName: ud.Device.Catalog.DevName,
+      CatDevName: ud.Device.Catalog.CatalogName,
       CatBrief: ud.Device.Catalog.Brief,
       CatDescription: ud.Device.Catalog.Description,
       CatIcon: ud.Device.Catalog.Icon,

@@ -110,7 +110,7 @@
 
       /* Обновляем курсор, если были получены новые устройства */
       if (catalog.length > 0) {
-        cursor = catalog[catalog.length - 1].DevID ?? null
+        cursor = catalog[catalog.length - 1].CatalogID ?? null
       } else {
         cursor = null
       }

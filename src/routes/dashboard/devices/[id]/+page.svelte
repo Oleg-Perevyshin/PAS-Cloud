@@ -189,7 +189,7 @@
       /* Параллельный запрос для получения данных по каждому модулю */
       const moduleRequests = moduleList.map(async (module) => {
         const DevID = module.DevSN.substring(0, 4)
-        const responseData = await API_CatalogDevice(DevID)
+        const responseData = await API_CatalogDevice(DevID, module.DevFW)
         if (!responseData?.catalog) {
           throw new Error(`Неверные данные для модуля: ${module.DevSN}`)
         }
@@ -203,7 +203,7 @@
 
         const moduleData: IDeviceModule = {
           ...parsedAPI,
-          DevID: responseData.catalog.DevID || '',
+          DevID: responseData.catalog.CatalogID || '',
           Icon: responseData.catalog.Icon || '',
           Brief: responseData.catalog.Brief || '',
           VerFW: responseData.catalog.VerFW || '',

@@ -2,23 +2,14 @@
 import { prisma } from '../Prisma'
 import { EncryptWebSocketPacket, FormatDate, ValidateDevSN } from './Common'
 import { GenerateUniqueID } from './ServerUtils'
-import type {
-  IWebSocketPacketMain,
-  IJoinGroup,
-  ICreateGroup,
-  IGroupList,
-  IDeleteGroup,
-  IGroupMessage,
-  IDeleteMessage,
-  IGroupMessageList,
-} from '../../stores/Interfaces'
+import type { IJoinGroup, ICreateGroup, IGroupList, IDeleteGroup, IGroupMessage, IDeleteMessage, IGroupMessageList } from '../../stores/Interfaces'
 
 /**
  * Присоединение к группе
  * @param UserID - идентификатор пользователя
  * @param GroupID - имя группы
  */
-export const JoinGroup = async (ClientID: string, GroupID: string): Promise<IWebSocketPacketMain> => {
+export const JoinGroup = async (ClientID: string, GroupID: string): Promise<Uint8Array> => {
   /* Проверяем пользователя и устройство */
   const [requesterUser, requesterDevice, existingGroup] = await Promise.all([
     prisma.user.findUnique({ where: { UserID: ClientID } }),
@@ -81,7 +72,7 @@ export const JoinGroup = async (ClientID: string, GroupID: string): Promise<IWeb
  * @param UserID - идентификатор пользователя
  * @param  - имя группы
  */
-export const CreateGroup = async (UserID: string | null, DeviceID: string | null, GroupName: string | null): Promise<IWebSocketPacketMain> => {
+export const CreateGroup = async (UserID: string | null, DeviceID: string | null, GroupName: string | null): Promise<Uint8Array> => {
   if (!GroupName) {
     const packet = EncryptWebSocketPacket('ER!', 'CreateGroup', {
       ClientID: UserID || DeviceID,
@@ -175,7 +166,7 @@ export const CreateGroup = async (UserID: string | null, DeviceID: string | null
  * Получение списка всех групп в БД
  * @param UserID - идентификатор пользователя
  */
-export const GetGroupList = async (ClientID: string): Promise<IWebSocketPacketMain | { GroupID: string; GroupName: string }[]> => {
+export const GetGroupList = async (ClientID: string): Promise<Uint8Array | { GroupID: string; GroupName: string }[]> => {
   /* Если это системный пользователь, сразу возвращаем список групп */
   if (ClientID === 'SYSTEM_WS_USER') {
     return await prisma.group.findMany({
@@ -250,7 +241,7 @@ export const GetGroupList = async (ClientID: string): Promise<IWebSocketPacketMa
  * @param UserID - идентификатор пользователя
  * @param  - имя группы
  */
-export const DeleteGroup = async (ClientID: string, GroupID: string): Promise<IWebSocketPacketMain> => {
+export const DeleteGroup = async (ClientID: string, GroupID: string): Promise<Uint8Array> => {
   /* Проверяем пользователя и права доступа */
   const requesterUser = await prisma.user.findUnique({
     where: { UserID: ClientID },
@@ -308,7 +299,7 @@ export const SetMessage = async (
   GroupID: string,
   Argument: string,
   Message: string | object | null | undefined,
-): Promise<IWebSocketPacketMain> => {
+): Promise<Uint8Array> => {
   let requesterUser = null
   let requesterDevice = null
 
@@ -329,8 +320,8 @@ export const SetMessage = async (
       throw new Error('ER_VALIDATE_DEVSN')
     }
     const DevID = DevSN.substring(0, 4)
-    requesterDevice = await prisma.catalog.findUnique({
-      where: { DevID },
+    requesterDevice = await prisma.catalogDevice.findUnique({
+      where: { CatalogID: DevID },
     })
     if (!requesterDevice) {
       throw new Error('ER_DEVICE_NOT_FOUND')
@@ -410,7 +401,7 @@ export const SetMessage = async (
  * @param cursor - курсок на сообщение
  * @param limit - количество сообщений
  */
-export const GetMessages = async (UserID: string, GroupID: string, cursor?: string | null, limit: number = 10): Promise<IWebSocketPacketMain> => {
+export const GetMessages = async (UserID: string, GroupID: string, cursor?: string | null, limit: number = 10): Promise<Uint8Array> => {
   /* Проверяем пользователя и права доступа */
   const requesterUser = await prisma.user.findUnique({
     where: { UserID },
@@ -495,7 +486,7 @@ export const GetMessages = async (UserID: string, GroupID: string, cursor?: stri
  * @param  - имя группы
  * @param MessageID - уникальный идентификатор сообщения
  */
-export const DeleteMessage = async (ClientID: string, MessageID: string): Promise<IWebSocketPacketMain> => {
+export const DeleteMessage = async (ClientID: string, MessageID: string): Promise<Uint8Array> => {
   /* Проверяем пользователя и права доступа */
   const requesterUser = await prisma.user.findUnique({
     where: { UserID: ClientID },

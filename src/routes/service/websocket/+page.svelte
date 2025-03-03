@@ -92,6 +92,8 @@
   const getGroups = () => {
     if (UserData?.UserID && selectedGroup?.id) {
       WebSocketStore.sendPacket('SYS', 'GroupList', { ClientID: UserData.UserID, GroupID: selectedGroup.id })
+    } else {
+      console.error('Не установлен UserData или selectedGroup')
     }
   }
 

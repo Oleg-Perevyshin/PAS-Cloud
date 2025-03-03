@@ -21,7 +21,7 @@
    * СОРТИРОВКА ДАННЫХ В ТАБЛИЦЕ
    */
   let currentSortField: keyof ICatalogDevice | null = $state(null)
-  let sortDirection: { [key: string]: 'asc' | 'desc' } = $state({ DevID: 'asc', DevName: 'asc' })
+  let sortDirection: { [key: string]: 'asc' | 'desc' } = $state({ CatalogID: 'asc', CatalogName: 'asc' })
   const sortDevices = (field: keyof ICatalogDevice) => {
     const sortedDevices = [...catalogDeviceList]
 
@@ -32,16 +32,16 @@
       sortDirection[field] = 'asc'
     }
 
-    /* Сортировка по полю DevID с учетом HEX */
+    /* Сортировка по полю CatalogID с учетом HEX */
     sortedDevices.sort((a, b) => {
       let aValue, bValue
 
-      if (field === 'DevID') {
+      if (field === 'CatalogID') {
         /* Преобразуем HEX в числовое значение для сравнения */
         aValue = parseInt(a[field], 16)
         bValue = parseInt(b[field], 16)
       } else {
-        /* Для других полей (например, DevName) */
+        /* Для других полей (например, CatalogName) */
         aValue = typeof a[field] === 'string' ? a[field].toLowerCase() : String(a[field] ?? '')
         bValue = typeof b[field] === 'string' ? b[field].toLowerCase() : String(b[field] ?? '')
 
@@ -83,18 +83,18 @@
     <button
       class={`cursor-pointer border-r border-b border-gray-400 p-2 font-semibold
       ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-700'}`}
-      onclick={() => sortDevices('DevID')}
+      onclick={() => sortDevices('CatalogID')}
     >
-      {t('catalog.devid', currentLang)}
-      {currentSortField === 'DevID' ? (sortDirection.DevID === 'asc' ? '▲' : '▼') : ''}
+      {t('catalog.id', currentLang)}
+      {currentSortField === 'CatalogID' ? (sortDirection.CatalogID === 'asc' ? '▲' : '▼') : ''}
     </button>
     <button
       class={`cursor-pointer border-r border-b border-gray-400 p-2 font-semibold
       ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-700'}`}
-      onclick={() => sortDevices('DevName')}
+      onclick={() => sortDevices('CatalogName')}
     >
-      {t('catalog.devname', currentLang)}
-      {currentSortField === 'DevName' ? (sortDirection.DevName === 'asc' ? '▲' : '▼') : ''}
+      {t('catalog.name', currentLang)}
+      {currentSortField === 'CatalogName' ? (sortDirection.CatalogName === 'asc' ? '▲' : '▼') : ''}
     </button>
     <div class="border-r border-b border-gray-400 p-2 font-semibold">{t('catalog.verfw', currentLang)}</div>
     <div class="border-b border-gray-400 p-2 font-semibold">{t('catalog.brief', currentLang)}</div>
@@ -111,10 +111,10 @@
         </div>
         <a
           class="flex h-full flex-shrink-0 cursor-pointer flex-col items-center justify-center border-r border-gray-400 p-2 hover:underline"
-          href={`/products/${device.DevID}`}>{device.DevID}</a
+          href={`/products/${device.CatalogID}`}>{device.CatalogID}</a
         >
         <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
-          {device.DevName}
+          {device.CatalogName}
         </div>
         <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
           {device.VerFW}

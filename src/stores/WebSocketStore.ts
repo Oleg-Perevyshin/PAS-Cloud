@@ -76,50 +76,46 @@ const createWebSocketStore = () => {
       }
 
       socket.onmessage = (event) => {
-        const packet = JSON.parse(event.data)
-        if (!packet.Data) {
-          throw new Error('В пакете не существует поля Data')
-        }
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            const receivedData = new Uint8Array(e.target.result as ArrayBuffer)
+            const jsonData = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
+            if (!jsonData) {
+              return console.log('Ошибка при расшифровке пакета')
+            }
 
-        /* Преобразуем объект Data в массив */
-        const receivedData = new Uint8Array(Object.values(packet.Data))
-        if (!(receivedData instanceof Uint8Array)) {
-          throw new Error('Данные не являются Uint8Array')
-        }
+            update((state) => ({ ...state, lastResponse: jsonData }))
+            console.info('Server:', jsonData)
 
-        const jsonData = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
-        if (!jsonData) {
-          return console.log('Ошибка при расшифровке пакета')
-        }
-
-        console.info('Server:', jsonData)
-
-        /* Сохраняем последний ответ */
-        update((state) => ({ ...state, lastResponse: jsonData }))
-
-        try {
-          switch (jsonData.HEADER) {
-            case 'SYS':
-              handlerSYS(jsonData)
-              break
-            case 'GET':
-              handlerGET(jsonData)
-              break
-            case 'SET':
-              handlerSET(jsonData)
-              break
-            case 'OK!':
-              handlerOK(jsonData)
-              break
-            case 'ER!':
-              handlerER(jsonData)
-              break
-            default:
-              console.warn(`Неизвестный HEADER: ${jsonData.HEADER}`)
+            try {
+              switch (jsonData.HEADER) {
+                case 'SYS':
+                  handlerSYS(jsonData)
+                  break
+                case 'GET':
+                  handlerGET(jsonData)
+                  break
+                case 'SET':
+                  handlerSET(jsonData)
+                  break
+                case 'OK!':
+                  handlerOK(jsonData)
+                  break
+                case 'ER!':
+                  handlerER(jsonData)
+                  break
+                default:
+                  console.warn(`Неизвестный HEADER: ${jsonData.HEADER}`)
+              }
+            } catch (error) {
+              console.error(`Ошибка WebSocket пакета: ${error}`)
+            }
+          } else {
+            console.error('Ошибка: результат чтения равен null')
           }
-        } catch (error) {
-          console.error(`Ошибка WebSocket пакета: ${error}`)
         }
+        reader.readAsArrayBuffer(event.data)
       }
 
       socket.onclose = () => {
@@ -473,25 +469,19 @@ const createWebSocketStore = () => {
     })
   }
 
+  
   /* Отправляем пакет на сервер */
   const sendPacket = (header: string, argument: string, value: object) => {
     update((state) => {
       if (state.socket && state.socket.readyState === WebSocket.OPEN) {
         const wsPackage = EncryptWebSocketPacket(header, argument, value)
         if (wsPackage) {
-          const base64Data = btoa(String.fromCharCode(...new Uint8Array(wsPackage.Data)))
-
-          const base64Size = base64Data.length
-          const arraySize = wsPackage.Data.byteLength
-          console.info(`Размер данных Base64: ${base64Size} символов`)
-          console.info(`Размер массива: ${arraySize} байт`)
-          
-          state.socket.send(JSON.stringify({ Data: base64Data }))
-          // state.socket.send(JSON.stringify({ Data: Array.from(wsPackage.Data) }))
+          state.socket.send(wsPackage)
+          // console.info(`Client:`, Array.from(wsPackage).map(byte => byte.toString(16).toUpperCase().padStart(2, '0')).join(' '))
           console.info(`Client:`, { HEADER: header, ARGUMENT: argument, VALUE: value })
         }
       } else {
-        console.error(`WebSocket закрыт`)
+        console.error(`Отправка невозможно, WebSocket закрыт`)
       }
       return state
     })

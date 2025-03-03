@@ -5,7 +5,7 @@ import { prisma } from './lib/Prisma'
 import { EncryptWebSocketPacket, DecryptWebSocketPacket, ValidateDevSN } from './lib/utils/Common'
 import { parse } from 'url'
 import { JoinGroup, GetGroupList, CreateGroup, DeleteGroup, SetMessage, GetMessages, DeleteMessage } from './lib/utils/WebSocket'
-import type { ILeaveGroup, IWebSocketPacket, IWebSocketPacketMain } from './stores/Interfaces'
+import type { ILeaveGroup, IWebSocketPacket } from './stores/Interfaces'
 
 /**
  * Структура хранит информацию о группах WebSocket соединений
@@ -33,25 +33,25 @@ enum SendOptions {
   ToGroupExceptRequester /* Отправить всем, кроме запрашивающего */,
 }
 
-/* Отправка пакета в группы */
-const sendToGroup = (GroupID: string, message: { Data: Uint8Array } | null, option: SendOptions, requester?: WebSocket) => {
-  if (!message?.Data) {
+/* Отправляем пакет клиентам (в группы) */
+const sendToGroup = (GroupID: string, message: Uint8Array | null, option: SendOptions, requester?: WebSocket) => {
+  if (!message) {
     return console.warn(`sendToGroup Нет сообщения для передачи`)
   }
-
   const wsGroup = wsGroups.get(GroupID)
   wsGroup?.forEach((client: WebSocket) => {
     if (client.readyState === client.OPEN) {
       if (option === SendOptions.ToRequester && client === requester) {
-        client.send(JSON.stringify({ Data: Array.from(message.Data) }))
+        client.send(message)
       } else if (option === SendOptions.ToGroup) {
-        client.send(JSON.stringify({ Data: Array.from(message.Data) }))
+        client.send(message)
       } else if (option === SendOptions.ToGroupExceptRequester && client !== requester) {
-        client.send(JSON.stringify({ Data: Array.from(message.Data) }))
+        client.send(message)
       }
     }
   })
-  console.log('Server:', DecryptWebSocketPacket(new Uint8Array(message.Data)) as IWebSocketPacket)
+  // console.info(`Server:`, Array.from(message).map(byte => byte.toString(16).toUpperCase().padStart(2, '0')).join(' '))
+  console.info('Server:', DecryptWebSocketPacket(message) as IWebSocketPacket)
 }
 
 /* Подключение клиента к комнате */
@@ -160,7 +160,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
       /* Подключаемся к указанной группе */
       try {
         const createGroupResponsePacket = await JoinGroup(ClientID, GroupID)
-        const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(createGroupResponsePacket.Data)) as IWebSocketPacket
+        const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(createGroupResponsePacket)) as IWebSocketPacket
 
         if (createGroupResponse && createGroupResponse.VALUE && 'GroupID' in createGroupResponse.VALUE) {
           const groupID = createGroupResponse.VALUE.GroupID as string
@@ -229,8 +229,8 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
       }
 
       try {
-        const createdGroup = (await CreateGroup(ClientID, null, GroupName)) as IWebSocketPacketMain
-        const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(createdGroup.Data)) as IWebSocketPacket
+        const createdGroup = await CreateGroup(ClientID, null, GroupName)
+        const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(createdGroup)) as IWebSocketPacket
         if (createGroupResponse && createGroupResponse.VALUE && 'GroupID' in createGroupResponse.VALUE) {
           const groupID = createGroupResponse.VALUE.GroupID as string
           if (groupID) {
@@ -281,7 +281,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
         break
       }
       try {
-        const groupResponse = (await GetGroupList(ClientID)) as IWebSocketPacketMain
+        const groupResponse = (await GetGroupList(ClientID)) as Uint8Array
         sendToGroup(GroupID, groupResponse, SendOptions.ToRequester, ws)
       } catch (error) {
         handleError(new Error(`Обработчик GET GroupList: ${error}`))
@@ -454,7 +454,7 @@ const handlerSET = async (ws: WebSocket, argument: string, value: string) => {
           groupResponse = await SetMessage(null, DevSN, GroupID, 'GroupMessage', Message)
         }
         if (groupResponse) {
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+          sendToGroup(GroupID, groupResponse, SendOptions.ToGroup, ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик SET GroupMessage: ${error}`))
@@ -582,11 +582,7 @@ const handlerOK = async (ws: WebSocket, argument: string, value: string) => {
 
 /* Обработчик пакетов с заголовком ER! */
 const handlerER = (ws: WebSocket, argument: string, value: string) => {
-  switch (argument) {
-    default: {
-      break
-    }
-  }
+  console.error(`HandlerER: ${argument} | ${value}`)
 }
 
 /* ************************************************************************* */
@@ -648,8 +644,8 @@ wss.on('connection', async (ws, req) => {
       }
 
       const DevID = DevSN.substring(0, 4)
-      const catalogDevID = await prisma.catalog.findUnique({
-        where: { DevID },
+      const catalogDevID = await prisma.catalogDevice.findUnique({
+        where: { CatalogID: DevID },
       })
       if (!catalogDevID) {
         return console.error(`handleGroupConnection: Устройство ${DevID} не существует в каталоге`), false
@@ -667,8 +663,8 @@ wss.on('connection', async (ws, req) => {
     }
 
     /* Подключаем клиента к личной группе, ClientID - может быть UserID или DevSN */
-    const handleGroupResponse = async (responsePacket: IWebSocketPacketMain, ClientID: string) => {
-      const response = DecryptWebSocketPacket(new Uint8Array(responsePacket.Data)) as IWebSocketPacket
+    const handleGroupResponse = async (responsePacket: Uint8Array, ClientID: string) => {
+      const response = DecryptWebSocketPacket(new Uint8Array(responsePacket)) as IWebSocketPacket
       if (response && response.VALUE && 'GroupID' in response.VALUE && 'GroupName' in response.VALUE) {
         const GroupID = response.VALUE.GroupID as string
         const GroupName = response.VALUE.GroupName as string
@@ -727,8 +723,8 @@ wss.on('connection', async (ws, req) => {
 
   /* Отправляем список групп клиенту (пользователю) */
   if (UserID) {
-    const groupResponse = (await GetGroupList(UserID)) as IWebSocketPacketMain
-    const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(groupResponse.Data)) as IWebSocketPacket
+    const groupResponse = (await GetGroupList(UserID)) as Uint8Array
+    const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(groupResponse)) as IWebSocketPacket
     if (createGroupResponse && createGroupResponse.VALUE && 'GroupID' in createGroupResponse.VALUE) {
       sendToGroup(createGroupResponse.VALUE.GroupID as string, groupResponse, SendOptions.ToGroup)
     }
@@ -737,108 +733,58 @@ wss.on('connection', async (ws, req) => {
   // logGroups('CONNECTION')
 
   /* Получено сообщение */
-  let buffer = ''
-  let timeoutId: NodeJS.Timeout | null = null
   ws.on('message', async (data) => {
     try {
-      /* Добавляем новые данные в буфер */
-      buffer += data.toString()
-
-      if (buffer.length > 1 * 1024 * 1024) {
-        // 1MB
-        return console.error('Переполнение буфера, сброс'), (buffer = '')
-      }
-
-      let startIndex = 0
-      while (startIndex < buffer.length) {
-        const endIndex = buffer.indexOf('}', startIndex)
-        if (endIndex === -1) {
-          break
-        }
-
-        const json = buffer.slice(startIndex, endIndex + 1)
-        try {
-          const parsedData = JSON.parse(json)
-          const base64Data = parsedData.Data
-          if (typeof base64Data !== 'string') {
-            throw new Error('Данные не являются строкой Base64')
-          }
-          /* Декодирование строки Base64 в массив байтов */
-          const binaryString = atob(base64Data)
-          const byteNumbers = new Uint8Array(binaryString.length)
-          for (let i = 0; i < binaryString.length; i++) {
-            byteNumbers[i] = binaryString.charCodeAt(i)
-          }
-          const receivedData = new Uint8Array(byteNumbers)
-          if (!(receivedData instanceof Uint8Array) || !base64Data) {
-            throw new Error('Данные не являются Uint8Array')
-          }
-
-          // const receivedData = new Uint8Array(parsedData.Data)
-          // // console.log('Client:', parsedData)
-          // if (!(receivedData instanceof Uint8Array) || !parsedData.Data) {
-          //   throw new Error('Данные не являются Uint8Array')
-          // }
-
-          /* Расшифровываем пакет */
-          const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
-          if (!decryptedPacket) {
-            console.log('Неверный пакет данных')
-            return
-          }
-
-          const { HEADER, ARGUMENT, VALUE } = decryptedPacket
-          console.log('Client:', HEADER, ARGUMENT, VALUE)
-          switch (HEADER) {
-            case 'SYS':
-              handlerSYS(ws, ARGUMENT, JSON.stringify(VALUE))
-              break
-            case 'GET':
-              handlerGET(ws, ARGUMENT, JSON.stringify(VALUE))
-              break
-            case 'SET':
-              handlerSET(ws, ARGUMENT, JSON.stringify(VALUE))
-              break
-            case 'OK!':
-              handlerOK(ws, ARGUMENT, JSON.stringify(VALUE))
-              break
-            case 'ER!':
-              handlerER(ws, ARGUMENT, JSON.stringify(VALUE))
-              break
-            default:
-              handleError(new Error(`Неизвестный HEADER: ${HEADER}`))
-              break
-          }
-
-          /* Обновляем индекс для обработки следующего сообщения */
-          startIndex = endIndex + 1
-        } catch (error) {
-          console.error(`Сервер получил неверные данные`, error)
-          break
+      let receivedData
+      if (Buffer.isBuffer(data)) {
+        receivedData = new Uint8Array(data)
+      } else if (data instanceof ArrayBuffer) {
+        receivedData = new Uint8Array(data)
+      } else {
+        if (typeof data === 'string') {
+          const encoder = new TextEncoder()
+          receivedData = encoder.encode(data)
+        } else {
+          throw new Error('Сервер получил данные не Buffer, не ArrayBuffer и не строку')
         }
       }
 
-      /* Удаляем обработанные данные из буфера */
-      buffer = buffer.slice(startIndex)
-
-      /* Удаляем таймер, если данные приходят */
-      if (timeoutId) {
-        clearTimeout(timeoutId)
+      /* Проверяем, что данные являются Uint8Array */
+      if (!(receivedData instanceof Uint8Array)) {
+        throw new Error('Сервер получил данные не Uint8Array')
       }
 
-      /* Устанавливаем новый таймер для очистки буфера */
-      timeoutId = setTimeout(() => {
-        buffer = ''
-        timeoutId = null
-      }, 2500)
+      /* Расшифровываем пакет */
+      const decryptedPacket = DecryptWebSocketPacket(receivedData) as IWebSocketPacket
+      if (!decryptedPacket) {
+        console.log('Сервер получил неверный пакет данных')
+        return
+      }
 
-      // /* Обновляем время последней активности */
-      // const clientInfo = clients.get(ws)
-      // if (clientInfo) {
-      //   clientInfo.lastPing = Date.now()
-      // }
+      const { HEADER, ARGUMENT, VALUE } = decryptedPacket
+      console.log('Client:', HEADER, ARGUMENT, VALUE)
+      switch (HEADER) {
+        case 'SYS':
+          handlerSYS(ws, ARGUMENT, JSON.stringify(VALUE))
+          break
+        case 'GET':
+          handlerGET(ws, ARGUMENT, JSON.stringify(VALUE))
+          break
+        case 'SET':
+          handlerSET(ws, ARGUMENT, JSON.stringify(VALUE))
+          break
+        case 'OK!':
+          handlerOK(ws, ARGUMENT, JSON.stringify(VALUE))
+          break
+        case 'ER!':
+          handlerER(ws, ARGUMENT, JSON.stringify(VALUE))
+          break
+        default:
+          handleError(new Error(`Неизвестный HEADER: ${HEADER}`))
+          break
+      }
     } catch (error) {
-      handleError(new Error(`Ошибка WebSocket пакета: ${error}`))
+      console.error(`Сервер получил неверные данные`, error)
     }
   })
 

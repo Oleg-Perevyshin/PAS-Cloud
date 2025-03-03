@@ -14,8 +14,7 @@ export const DELETE: RequestHandler = async (event) => {
 
   try {
     /* Проверяем права доступа */
-    const hasAccess = ['MANAGER', 'ADMIN'].includes(requester_user.Role)
-    if (!hasAccess) {
+    if (requester_user && !['MANAGER', 'ADMIN'].includes(requester_user.Role)) {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }
 
