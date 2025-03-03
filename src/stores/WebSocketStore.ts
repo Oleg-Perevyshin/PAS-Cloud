@@ -469,7 +469,6 @@ const createWebSocketStore = () => {
     })
   }
 
-  
   /* Отправляем пакет на сервер */
   const sendPacket = (header: string, argument: string, value: object) => {
     update((state) => {
