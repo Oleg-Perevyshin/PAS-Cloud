@@ -14,27 +14,35 @@
   import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
   import { addMessage } from '../../../stores'
 
-  /* Переменные компонента */
-  let isExpanded: { [key: number]: boolean } = $state({})
-  let selectedTag: IOptionUI | null = $state({ id: 'tag-selector-ad-option', name: 'ALL', value: null, color: 'bg-pink-400 border-2 !border-pink-400' })
-  let selectedTags: (IOptionUI | null)[] = $state([])
-  let filteredDevices: IUser['Devices'] = $state([])
+  
   let UserData: IUser | undefined = $state()
-  let currentLang: string | undefined = $state()
+  let currentLang: string | undefined = $state('ru')
   let currentTheme: string | undefined = $state()
   let UserGroupID: string | null = $state(null)
-
+  let isExpanded: { [key: number]: boolean } = $state({})
+  let selectedTag: IOptionUI | null = $state(null)
+  let selectedTags: (IOptionUI | null)[] = $state([])
+  let filteredDevices: IUser['Devices'] = $state([])
+  
   /* Подписка на изменения в UserStore и Language */
   let isDataFetched = false
   onMount(() => {
     /* Подписки на состояние */
     const subscriptions = {
-      Language: Language.subscribe((value) => (currentLang = value)),
+      Language: Language.subscribe((value) => {
+        currentLang = value
+        selectedTag = {
+          id: 'tag-all',
+          name: t('dashboard.device.reset', currentLang),
+          value: 'tag-all',
+          color: 'bg-pink-400 border-2 !border-pink-400'
+        }
+      }),
       Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
       User: UserStore.subscribe((value) => {
         UserData = value
         if (UserData.UserID && UserData.Devices && UserData.Tags) {
-          selectedTags = UserData.Devices.map((device) => UserData?.Tags.find((tag) => tag.id === device.TagID) || null)
+          selectedTags = UserData.Devices.map((device) => UserData?.Tags.find((tag) => tag.value === device.TagID) || null)
           filteredDevices = UserData.Devices
           if (isDataFetched === false) {
             getDeviceList(true)
@@ -97,7 +105,7 @@
     LoaderStore.set(true)
     try {
       await API_UserAddDevice(UserData.UserID, serial_number, selectedTagAdd.id, true)
-      selectedTags = UserData?.Devices.map((device) => UserData?.Tags.find((tag) => tag.id === device.TagID) || null) || []
+      selectedTags = UserData?.Devices.map((device) => UserData?.Tags.find((tag) => tag.value === device.TagID) || null) || []
       serial_number = ''
       getDeviceList(true)
     } catch (error) {
@@ -112,12 +120,12 @@
     if (!UserData) {
       return console.error('Ошибка updateDeviceTag - UserData не существует')
     }
-    if (!tag) {
+    if (!tag?.value) {
       return console.error('Ошибка updateDeviceTag - tag не существует')
     }
     LoaderStore.set(true)
     try {
-      await API_UpdateDeviceTagID(UserData.UserID, UserData.Devices[index].DevSN, tag.id, true)
+      await API_UpdateDeviceTagID(UserData.UserID, UserData.Devices[index].DevSN, tag.value, true)
       selectedTags[index] = tag
     } catch (error) {
       console.error(`Ошибка updateDeviceTag - обновление TagID устройства ${UserData.Devices[index]?.DevSN}: `, error)
@@ -128,7 +136,6 @@
 
   /* Обработчик для фильтрации устройств по тегу */
   const filterDevicesByTag = (tag: IOptionUI | null) => {
-    selectedTag = tag
     if (!UserData) {
       console.error('Ошибка filterDevicesByTag - UserData не существует')
       filteredDevices = []
@@ -137,7 +144,6 @@
     }
     filteredDevices = tag ? UserData.Devices.filter((device) => device.TagID === tag.value) : UserData.Devices
     selectedTags = filteredDevices.map((device) => UserData?.Tags.find((tag) => tag.value === device.TagID) || null)
-
     isExpanded = {}
   }
 
@@ -200,31 +206,34 @@
         className="m-1"
         options={[
           ...(UserData.Tags?.map((tag) => ({
-            id: tag.id,
+            id: tag.value,
             name: tag.name,
             value: tag.value,
             color: tag.color,
           })) || []),
-        ].reduce((acc, tag, index) => {
-          acc.push(tag)
+        ].reduce<IOptionUI[]>((acc, tag, index) => {
+          acc.push(tag);
           if (index === 2) {
-            acc.push({ id: 'tag-selector-ad-option', name: 'ALL', value: null, color: 'bg-pink-400 border-2 !border-pink-400' })
+            acc.push({
+              id: 'tag-all',
+              name: t('dashboard.device.reset', currentLang),
+              value: 'tag-all',
+              color: 'bg-pink-400 border-2 !border-pink-400',
+            });
           }
           return acc;
         }, [])}
-        value={selectedTag?.id}
-        onChange={(value) => {
+        value={selectedTag?.value}
+        onChange={value => {
           selectedTag = value
-          filterDevicesByTag(value)
+          if (value.value === 'tag-all') {
+            filterDevicesByTag(null);
+          } else {
+            filterDevicesByTag(value);
+          }
         }}
       />
       <div class="flex flex-row">
-        <Button
-          label={t('dashboard.device.reset', currentLang)}
-          props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800' }}
-          className="m-2 w-40 rounded-2xl"
-          onClick={() => filterDevicesByTag(null)}
-        />
         <Button
           label={t('common.update', currentLang)}
           props={{ bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800' }}

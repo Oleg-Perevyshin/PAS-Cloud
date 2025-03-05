@@ -6,7 +6,7 @@ import type { UserRole } from '../enums'
 export interface IOptionUI {
   id: string
   name: string
-  value?: string | null
+  value?: string
   color?: string
 }
 /**
