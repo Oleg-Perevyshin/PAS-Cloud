@@ -159,7 +159,8 @@ const translations: Translations = {
     'service.catalog.title_search': 'Поиск по каталогу',
     'service.catalog.create': 'Создать новое устройство',
     /* Модальное окно и страница устройства */
-    'service.catalog.title_edit': 'Редактор устройства',
+    'service.catalog.title_create': 'Создать устройство',
+    'service.catalog.title_edit': 'Редактировать устройство',
     'service.catalog.devid': 'Код по каталогу',
     'service.catalog.category': 'Категория',
     'service.catalog.type': 'Тип',

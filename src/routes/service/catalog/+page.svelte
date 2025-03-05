@@ -165,7 +165,7 @@
   const confirmDeleteDevice = async () => {
     if (currentDevice?.CatalogID === undefined) return console.error('Ошибка confirmDeleteDevice - currentDevice.CatalogID не существует')
     try {
-      const responseData = await API_CatalogDeleteDevice(currentDevice.CatalogID)
+      const responseData = await API_CatalogDeleteDevice(currentDevice.CatalogID, null)
       if (responseData?.status.code == 200) {
         RemoveDeviceFromStore(currentDevice.CatalogID)
       }
@@ -284,19 +284,24 @@
     <div class="sticky top-0">
       <h2>{t('service.catalog.title', currentLang)}</h2>
       <div class="flex w-full items-center justify-center">
-        <Button onClick={getDeviceList} label={t('common.update', currentLang)} props={{ bgColor: 'bg-blue-200' }} className="m-8 w-48 rounded-2xl" />
+        <Button
+          onClick={getDeviceList}
+          label={t('common.update', currentLang)}
+          props={currentTheme === 'light' ? { bgColor: 'bg-blue-200' } : { bgColor: 'bg-blue-800' }}
+          className="m-8 w-48 rounded-2xl"
+        />
         <Input id="search" props={{ autocomplete: 'on', maxLength: 64 }} bind:value={querySearch} className="flex-grow mx-4 min-w-72" />
         <Button
           onClick={handleDevicesSearch}
           label={t('common.search', currentLang)}
-          props={{ bgColor: 'bg-lime-200' }}
+          props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
           className="mx-4 w-48 rounded-2xl"
         />
       </div>
       <Button
         onClick={createDevice}
         label={t('service.catalog.create', currentLang)}
-        props={{ bgColor: 'bg-blue-200' }}
+        props={currentTheme === 'light' ? { bgColor: 'bg-blue-200' } : { bgColor: 'bg-blue-800' }}
         className="mb-4 h-14 w-72 rounded-2xl"
       />
     </div>
@@ -363,13 +368,13 @@
               <Button
                 onClick={() => editDevice(device.CatalogID)}
                 label={t('common.edit', currentLang)}
-                props={{ bgColor: 'bg-green-200' }}
+                props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
                 className="m-1 w-48 rounded-2xl"
               />
               <Button
                 onClick={() => handleDeleteDevice(device)}
                 label={t('common.delete', currentLang)}
-                props={{ bgColor: 'bg-red-200' }}
+                props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
                 className="m-1 w-48 rounded-2xl"
               />
             </div>

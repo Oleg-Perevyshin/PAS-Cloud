@@ -51,7 +51,7 @@ const sendToGroup = (GroupID: string, message: Uint8Array | null, option: SendOp
     }
   })
   // console.info(`Server:`, Array.from(message).map(byte => byte.toString(16).toUpperCase().padStart(2, '0')).join(' '))
-  console.info('Server:', DecryptWebSocketPacket(message) as IWebSocketPacket)
+  console.info('↑', DecryptWebSocketPacket(message) as IWebSocketPacket)
 }
 
 /* Подключение клиента к комнате */
@@ -330,7 +330,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
     default: {
       const { ClientID, DevSN, GroupID, Data } = JSON.parse(value.toString())
       if (!GroupID) {
-        handleError(new Error(`Обработчик SET GroupMessage: Отсутствует GroupID`))
+        handleError(new Error(`Обработчик SYS GroupMessage: Отсутствует GroupID`))
         break
       }
       try {
@@ -346,7 +346,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
           sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
         }
       } catch (error) {
-        handleError(new Error(`Обработчик SET GroupMessage: ${error}`))
+        handleError(new Error(`Обработчик SYS GroupMessage: ${error}`))
       }
       break
     }
@@ -762,7 +762,7 @@ wss.on('connection', async (ws, req) => {
       }
 
       const { HEADER, ARGUMENT, VALUE } = decryptedPacket
-      console.log('Client:', HEADER, ARGUMENT, VALUE)
+      console.log('↓', HEADER, ARGUMENT, VALUE)
       switch (HEADER) {
         case 'SYS':
           handlerSYS(ws, ARGUMENT, JSON.stringify(VALUE))

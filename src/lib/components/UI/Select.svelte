@@ -3,7 +3,6 @@
   import { onMount } from 'svelte'
   import { slide } from 'svelte/transition'
   import { t } from '$lib/locales/i18n'
-  import { ThemeStore } from '../../../stores'
   import type { IOptionUI } from '../../../stores/Interfaces'
 
   interface Props {
@@ -11,6 +10,7 @@
     label?: string
     props?: {
       currentLang?: string
+      bgColor?: string
       disabled?: boolean
     }
     value?: IOptionUI | null
@@ -26,6 +26,7 @@
     label = '',
     props = {
       currentLang: 'ru',
+      bgColor: '',
       disabled: false,
     },
     id = '',
@@ -36,18 +37,14 @@
   /* Применяем значение по умолчанию, если props не передан */
   props = {
     currentLang: 'ru',
+    bgColor: '',
     disabled: false,
     ...props,
   }
 
   let isDropdownOpen = $state(false)
-  let currentTheme: string | undefined = $state()
 
   onMount(() => {
-    const unsubscribeTheme = ThemeStore.subscribe((value) => {
-      currentTheme = value
-    })
-
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (!target.closest('.relative')) {
@@ -60,7 +57,6 @@
     }
 
     return () => {
-      unsubscribeTheme()
       if (typeof window !== 'undefined') {
         window.removeEventListener('click', handleClickOutside)
       }
@@ -90,17 +86,18 @@
       event.preventDefault()
     }
   }
+  // relative m-2 inline-block cursor-pointer
 </script>
 
-<div class={`relative m-2 inline-block cursor-pointer ${className}`}>
-  <label for={id} class="mt-1 block font-semibold">{label}</label>
+<div class={`relative inline-block cursor-pointer ${className}`}>
+  <label for={id} class="mx-4 block font-semibold">{label}</label>
   <button
     {id}
     class={`w-full rounded-2xl border border-gray-400 p-1 text-center
       duration-300 hover:shadow-lg
-      ${currentTheme === 'light' ? 'bg-white' : ''}
       ${value?.color}
-      ${props.disabled ? 'cursor-not-allowed opacity-50' : ''}`}
+      ${props.disabled ? 'cursor-not-allowed opacity-50' : ''}
+      ${props.bgColor}`}
     onclick={toggleDropdown}
     onkeydown={handleKeydown}
     aria-haspopup="true"
@@ -112,16 +109,15 @@
 
   {#if isDropdownOpen}
     <div
-      class={`absolute top-full left-1/2 -translate-x-1/2 transform rounded-b-2xl border border-gray-400
-      ${currentTheme === 'light' ? '!bg-white' : ''} z-50`}
+      class={`absolute top-full left-1/2 z-50 -translate-x-1/2 transform rounded-b-2xl border border-gray-400`}
       style="width: calc(100% - 1.5rem);"
       transition:slide={{ duration: 300 }}
     >
       {#each options as option, index}
         <button
           class={`flex h-full w-full cursor-pointer items-center justify-center p-1
-            opacity-100 transition duration-300 hover:opacity-75 hover:shadow-lg
-            ${option.color} ${index === options.length - 1 ? 'rounded-b-2xl' : ''}`}
+            opacity-100 transition duration-300 hover:underline
+            ${props.bgColor} ${option.color} ${index === options.length - 1 ? 'rounded-b-2xl' : ''}`}
           onclick={() => selectOption(option)}
           disabled={props.disabled}
         >

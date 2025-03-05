@@ -99,7 +99,7 @@ UIBlocks:
             Options:
               - id: 1
                 name: STA
-                color: bg-green-400
+                color: bg-lime-400
               - id: 2
                 name: AP
                 color: bg-red-400
@@ -301,14 +301,6 @@ UIBlocks:
               Argument: DefaultConfig
               Variables: [DefaultConfig]
           - Type: Input
-            UiID: DevID
-            Label: Device ID
-            EventHandler:
-              Action: updateValue
-              Header: SET
-              Argument: DevID
-              Variables: [DevID]
-          - Type: Input
             UiID: SrvURL
             Label: URL to Server Update
             EventHandler:
@@ -316,6 +308,22 @@ UIBlocks:
               Header: SET
               Argument: SrvURL
               Variables: [SrvURL]
+          - Type: Input
+            UiID: DevID
+            Label: Device ID
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DevID
+              Variables: [DevID]
+          - Type: Select
+            UiID: VerFWs
+            Label: Versions
+            ClassName: w-64
+            Options: Versions
+            EventHandler:
+              Action: updateValue
+              Variables: [VerFW]
           - Type: Button
             UiID: UpdateByID
             Label: Update Module By ID
@@ -324,4 +332,4 @@ UIBlocks:
               Action: setValues
               Header: SYS
               Argument: UpdateByID
-              Variables: [DevID, SrvURL]
+              Variables: [SrvURL, DevID, VerFW]

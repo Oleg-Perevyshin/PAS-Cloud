@@ -206,21 +206,40 @@
                 : group.FirstName && group.LastName
                   ? `${group.FirstName} ${group.LastName}`
                   : group.GroupName,
-            color: group.GroupName === UserData?.UserID ? 'bg-yellow-200 !border-yellow-200' : 'bg-lime-200 !border-lime-200',
+            color:
+              group.GroupName === UserData?.UserID
+                ? currentTheme === 'light'
+                  ? 'bg-yellow-200 !border-yellow-200'
+                  : 'bg-yellow-800 !border-yellow-800'
+                : currentTheme === 'light'
+                  ? 'bg-lime-200 !border-lime-200'
+                  : 'bg-lime-800 !border-lime-800',
           }))}
           value={selectedGroup}
           onUpdate={(value: IOptionUI | null) => joinToGroup(value)}
           className="m-2 w-1/2"
           props={{ currentLang: currentLang }}
         />
-        <Button label={'Получить сообщения'} props={{ bgColor: 'bg-green-300' }} onClick={getMessages} className="m-2 w-64 rounded-2xl" />
+        <Button
+          label={t('common.update', currentLang)}
+          props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
+          onClick={getMessages}
+          className="m-2 w-64 rounded-2xl"
+        />
       </div>
 
       <!-- Блок создания группы -->
-      <div class="m-2 flex w-full flex-row flex-nowrap items-center justify-center p-2">
-        <Input id="InputChatName" props={{ autocomplete: 'on', maxLength: 32 }} className="flex-grow w-full m-1 border" bind:value={groupName} />
-        <Button onClick={createGroup} label={t('common.create', currentLang)} props={{ bgColor: 'bg-blue-200' }} className="m-1 w-48 rounded-2xl" />
-      </div>
+      {#if UserData?.Role && ['MANAGER', 'ADMIN'].includes(UserData.Role)}
+        <div class="m-2 flex w-full flex-row flex-nowrap items-center justify-center p-2">
+          <Input id="InputChatName" props={{ autocomplete: 'on', maxLength: 32 }} className="flex-grow w-full m-1 border" bind:value={groupName} />
+          <Button
+            onClick={createGroup}
+            label={t('common.create', currentLang)}
+            props={currentTheme === 'light' ? { bgColor: 'bg-blue-200' } : { bgColor: 'bg-blue-800' }}
+            className="m-1 w-48 rounded-2xl"
+          />
+        </div>
+      {/if}
 
       <!-- Блок создания сообщения и отправки -->
       <div class="m-2 flex w-full flex-row flex-nowrap items-center justify-center p-2">
@@ -239,7 +258,7 @@
         <Button
           onClick={sendPacket}
           label={t('common.send', currentLang)}
-          props={{ bgColor: 'bg-blue-200' }}
+          props={currentTheme === 'light' ? { bgColor: 'bg-blue-200' } : { bgColor: 'bg-blue-800' }}
           className="m-1 ml-2 w-36 h-14 rounded-2xl"
         />
       </div>

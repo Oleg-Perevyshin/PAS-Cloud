@@ -183,12 +183,16 @@
 
 <!-- Разметка компонента -->
 {#if $CatalogStore}
-  <div class="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
     <div
-      class={`flex h-[75%] w-[75%] flex-col overflow-auto rounded-2xl p-5 text-center
+      class={`flex w-[75%] flex-col overflow-auto rounded-2xl p-5 text-center
       ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
     >
-      <h2>{t('service.catalog.title_edit', currentLang)}</h2>
+      {#if isEditing}
+        <h2>{t('service.catalog.title_edit', currentLang)}</h2>
+      {:else}
+        <h2>{t('service.catalog.title_create', currentLang)}</h2>
+      {/if}
 
       <!-- Иконка, CatalogID, CatalogName, Created, Updated, VerFW -->
       <div
@@ -219,7 +223,11 @@
             <Select
               id="Category"
               label={t('service.catalog.category', currentLang)}
-              props={{ disabled: isEditing ?? false, currentLang: currentLang }}
+              props={{
+                currentLang: currentLang,
+                bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800',
+                disabled: isEditing ?? false,
+              }}
               options={OPTION_DEV_CATEGORY}
               value={DevCategory}
               onUpdate={(value) => {
@@ -230,7 +238,11 @@
             <Select
               id="Type"
               label={t('service.catalog.type', currentLang)}
-              props={{ disabled: isEditing ?? false, currentLang: currentLang }}
+              props={{
+                currentLang: currentLang,
+                bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800',
+                disabled: isEditing ?? false,
+              }}
               options={OPTION_DEVID}
               value={DevType}
               onUpdate={(value) => {
@@ -241,7 +253,11 @@
             <Select
               id="Model"
               label={t('service.catalog.model', currentLang)}
-              props={{ disabled: isEditing ?? false, currentLang: currentLang }}
+              props={{
+                currentLang: currentLang,
+                bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800',
+                disabled: isEditing ?? false,
+              }}
               options={OPTION_DEVID}
               value={DevModel}
               onUpdate={(value) => {
@@ -252,7 +268,11 @@
             <Select
               id="Revision"
               label={t('service.catalog.revision', currentLang)}
-              props={{ disabled: isEditing ?? false, currentLang: currentLang }}
+              props={{
+                currentLang: currentLang,
+                bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800',
+                disabled: isEditing ?? false,
+              }}
               options={OPTION_DEVID}
               value={DevRevision}
               onUpdate={(value) => {
@@ -263,7 +283,7 @@
           </div>
 
           <!-- CatalogName, VerFW -->
-          <div class="grid grid-cols-4 gap-2">
+          <div class="grid grid-cols-4 items-start gap-2">
             <div class="col-span-3 flex flex-col">
               <Input
                 id="CatalogName"
@@ -274,11 +294,13 @@
                 bind:value={$CatalogStore.CatalogName}
               />
             </div>
-            <div class="col-span-1 flex flex-col">
+            <div class="col-span-1 flex flex-col items-center">
               <Select
                 id="Versions"
                 label={t('service.catalog.verfw', currentLang)}
-                props={{ currentLang: currentLang }}
+                props={currentTheme === 'light'
+                  ? { bgColor: '!bg-blue-200', currentLang: currentLang }
+                  : { bgColor: '!bg-blue-800', currentLang: currentLang }}
                 options={[
                   ...($CatalogStore.Versions?.map((version) => ({
                     id: version.VerFW || '',
@@ -301,6 +323,15 @@
                   className="w-full"
                   bind:value={$CatalogStore.VerFW}
                   onUpdate={validateVerFW}
+                />
+              {/if}
+
+              {#if isEditing}
+                <Button
+                  onClick={() => handleDeleteDevice()}
+                  label={t('common.delete', currentLang)}
+                  props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
+                  className="mt-2 w-full"
                 />
               {/if}
             </div>
@@ -386,16 +417,15 @@
       <!-- Кнопки -->
       <div class="mt-auto mb-4 flex justify-center">
         <Button
-          onClick={() => handleDeleteDevice()}
-          label={t('common.delete', currentLang)}
-          props={{ bgColor: 'bg-red-200' }}
+          onClick={onCancel}
+          label={t('common.cancel', currentLang)}
+          props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
           className="m-1 mx-4 w-48 rounded-2xl"
         />
-        <Button onClick={onCancel} label={t('common.cancel', currentLang)} props={{ bgColor: 'bg-red-200' }} className="m-1 mx-4 w-48 rounded-2xl" />
         <Button
           onClick={handleAddDevice}
           label={t('common.save', currentLang)}
-          props={{ bgColor: 'bg-green-200' }}
+          props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
           className="m-1 mx-4 w-48 rounded-2xl"
         />
       </div>

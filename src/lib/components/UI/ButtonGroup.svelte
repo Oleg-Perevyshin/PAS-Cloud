@@ -1,4 +1,4 @@
-<!-- $lib/components/UI/RadioGroup.svelte -->
+<!-- $lib/components/UI/ButtonGroup.svelte -->
 <script lang="ts">
   import type { IOptionUI } from '../../../stores/Interfaces'
 
@@ -43,13 +43,13 @@
   {#if label}
     <p class="mx-4 block font-semibold">{label}</p>
   {/if}
-  <div class="flex flex-row items-center">
+  <div class="flex flex-row items-stretch">
     {#each options as item, index}
       <button
         type="button"
         class={`flex-1 cursor-pointer border border-gray-400 bg-blue-300 px-2 py-1 text-center transition duration-300
           select-none hover:opacity-75 hover:shadow-lg
-          ${item.id === value ? 'opacity-100' : 'opacity-50'}
+          ${item.id === value ? 'opacity-100' : 'opacity-25'}
           ${index === 0 ? 'rounded-l-full' : ''}
           ${index === options.length - 1 ? 'rounded-r-full' : ''}
           ${item.color}

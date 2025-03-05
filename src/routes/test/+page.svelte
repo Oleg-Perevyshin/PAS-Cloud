@@ -10,18 +10,23 @@
   import { EncryptWebSocketPacket, DecryptWebSocketPacket } from '$lib/utils/Common'
 
   const RadioGroupOption = [
-    { id: '1', name: 'Param 1', color: '' },
-    { id: '2', name: 'Param 2', color: '' },
-    { id: '3', name: 'Param 3', color: '' },
-    { id: '4', name: 'Param 4', color: '' },
-    { id: '5', name: 'Param 5', color: '' },
+    { id: '1', name: 'B1', color: 'bg-stone-400 border-2 !border-stone-400' },
+    { id: '2', name: 'B2', color: 'bg-red-400 border-2 !border-red-400' },
+    { id: '3', name: 'B3', color: 'bg-orange-400 border-2 !border-orange-400' },
+    { id: '4', name: 'B4', color: 'bg-yellow-400 border-2 !border-yellow-400' },
+    { id: '5', name: 'B5', color: 'bg-lime-400 border-2 !border-lime-400' },
+    { id: '6', name: 'B6', color: 'bg-emerald-400 border-2 !border-emerald-400' },
+    { id: '7', name: 'B7', color: 'bg-cyan-400 border-2 !border-cyan-400' },
+    { id: '8', name: 'B8', color: 'bg-blue-400 border-2 !border-blue-400' },
+    { id: '9', name: 'B9', color: 'bg-violet-400 border-2 !border-violet-400' },
+    { id: '10', name: 'B10', color: 'bg-fuchsia-400 border-2 !border-fuchsia-400' },
   ]
 
-  let radioButtonValue: string | null = $state('Param 4')
+  let radioButtonValue: string | null = $state('7')
 
   const handleRadioButton = (value: IOptionUI) => {
     console.log('ButtonGroup Value:', value)
-    radioButtonValue = value.name
+    radioButtonValue = value.id
   }
 
   let sliderValue: number | null = $state(23)
@@ -51,10 +56,29 @@
     console.info('Decrypt Data:', DecryptResponse)
   }
 
-  let progressBarValue: number | null = $state(23)
   const handleProgressBar = (value: number) => {
     console.log('Slider Value:', value)
     sliderValue = value
+  }
+
+  let progressBarValue: number = $state(50)
+  /* Функция для уменьшения значения прогресс-бара */
+  const decreaseProgressBar = () => {
+    if (progressBarValue > 0) {
+      progressBarValue -= 10
+    }
+  }
+
+  /* Функция для сброса прогресс-бара */
+  const resetProgressBar = () => {
+    progressBarValue = 50;
+  }
+
+  /* Функция для увеличения значения прогресс-бара */
+  const increaseProgressBar = () => {
+    if (progressBarValue < 100) {
+      progressBarValue += 10
+    }
   }
 </script>
 
@@ -65,7 +89,7 @@
   </div>
 
   <ButtonGroup
-    id="test"
+    id="TestButtonGroup"
     label="Component - ButtonGroup"
     className="m-4"
     options={RadioGroupOption}
@@ -88,13 +112,18 @@
   <br />
 
   <div class="flex flex-row">
-    <Input id="testInputHeader" bind:value={packHeader} props={{ autocomplete: 'on', maxLength: 8 }} className="m-1" />
-    <Input id="testInputArgument" bind:value={packArgument} props={{ autocomplete: 'on', maxLength: 16 }} className="m-1" />
-    <Input id="testInputValue" bind:value={packValue} props={{ autocomplete: 'on', maxLength: 32 }} className="m-1" />
-    <Button onClick={testCrypto} label="Отправить" props={{ bgColor: 'bg-lime-300' }} className="m-1 w-40 rounded-2xl" />
+    <Input id="TestInputHeader" bind:value={packHeader} props={{ autocomplete: 'on', maxLength: 8 }} className="m-1" />
+    <Input id="TestInputArgument" bind:value={packArgument} props={{ autocomplete: 'on', maxLength: 16 }} className="m-1" />
+    <Input id="TestInputValue" bind:value={packValue} props={{ autocomplete: 'on', maxLength: 32 }} className="m-1" />
+    <Button onClick={testCrypto} label="Отправить" props={{ bgColor: 'bg-lime-200' }} className="m-1 w-40 rounded-2xl" />
   </div>
 
   <br />
 
   <ProgressBar id="testProgressBar" label="Component - ProgressBar" className="" bind:value={progressBarValue} />
+  <div class="flex mt-4">
+    <Button onClick={decreaseProgressBar} label="-10" className="m-1" />
+    <Button onClick={resetProgressBar} label="Сбросить" className="m-1" />
+    <Button onClick={increaseProgressBar} label="+10" className="m-1" />
+  </div>
 </div>

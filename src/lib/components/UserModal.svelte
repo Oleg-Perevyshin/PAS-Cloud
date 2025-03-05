@@ -51,9 +51,9 @@
 </script>
 
 {#if userData}
-  <button class="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black" onclick={handleBackgroundClick}>
+  <button class="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onclick={handleBackgroundClick}>
     <div
-      class={`flex max-h-[50vh] max-w-[50vw] flex-col overflow-auto rounded-2xl p-5 text-center
+      class={`flex max-h-[90vh] max-w-[90vw] flex-col overflow-auto rounded-2xl p-5 text-center
       ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
     >
       <h2>{t('common.dynamic.user', currentLang)}</h2>

@@ -26,7 +26,7 @@
   }
 </script>
 
-<div class="editorModal bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black">
+<div class="editorModal fixed inset-0 z-50 flex items-center justify-center bg-black/80">
   <div class={`flex h-auto w-[55rem] flex-col overflow-auto rounded-2xl p-5 text-center ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
     <h2>
       {currentEditNews ? t('dashboard.news.title_edit', currentLang) : t('dashboard.news.title_create', currentLang)}
@@ -105,13 +105,13 @@
       <Button
         onClick={onCancel}
         label={t('common.cancel', currentLang)}
-        props={{ bgColor: currentTheme === 'light' ? 'bg-red-300' : 'bg-red-900' }}
+        props={{ bgColor: currentTheme === 'light' ? 'bg-red-200' : 'bg-red-900' }}
         className="m-4 h-10 w-60 rounded-2xl"
       />
       <Button
         onClick={() => onSave($NewsStore, false)}
         label={t('common.save', currentLang)}
-        props={{ bgColor: currentTheme === 'light' ? 'bg-emerald-300' : 'bg-emerald-900' }}
+        props={{ bgColor: currentTheme === 'light' ? 'bg-emerald-200' : 'bg-emerald-800' }}
         className="m-4 h-10 w-60 rounded-2xl"
       />
     </div>

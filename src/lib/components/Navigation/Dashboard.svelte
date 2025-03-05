@@ -67,7 +67,7 @@
         label: '',
         page: 'profile',
         icon: IconProfile,
-        bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800',
+        bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800',
         textColor: '',
         role: ['USER', 'ENGINEER', 'MANAGER', 'ADMIN'],
       },
@@ -76,7 +76,7 @@
         label: '',
         page: 'devices',
         icon: IconDevices,
-        bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800',
+        bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800',
         textColor: '',
         role: ['ENGINEER', 'MANAGER', 'ADMIN'],
       },
@@ -85,7 +85,7 @@
         label: '',
         page: 'news',
         icon: IconNews,
-        bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800',
+        bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800',
         textColor: '',
         role: ['ENGINEER', 'MANAGER', 'ADMIN'],
       },
@@ -94,7 +94,7 @@
         label: '',
         page: 'chat',
         icon: IconChat,
-        bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800',
+        bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800',
         textColor: '',
         role: ['ENGINEER', 'MANAGER', 'ADMIN'],
       },
@@ -123,7 +123,7 @@
     <Button
       onClick={toggleExpand}
       label={t('nav.dashboard', currentLang)}
-      props={{ bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800', textAlignment: 'center' }}
+      props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800', textAlignment: 'center' }}
       icon={IconDashboard}
       iconProps={{ width: '2rem', height: '2rem' }}
       className="m-1 h-12 w-[95%] rounded-2xl text-left"

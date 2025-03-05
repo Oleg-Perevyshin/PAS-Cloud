@@ -83,7 +83,7 @@
 </script>
 
 <!-- Разметка компонента layout -->
-<div class={`mx-auto flex h-screen max-w-screen-2xl flex-col justify-between ${currentTheme} transition-all duration-500`}>
+<div class={`mx-auto flex h-screen max-w-[1600px] flex-col justify-between ${currentTheme} transition-all duration-500`}>
   <!-- Header -->
   <div
     class={`m-2 mt-4 mr-4 ml-4 flex h-20 items-center justify-between rounded-xl p-1
@@ -146,13 +146,13 @@
 <style>
   /* Стили для светлой темы */
   :global([data-theme='light']) {
-    background-color: #cde; /* Цвет фона для светлой темы */
-    color: #303030; /* Цвет текста для светлой темы */
+    background-color: #def; /* Цвет фона для светлой темы */
+    color: #333; /* Цвет текста для светлой темы */
   }
 
   /* Стили для темной темы */
   :global([data-theme='dark']) {
     background-color: #012; /* Цвет фона для темной темы */
-    color: #f0f0f0; /* Цвет текста для темной темы */
+    color: #fff; /* Цвет текста для темной темы */
   }
 </style>

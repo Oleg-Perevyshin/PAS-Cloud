@@ -257,16 +257,16 @@
       <Button
         onClick={() => (showModalDelete = true)}
         label={t('dashboard.profile.delete', currentLang)}
-        props={{ bgColor: 'bg-red-300' }}
-        className="m-8 h-12 w-72 rounded-2xl"
+        props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
+        className="m-1 mx-4 w-72 rounded-2xl"
       />
 
       <!-- Кнопка СОХРАНИТЬ -->
       <Button
         onClick={handleUserUpdate}
         label={t('dashboard.profile.save', currentLang)}
-        props={{ bgColor: 'bg-green-300' }}
-        className="m-8 h-12 w-72 rounded-2xl"
+        props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
+        className="m-1 mx-4 w-72 rounded-2xl"
       />
     </div>
   </div>

@@ -14,7 +14,7 @@
 </script>
 
 {#if imageSrc}
-  <button class="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black" onclick={handleBackgroundClick}>
+  <button class="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onclick={handleBackgroundClick}>
     <div
       class="relative flex flex-shrink-0 items-center justify-center
       overflow-hidden rounded-2xl border border-gray-400"

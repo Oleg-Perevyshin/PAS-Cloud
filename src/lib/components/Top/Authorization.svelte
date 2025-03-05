@@ -292,7 +292,7 @@
       <div class="flex items-center justify-center">
         <Button
           label={t('auth.login', currentLang)}
-          props={{ bgColor: 'bg-green-400' }}
+          props={{ bgColor: 'bg-lime-400' }}
           onClick={Login}
           icon={IconLogin}
           className="w-full max-w-xs rounded-2xl"

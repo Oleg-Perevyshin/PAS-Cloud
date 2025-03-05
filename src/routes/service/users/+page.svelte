@@ -328,13 +328,13 @@
         <Button
           onClick={handleUsersSearch}
           label={t('common.search', currentLang)}
-          props={{ bgColor: 'bg-lime-200' }}
+          props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
           className="mx-4 w-48 rounded-2xl"
         />
         <Button
           onClick={() => handleUsersListStart()}
           label={t('common.update', currentLang)}
-          props={{ bgColor: 'bg-lime-200' }}
+          props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
           className="m-8 w-48 rounded-2xl"
         />
       </div>
@@ -396,26 +396,34 @@
                 <Button
                   onClick={() => handleUserEdit(user)}
                   label={t('common.edit', currentLang)}
-                  props={{ bgColor: 'bg-yellow-200' }}
+                  props={currentTheme === 'light' ? { bgColor: 'bg-yellow-200' } : { bgColor: 'bg-yellow-800' }}
                   className="m-1 w-48 rounded-2xl"
                 />
                 <Button
                   onClick={() => user.UserID && handleUserActDeactivation(user.UserID)}
                   label={user.IsActivated ? t('common.block', currentLang) : t('common.activate', currentLang)}
-                  props={{ bgColor: user.IsActivated ? 'bg-green-100' : 'bg-yellow-100' }}
+                  props={{
+                    bgColor: user.IsActivated
+                      ? currentTheme === 'light'
+                        ? 'bg-lime-200'
+                        : 'bg-lime-800'
+                      : currentTheme === 'light'
+                        ? 'bg-yellow-200'
+                        : 'bg-yellow-800',
+                  }}
                   className="m-1 w-48 rounded-2xl"
                 />
                 <Button
                   onClick={() => handleUserDelete(user)}
                   label={t('common.delete', currentLang)}
-                  props={{ bgColor: 'bg-red-200' }}
+                  props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
                   className="m-1 w-48 rounded-2xl"
                 />
               {:else}
                 <Button
                   onClick={() => goto(`/dashboard/profile`)}
                   label={t('service.user.edit_my_profile', currentLang)}
-                  props={{ bgColor: 'bg-green-100' }}
+                  props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
                   className="m-1 h-20 w-48 rounded-2xl overflow-auto"
                   icon={IconProfile}
                   iconProps={{ width: '2rem', height: '2rem' }}
@@ -455,7 +463,7 @@
 
 <!-- Модальное окно редактора аккаунта -->
 {#if showModalEdit}
-  <div class="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
     <div
       class={`flex h-[70%] w-[80%] flex-col overflow-auto rounded-2xl p-5 text-center
       ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
@@ -467,25 +475,61 @@
         <Button
           onClick={() => (activeTab = 'main')}
           label={t('service.user.main', currentLang)}
-          props={{ bgColor: activeTab === 'main' ? 'bg-blue-200' : 'bg-gray-200' }}
+          props={{
+            bgColor:
+              activeTab === 'main'
+                ? currentTheme === 'light'
+                  ? 'bg-blue-200'
+                  : 'bg-blue-800'
+                : currentTheme === 'light'
+                  ? 'bg-gray-200'
+                  : 'bg-gray-800',
+          }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
         <Button
           onClick={() => (activeTab = 'location')}
           label={t('service.user.location', currentLang)}
-          props={{ bgColor: activeTab === 'location' ? 'bg-blue-200' : 'bg-gray-200' }}
+          props={{
+            bgColor:
+              activeTab === 'location'
+                ? currentTheme === 'light'
+                  ? 'bg-blue-200'
+                  : 'bg-blue-800'
+                : currentTheme === 'light'
+                  ? 'bg-gray-200'
+                  : 'bg-gray-800',
+          }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
         <Button
           onClick={() => (activeTab = 'tags')}
           label={t('service.user.tags', currentLang)}
-          props={{ bgColor: activeTab === 'tags' ? 'bg-blue-200' : 'bg-gray-200' }}
+          props={{
+            bgColor:
+              activeTab === 'tags'
+                ? currentTheme === 'light'
+                  ? 'bg-blue-200'
+                  : 'bg-blue-800'
+                : currentTheme === 'light'
+                  ? 'bg-gray-200'
+                  : 'bg-gray-800',
+          }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
         <Button
           onClick={() => (activeTab = 'devices')}
           label={t('service.user.devices', currentLang)}
-          props={{ bgColor: activeTab === 'devices' ? 'bg-blue-200' : 'bg-gray-200' }}
+          props={{
+            bgColor:
+              activeTab === 'devices'
+                ? currentTheme === 'light'
+                  ? 'bg-blue-200'
+                  : 'bg-blue-800'
+                : currentTheme === 'light'
+                  ? 'bg-gray-200'
+                  : 'bg-gray-800',
+          }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
       </div>
@@ -544,7 +588,9 @@
             <Select
               id="Role"
               label={t('service.user.role', currentLang)}
-              props={{ currentLang: currentLang }}
+              props={currentTheme === 'light'
+                ? { bgColor: '!bg-blue-200', currentLang: currentLang }
+                : { bgColor: '!bg-blue-800', currentLang: currentLang }}
               options={DEFAULT_ROLES}
               value={selectedRole}
               onUpdate={(value) => (selectedRole = value)}
@@ -668,8 +714,12 @@
             {#if UserDataTemp && Array.isArray(UserDataTemp.Tags)}
               {#each UserDataTemp.Tags as tag, index}
                 <div class="mb-2 flex w-full items-center justify-center">
-                  <p class="mx-2 h-8 w-8 cursor-not-allowed rounded-2xl {tag.color}"></p>
-                  <Input id={tag.name} props={{ maxLength: 20 }} bind:value={UserDataTemp.Tags[index].name} className="mx-2 w-70" />
+                  <Input
+                    id={`${UserDataTemp.UserID}-Tag-${tag.id}`}
+                    props={{ maxLength: 20 }}
+                    bind:value={UserDataTemp.Tags[index].name}
+                    className={`m-1 rounded-full ${tag.color}`}
+                  />
                 </div>
               {/each}
             {/if}
@@ -694,7 +744,7 @@
             <Button
               onClick={handleAddDevice}
               label={t('common.add', currentLang)}
-              props={{ bgColor: 'bg-lime-200' }}
+              props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
               className="mx-4 w-48 rounded-2xl"
             />
           </div>
@@ -715,11 +765,16 @@
 
       <!-- Кнопки -->
       <div class="mt-auto mb-4 flex justify-center">
-        <Button onClick={cancelEdit} label={t('common.cancel', currentLang)} props={{ bgColor: 'bg-red-200' }} className="m-2 w-60 rounded-2xl" />
+        <Button
+          onClick={cancelEdit}
+          label={t('common.cancel', currentLang)}
+          props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
+          className="m-2 w-60 rounded-2xl"
+        />
         <Button
           onClick={saveUserChanges}
           label={t('common.save', currentLang)}
-          props={{ bgColor: 'bg-green-200' }}
+          props={currentTheme === 'light' ? { bgColor: 'bg-lime-200' } : { bgColor: 'bg-lime-800' }}
           className="m-2 w-60 rounded-2xl"
         />
       </div>

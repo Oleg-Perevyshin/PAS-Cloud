@@ -129,8 +129,12 @@
           if (UserData?.UserID && DevGroupID && !moduleListFetched) {
             moduleListFetched = true /* Запрос на получение списка модулей в изделии выполнен */
             const { ModuleList } = state.lastResponse.VALUE as IReqModuleList
-            await getDevicesAPI(ModuleList)
-            isInitialized = true
+
+            /* Запрашиваем данные по всем модулям из каталога */
+            let isGotDevicesAPI = await getDevicesAPI(ModuleList)
+            if (isGotDevicesAPI) {
+              isInitialized = true
+            }
           }
         }
 
@@ -173,8 +177,8 @@
     }
   })
 
-  /* Запрашиваем данные обо всех модулях в изделии из БД */
-  const getDevicesAPI = async (moduleList: Array<{ DevSN: string; DevName: string; DevFW: string }>): Promise<boolean> => {
+  /* Запрашиваем данные обо всех модулях в изделии из каталога */
+  const getDevicesAPI = async (moduleList: { DevSN: string; DevName: string; DevFW: string }[]): Promise<boolean> => {
     LoaderStore.set(true)
     try {
       /* Проверка наличия модулей в списке */
@@ -207,6 +211,7 @@
           Icon: responseData.catalog.Icon || '',
           Brief: responseData.catalog.Brief || '',
           VerFW: responseData.catalog.VerFW || '',
+          Versions: responseData.catalog.Versions,
           DevSN: module.DevSN || '',
           DevName: module.DevName || '',
           DevFW: module.DevFW || '',
@@ -335,54 +340,14 @@
       }
     }
   }
-
-  /* Переключение между модулями */
-  const getModuleConfig = (module: IDeviceModule) => {
-    if (DevSN && DevGroupID) {
-      WebSocketStore.sendPacket('GET', 'ModuleConfig', {
-        ClientID: UserData?.UserID,
-        DevSN: DevSN,
-        ModuleSN: module.DevSN,
-        GroupID: DevGroupID,
-      })
-    }
-    selectedModule = module
-    moduleConfigFetched = false
-  }
 </script>
 
 <!-- Разметка компонента -->
 {#if UserData?.Role && ['ENGINEER', 'MANAGER', 'ADMIN'].includes(UserData.Role)}
   <div class="flex h-full flex-col">
-    <h2 class="sticky top-0">{t('common.controls', currentLang)}</h2>
-    <!-- Сборная информация о модуле -->
-    {#if currentDevice}
-      <br />
-      <div class="m-1 flex flex-row items-center p-1">
-        <!-- Иконка изделия из каталога -->
-        <div class="flex h-20 w-20 flex-shrink-0 items-center justify-center">
-          <img src={currentDevice.Icon} alt="Device Icon" class="h-full w-full object-cover" />
-        </div>
-
-        <!-- Краткая информация об изделии (Имя, серийный номер, версия прошивки) -->
-        <div class="ml-6 flex w-1/4 flex-col items-start">
-          <h4>{currentDevice?.DevName}</h4>
-          <p class="text-xs text-gray-400">{currentDevice?.DevSN}</p>
-          <p class="text-xs text-gray-400">{t('dashboard.device.devfw', currentLang)}: {currentDevice?.DevFW}</p>
-        </div>
-
-        <!-- Информация из каталога (Ссылка на изделие в каталоге, версия прошивки, краткое описание) -->
-        <div class="flex w-3/4 flex-col items-start">
-          <a href={`/products/${currentDevice.DevID}`} class="no-underline hover:no-underline">
-            <p class="font-semibold">{t('dashboard.device.catid', currentLang)}: {currentDevice.DevID}</p>
-          </a>
-          <p>{t('dashboard.device.catverfw', currentLang)}: {currentDevice.VerFW}</p>
-          <p class="text-justify text-gray-400">{currentDevice.Brief}</p>
-        </div>
-      </div>
-      <hr class="my-2 border-gray-300" />
-    {/if}
-
+    <h2 class="sticky top-0">{t('common.controls', currentLang)} {currentDevice?.DevName}</h2>
+    <p class="text-xs text-gray-400">{currentDevice?.DevSN}</p>
+    <hr class="my-2 border-gray-300" />
     {#if currentDevice && currentDevice.IsOnline && isInitialized}
       <!-- Блок кнопок для выбора конкретного модуля в изделии -->
       <div class={`overflow-none flex flex-grow flex-col items-center justify-start`}>
@@ -394,7 +359,20 @@
               ${selectedModule && selectedModule.DevSN === module.DevSN ? 'border-blue-400' : 'border-gray-400'}
               ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-600'}
             `}
-                onclick={() => getModuleConfig(module)}
+                onclick={() => {
+                  if (DevSN && DevGroupID) {
+                    WebSocketStore.sendPacket('GET', 'ModuleConfig', {
+                      ClientID: UserData?.UserID,
+                      DevSN: DevSN,
+                      ModuleSN: module.DevSN,
+                      GroupID: DevGroupID,
+                    })
+                  }
+                  selectedModule = module
+                  
+                  /* Сбрасываем флаг чтоб получить ответ */
+                  moduleConfigFetched = false
+                }}
               >
                 <div class={`flex h-10 items-start justify-between rounded-t-xl`}>
                   <div class="mt-1 ml-1 flex h-8 w-8 flex-shrink-0 items-center justify-center">
@@ -423,23 +401,9 @@
           {#if selectedModule}
             <div class="m-1 flex flex-col items-center rounded-2xl">
               <a href={`/products/${selectedModule.DevID}`} class="no-underline hover:no-underline">
-                <p class="text-center font-semibold">
-                  {t('dashboard.device.device_sn', currentLang)}: {selectedModule.DevSN}
-                </p>
+                <p class="text-center font-semibold">{selectedModule.DevName} | {selectedModule?.DevID}</p>
               </a>
-              <div class="mt-2 flex w-full justify-center">
-                <div class="flex w-1/3 flex-col items-center">
-                  <p>
-                    {t('dashboard.device.devfw', currentLang)}: {selectedModule.DevFW} | {t('dashboard.device.catverfw', currentLang)}: {selectedModule.VerFW}
-                  </p>
-                </div>
-                <div class="flex w-2/3 flex-col items-center">
-                  <p class="text-justify text-gray-400">{selectedModule.Brief}</p>
-                </div>
-              </div>
-              <p class="text-justify font-semibold text-fuchsia-400">
-                {StatusData?.Status.Title}: {StatusData?.Status.Message}
-              </p>
+              <p class="text-xs text-gray-400">{selectedModule?.DevSN}</p>
             </div>
           {:else}
             <h5>{t('dashboard.device.selectmodule')}</h5>
@@ -465,6 +429,7 @@
                   flex w-full flex-col items-center justify-between border last:rounded-b-2xl last:border-b-0
                   ${currentTheme === 'light' ? '!bg-yellow-100' : '!bg-yellow-700'}
                   ${isExpandedBlock[`${selectedModule.DevSN}_${blockIndex}`] ? 'rounded-t-2xl' : 'rounded-2xl'}
+                  cursor-pointer
                 `}
                     onclick={() => {
                       isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`] = !isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`]
@@ -485,9 +450,7 @@
                           transition:slide={{ duration: 300 }}
                         >
                           <button
-                            class={`
-                          flex w-full flex-col items-center justify-between
-                        `}
+                            class={`flex w-full flex-col items-center justify-between cursor-pointer`}
                             onclick={() => {
                               isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`] =
                                 !isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`]
@@ -616,11 +579,9 @@
           class={`flex h-8 items-center justify-center border-t border-gray-400
             ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
         >
-          {#if currentDevice && currentDevice.Modules && currentDevice.Modules.length > 0}
-            <h5>{t('dashboard.device.modules_num')} {currentDevice?.Modules.length}</h5>
-          {:else}
-            <h5>{t('dashboard.device.modules_num')} 0</h5>
-          {/if}
+          <p class="text-justify font-semibold text-fuchsia-400">
+            {StatusData?.Status.Title}: {StatusData?.Status.Message}
+          </p>
         </div>
       </div>
     {:else}

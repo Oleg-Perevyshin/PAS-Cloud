@@ -11,11 +11,12 @@
   import Button from '$lib/components/UI/Button.svelte'
   import Input from '$lib/components/UI/Input.svelte'
   import Select from '$lib/components/UI/Select.svelte'
+  import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
   import { addMessage } from '../../../stores'
 
   /* Переменные компонента */
   let isExpanded: { [key: number]: boolean } = $state({})
-  let selectedTag: IOptionUI | null = $state(null)
+  let selectedTag: IOptionUI | null = $state({ id: 'tag-selector-ad-option', name: 'ALL', value: null, color: 'bg-pink-400 border-2 !border-pink-400' })
   let selectedTags: (IOptionUI | null)[] = $state([])
   let filteredDevices: IUser['Devices'] = $state([])
   let UserData: IUser | undefined = $state()
@@ -134,8 +135,8 @@
       selectedTags = []
       return
     }
-    filteredDevices = tag ? UserData.Devices.filter((device) => device.TagID === tag.id) : UserData.Devices
-    selectedTags = filteredDevices.map((device) => UserData?.Tags.find((tag) => tag.id === device.TagID) || null)
+    filteredDevices = tag ? UserData.Devices.filter((device) => device.TagID === tag.value) : UserData.Devices
+    selectedTags = filteredDevices.map((device) => UserData?.Tags.find((tag) => tag.value === device.TagID) || null)
 
     isExpanded = {}
   }
@@ -192,32 +193,46 @@
     </div>
 
     <!-- Селектор устройств (фильтрация по тегам) -->
-    <div class={`mt-4`}>
+    <div class={`mt-4 flex flex-col items-center`}>
       <p class="text-xl font-medium">{t('dashboard.device.tags', currentLang)}</p>
-      {#if UserData && UserData.Tags}
-        <Select
-          value={selectedTag}
-          onUpdate={(value) => {
-            selectedTag = value
-            filterDevicesByTag(value)
-          }}
-          options={UserData.Tags}
-          className="m-2 h-auto w-64"
-          props={{ currentLang: currentLang }}
+      <ButtonGroup
+        id="tag-selector"
+        className="m-1"
+        options={[
+          ...(UserData.Tags?.map((tag) => ({
+            id: tag.id,
+            name: tag.name,
+            value: tag.value,
+            color: tag.color,
+          })) || []),
+        ].reduce((acc, tag, index) => {
+          acc.push(tag)
+          if (index === 2) {
+            acc.push({ id: 'tag-selector-ad-option', name: 'ALL', value: null, color: 'bg-pink-400 border-2 !border-pink-400' })
+          }
+          return acc;
+        }, [])}
+        value={selectedTag?.id}
+        onChange={(value) => {
+          selectedTag = value
+          filterDevicesByTag(value)
+        }}
+      />
+      <div class="flex flex-row">
+        <Button
+          label={t('dashboard.device.reset', currentLang)}
+          props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800' }}
+          className="m-2 w-40 rounded-2xl"
+          onClick={() => filterDevicesByTag(null)}
         />
-      {/if}
-      <Button
-        label={t('dashboard.device.reset', currentLang)}
-        props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800' }}
-        className="m-2 w-40 rounded-2xl"
-        onClick={() => filterDevicesByTag(null)}
-      />
-      <Button
-        label={t('common.update', currentLang)}
-        props={{ bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800' }}
-        className="m-2 w-40 rounded-2xl"
-        onClick={() => getDeviceList(true)}
-      />
+        <Button
+          label={t('common.update', currentLang)}
+          props={{ bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800' }}
+          className="m-2 w-40 rounded-2xl"
+          onClick={() => getDeviceList(true)}
+        />
+      </div>
+     
     </div>
 
     <!-- Блок отображения устройств -->
@@ -231,7 +246,7 @@
               <div
                 class={`
                   m-1 flex w-64 flex-col rounded-2xl border-4
-                  ${UserData.Tags.find((tag) => tag.id === device.TagID)?.color || 'border-gray-400'}
+                  ${UserData.Tags.find((tag) => tag.value === device.TagID)?.color || 'border-gray-400'}
                   shadow transition-shadow duration-250 hover:shadow
                   ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}
                   ${device.IsOnline === null ? '!bg-gray-300 backdrop-blur-sm' : ''}

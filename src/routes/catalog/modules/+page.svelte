@@ -145,7 +145,7 @@
         <Button
           onClick={handleDevicesSearch}
           label={t('common.search', currentLang)}
-          props={{ bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800' }}
+          props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800' }}
           className="mx-4 w-48 rounded-2xl"
         />
         <Button

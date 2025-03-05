@@ -86,7 +86,7 @@ const createWebSocketStore = () => {
             }
 
             update((state) => ({ ...state, lastResponse: jsonData }))
-            console.info('Server:', jsonData)
+            console.info('↓', jsonData)
 
             try {
               switch (jsonData.HEADER) {
@@ -430,7 +430,6 @@ const createWebSocketStore = () => {
   ) => {
     update((state) => {
       const currentMessages = state.valueContent.get(GroupID) || []
-      console.log('Current Messages:', currentMessages)
       let updatedMessages: IGroupMessage[]
 
       switch (action) {
@@ -464,7 +463,6 @@ const createWebSocketStore = () => {
       }
 
       state.valueContent.set(GroupID, updatedMessages)
-      console.log('Updated Messages:', updatedMessages)
       return { ...state, valueContent: new Map(state.valueContent) }
     })
   }
@@ -477,7 +475,7 @@ const createWebSocketStore = () => {
         if (wsPackage) {
           state.socket.send(wsPackage)
           // console.info(`Client:`, Array.from(wsPackage).map(byte => byte.toString(16).toUpperCase().padStart(2, '0')).join(' '))
-          console.info(`Client:`, { HEADER: header, ARGUMENT: argument, VALUE: value })
+          console.info('↑', { HEADER: header, ARGUMENT: argument, VALUE: value })
         }
       } else {
         console.error(`Отправка невозможно, WebSocket закрыт`)

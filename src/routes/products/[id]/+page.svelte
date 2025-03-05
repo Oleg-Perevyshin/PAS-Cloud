@@ -71,7 +71,7 @@
    */
   const downloadFile = async (type: 'Firmware' | 'Manual' | 'API') => {
     try {
-      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&TypeData=${type}`)
+      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&TypeData=${type}&VerFW=${SelectedVerFWs?.name}`)
       if (!response.ok) {
         throw new Error('Ошибка получения файла: ' + response.statusText)
       }
@@ -80,11 +80,11 @@
       const a = document.createElement('a')
       a.href = url
       if (type === 'Firmware') {
-        a.download = `${product?.CatalogID}-Core.bin`
+        a.download = `${product?.CatalogID}-Core-v${SelectedVerFWs?.name}.bin`
       } else if (type === 'Manual') {
-        a.download = `${product?.CatalogID}-Manual.pdf`
+        a.download = `${product?.CatalogID}-Manual-v${SelectedVerFWs?.name}.pdf`
       } else if (type === 'API') {
-        a.download = `${product?.CatalogID}-API.yaml`
+        a.download = `${product?.CatalogID}-API-v${SelectedVerFWs?.name}.yaml`
       } else {
         console.error('Неизвестный тип данных для скачивания')
       }
@@ -137,7 +137,7 @@
           </div>
 
           <!-- Имя устройства и версия прошивки -->
-          <div class="mb-2 grid grid-cols-4 items-center gap-2">
+          <div class="mb-2 grid grid-cols-4 items-center gap-2 py-2">
             <div class="col-span-3 flex flex-col rounded-2xl border border-gray-400">
               <p class="block font-semibold">{t('products.devname', currentLang)}</p>
               <p>{product.CatalogName}</p>
@@ -146,7 +146,10 @@
               <Select
                 id="VerFWs"
                 label={t('products.verfw', currentLang)}
-                props={{ currentLang: currentLang }}
+                props={{
+                  currentLang: currentLang,
+                  bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800',
+                }}
                 options={product.Versions?.map((version) => ({
                   id: version.VerFW || '',
                   name: version.VerFW || '',
@@ -164,7 +167,9 @@
 
           <!-- Блок для скачивания инструкции, прошивки и файла API -->
           <div class="grid grid-cols-1 justify-items-center gap-2 md:grid-cols-3">
-            <p class="col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 bg-yellow-300 p-2 px-4">
+            <p class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
+              ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-500'}
+            `}>
               <a
                 href={`/api/catalog_file?CatalogID=${CatalogID}&TypeData=Manual&VerFW=${SelectedVerFWs?.name}`}
                 class="!text-blue-600 hover:underline"
@@ -174,12 +179,16 @@
                 <strong>{t('products.manual', currentLang)}</strong>
               </a>
             </p>
-            <p class="col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 bg-yellow-300 p-2 px-4">
+            <p class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
+              ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-500'}
+            `}>
               <button class="text-blue-600 hover:underline" onclick={() => downloadFile('Firmware')}>
                 <strong>{t('products.firmware', currentLang)}</strong>
               </button>
             </p>
-            <p class="col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 bg-yellow-300 p-2 px-4">
+            <p class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
+              ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-500'}
+            `}>
               <button class="text-blue-600 hover:underline" onclick={() => downloadFile('API')}>
                 <strong>{t('products.api', currentLang)}</strong>
               </button>

@@ -134,19 +134,27 @@
               <Button
                 onClick={() => onDelete?.(news.NewsID)}
                 label={t('common.delete', currentLang)}
-                props={{ bgColor: 'bg-red-300' }}
+                props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
                 className="m-1 w-40 rounded-2xl"
               />
               <Button
                 onClick={() => onEdit?.(news.NewsID)}
                 label={t('common.edit', currentLang)}
-                props={{ bgColor: 'bg-yellow-300' }}
+                props={currentTheme === 'light' ? { bgColor: 'bg-yellow-200' } : { bgColor: 'bg-yellow-800' }}
                 className="m-1 w-40 rounded-2xl"
               />
               <Button
                 onClick={() => onSaveEdit?.(news, !news.Published)}
                 label={news.Published ? t('common.disable', currentLang) : t('common.publish', currentLang)}
-                props={{ bgColor: news.Published ? 'bg-red-300' : 'bg-emerald-300' }}
+                props={{
+                  bgColor: news.Published
+                    ? currentTheme === 'light'
+                      ? 'bg-red-200'
+                      : 'bg-red-900'
+                    : currentTheme === 'light'
+                      ? 'bg-emerald-200'
+                      : 'bg-emerald-800',
+                }}
                 className="m-1 w-40 rounded-2xl"
               />
             </div>

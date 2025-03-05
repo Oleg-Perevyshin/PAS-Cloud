@@ -51,7 +51,7 @@
 </script>
 
 {#if show}
-  <div class="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
     <div class={`w-[80%] rounded-2xl p-4 text-center ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
       <h3>{t('common.system.message', currentLang)}</h3>
       <hr />
@@ -59,12 +59,7 @@
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html renderedContents}
       <hr />
-      <Button
-        onClick={onConfirm}
-        label={t('common.ok', currentLang)}
-        props={{ bgColor: 'bg-green-200' }}
-        className="m-2 mt-4 h-10 w-60 rounded-2xl"
-      />
+      <Button onClick={onConfirm} label={t('common.ok', currentLang)} props={{ bgColor: 'bg-lime-200' }} className="m-2 mt-4 h-10 w-60 rounded-2xl" />
     </div>
   </div>
 {/if}

@@ -1,5 +1,4 @@
 // src/routes/api/catalog_search/+server.ts
-
 import type { RequestHandler } from '@sveltejs/kit'
 import { prisma } from '$lib/Prisma'
 import { ResponseManager } from '$lib/utils/ResponseManager'
@@ -26,39 +25,30 @@ export const GET: RequestHandler = async (event) => {
     /* Определите тип для queryOptions */
     const queryOptions: {
       take: number
-      orderBy: { DevID: 'asc' }
+      orderBy: { CatalogID: 'asc' }
       select: {
-        DevID: boolean
-        DevName: boolean
+        CatalogID: boolean
+        CatalogName: boolean
         Brief: boolean
-        Description: boolean
         Icon: boolean
         VerFW: boolean
-        MetaData: boolean
-        Created: boolean
-        Updated: boolean
       }
       where?: {
         OR: Array<{
-          DevID?: { contains: string; mode: 'insensitive' }
-          DevName?: { contains: string; mode: 'insensitive' }
+          CatalogID?: { contains: string; mode: 'insensitive' }
+          CatalogName?: { contains: string; mode: 'insensitive' }
           Brief?: { contains: string; mode: 'insensitive' }
-          Description?: { contains: string; mode: 'insensitive' }
         }>
       }
     } = {
       take: pageSize,
-      orderBy: { DevID: 'asc' },
+      orderBy: { CatalogID: 'asc' },
       select: {
-        DevID: true,
-        DevName: true,
+        CatalogID: true,
+        CatalogName: true,
         Brief: true,
-        Description: true,
         Icon: true,
         VerFW: true,
-        MetaData: true,
-        Created: true,
-        Updated: true,
       },
     }
 
@@ -66,10 +56,9 @@ export const GET: RequestHandler = async (event) => {
     if (actualSearch) {
       queryOptions.where = {
         OR: [
-          { DevID: { contains: actualSearch, mode: 'insensitive' } },
-          { DevName: { contains: actualSearch, mode: 'insensitive' } },
+          { CatalogID: { contains: actualSearch, mode: 'insensitive' } },
+          { CatalogName: { contains: actualSearch, mode: 'insensitive' } },
           { Brief: { contains: actualSearch, mode: 'insensitive' } },
-          { Description: { contains: actualSearch, mode: 'insensitive' } },
         ],
       }
     }

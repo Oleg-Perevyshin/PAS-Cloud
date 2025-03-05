@@ -6,7 +6,8 @@ import type { UserRole } from '../enums'
 export interface IOptionUI {
   id: string
   name: string
-  color: string
+  value?: string | null
+  color?: string
 }
 /**
  * Вспомогательный интерфейс для привязки Тега к конкретному устройству из кабинета пользователя
@@ -44,7 +45,12 @@ export interface IUser {
   PostCode: string                        // Почтовый индекс
   PhoneNumber: string                     // Номер телефона
   IsActivated: boolean                    // Статус активации пользователя
-  Tags: { id: string; name: string; color: string }[] // Теги пользователя
+  Tags: {                                 // Теги пользователя
+    id: string
+    name: string
+    value: string
+    color: string
+  }[]
   Devices: IUserDevice[]                  // Устройства, привязанные к пользователю
   IsOnline: boolean                       // Статус входа пользователя
   Created?: string                        // Дата создания пользователя (опционально)
@@ -68,7 +74,12 @@ export interface IUserTemp {
   PostCode: string                        // Почтовый индекс
   PhoneNumber: string                     // Номер телефона
   IsActivated: boolean                    // Статус активации пользователя
-  Tags: { id: string; name: string; color: string }[] // Теги пользователя
+  Tags: {                                 // Теги пользователя
+    id: string
+    name: string
+    value: string
+    color: string
+  }[]
   Devices: IUserDevice[]                  // Устройства, привязанные к пользователю
   IsOnline: boolean                       // Статус входа пользователя
   Created?: string                        // Дата создания пользователя (опционально)
@@ -297,6 +308,12 @@ export interface IDeviceModule {
   DevFW: string                           // Текущая версия прошивки МОДУЛЯ
   VerFW: string                           // Самая последняя версия прошивки на сервере
   Brief: string                           // Краткое описание (из каталога)
+  Versions: {                             // Версии прошивок на сервере
+    VerFW: string
+    Description: string
+    Created: string
+    Updated: string
+  }[]
   Status: IWebSocketValueStatus           // Сообщения со статусом модуля
   UIBlocks: IDeviceBlock[]                // Массив логических блоки для построения Web интерфейса управления
 }

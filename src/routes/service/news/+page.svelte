@@ -172,7 +172,7 @@
       <Button
         onClick={getNewsList}
         label={t('common.update', currentLang)}
-        props={{ bgColor: 'bg-fuchsia-300' }}
+        props={{ bgColor: currentTheme === 'light' ? 'bg-fuchsia-200' : 'bg-fuchsia-800' }}
         className="m-4 h-10 w-60 rounded-2xl"
       />
     </div>

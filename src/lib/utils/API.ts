@@ -501,7 +501,7 @@ export const API_CatalogDevice = async (CatalogID: string, VerFW: string) => {
  * Удаление устройства из каталога
  * @param DevID - идентификатор устройства
  */
-export const API_CatalogDeleteDevice = async (DevID: string, VerFW: string) => {
+export const API_CatalogDeleteDevice = async (DevID: string, VerFW: string | null) => {
   try {
     const responseData = await SmartRequest(`${API_ROUTES.CATALOG_DELETE_DEVICE}`, {
       method: 'DELETE',

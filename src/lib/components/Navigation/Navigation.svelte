@@ -108,7 +108,7 @@
         <Button
           onClick={() => changePage('/dashboard/profile')}
           label="..."
-          props={{ bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800', textAlignment: 'center' }}
+          props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800', textAlignment: 'center' }}
           icon={IconMenuDashboard}
           iconProps={{ width: '2rem', height: '2rem' }}
           className="m-1 h-12 w-[95%] rounded-2xl text-left"

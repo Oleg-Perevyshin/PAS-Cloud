@@ -218,12 +218,6 @@
     <h2>{t('service.websocket.title', currentLang)}</h2>
     <!-- Блок работы с группами (обновить список, выбрать и подключиться, обновить сообщения) -->
     <div class="m-2 flex w-full flex-row flex-nowrap items-center justify-center p-2">
-      <Button
-        label={'Обновить группы'}
-        props={{ bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800' }}
-        onClick={getGroups}
-        className="w-64 rounded-2xl"
-      />
       {#if groups}
         <Select
           options={groups.map((group) => ({
@@ -245,15 +239,15 @@
           }))}
           value={selectedGroup}
           onUpdate={(value: IOptionUI | null) => joinToGroup(value)}
-          className="mx-4 w-1/3"
+          className="mx-4 w-2/3"
           props={{ currentLang: currentLang }}
         />
       {/if}
       <Button
         label={'Получить сообщения'}
-        props={{ bgColor: currentTheme === 'light' ? 'bg-green-200' : 'bg-green-800' }}
+        props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800' }}
         onClick={getMessages}
-        className="w-64 rounded-2xl"
+        className="w-60 rounded-2xl"
       />
     </div>
 
@@ -345,7 +339,7 @@
                   deleteMessage(messageId)
                 }
               }}
-              props={{ bgColor: currentTheme === 'light' ? 'bg-red-200' : 'bg-red-800' }}
+              props={{ bgColor: currentTheme === 'light' ? 'bg-red-200' : 'bg-red-900' }}
               className="absolute right-0 top-0 border-0 rounded-none rounded-tr-2xl"
               icon={IconDelete}
               iconProps={{ width: '1.5rem', height: '1.5rem' }}
