@@ -12,6 +12,7 @@ const DefaultUserTemp: IUserTemp = {
   Role: '',
   FirstName: '',
   LastName: '',
+  Department: '',
   AboutMe: '',
   Country: '',
   Region: '',

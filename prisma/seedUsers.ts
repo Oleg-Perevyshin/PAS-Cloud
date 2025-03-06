@@ -3,17 +3,13 @@ import { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 const prisma = new PrismaClient()
-const DEFAULT_TAGS = [
-  { id: '1', name: 'Tag 1', color: 'bg-stone-400 border-2 !border-stone-400' },
-  { id: '2', name: 'Tag 2', color: 'bg-red-400 border-2 !border-red-400' },
-  { id: '3', name: 'Tag 3', color: 'bg-orange-400 border-2 !border-orange-400' },
-  { id: '4', name: 'Tag 4', color: 'bg-yellow-400 border-2 !border-yellow-400' },
-  { id: '5', name: 'Tag 5', color: 'bg-lime-400 border-2 !border-lime-400' },
-  { id: '6', name: 'Tag 6', color: 'bg-emerald-400 border-2 !border-emerald-400' },
-  { id: '7', name: 'Tag 7', color: 'bg-cyan-400 border-2 !border-cyan-400' },
-  { id: '8', name: 'Tag 8', color: 'bg-blue-400 border-2 !border-blue-400' },
-  { id: '9', name: 'Tag 9', color: 'bg-violet-400 border-2 !border-violet-400' },
-  { id: '10', name: 'Tag 10', color: 'bg-fuchsia-400 border-2 !border-fuchsia-400' },
+export const DEFAULT_TAGS = [
+  { id: 'tag-1', name: 'Tag 1', value: 'tag-1', color: 'bg-stone-400 border-2 !border-stone-400' },
+  { id: 'tag-2', name: 'Tag 2', value: 'tag-2', color: 'bg-red-400 border-2 !border-red-400' },
+  { id: 'tag-3', name: 'Tag 3', value: 'tag-3', color: 'bg-yellow-400 border-2 !border-yellow-400' },
+  { id: 'tag-4', name: 'Tag 4', value: 'tag-4', color: 'bg-green-400 border-2 !border-green-400' },
+  { id: 'tag-5', name: 'Tag 5', value: 'tag-5', color: 'bg-sky-400 border-2 !border-sky-400' },
+  { id: 'tag-6', name: 'Tag 6', value: 'tag-6', color: 'bg-fuchsia-400 border-2 !border-fuchsia-400' },
 ]
 
 async function GenerateUniqueID(model: 'news' | 'user', blocks: number, charsPerBlock: number): Promise<string> {
@@ -109,26 +105,6 @@ const seed = async () => {
       Address: 'ул. Пролетарская 15',
       PostCode: '220019',
       PhoneNumber: '+375335569584',
-      Tags: DEFAULT_TAGS,
-    },
-    {
-      IsActivated: true,
-      IsOnline: false,
-      Role: 'MANAGER',
-      EMail: 'user_104@gmail.com',
-      Password: '$argon2id$v=19$m=65536,t=3,p=4$cQr7WMka597cn2ZRe8f4QA$zULE+m8ZfBKpwaTqNlbz7lP17l5NNA6WzHbEJKnSoJI',
-      NickName: 'Caramel',
-      Avatar: '',
-      FirstName: 'Елена',
-      LastName: 'Петрова',
-      Department: 'Техническое зрение',
-      AboutMe: 'Менеджер проектов',
-      Country: 'Беларусь',
-      Region: 'Минская обл.',
-      City: 'Минск',
-      Address: 'ул. Ленина 20',
-      PostCode: '220030',
-      PhoneNumber: '+375296859516',
       Tags: DEFAULT_TAGS,
     },
   ]

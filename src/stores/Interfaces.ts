@@ -125,7 +125,7 @@ export interface ICatalogDevice {
   MetaData?: string                       // Мета данные о прошивке
   Firmware: File | null,                  // Прошивки
   Manual: File | null,                    // Руководство пользователя
-  API: File | IDeviceModule | null,       // API
+  API: File | IDeviceModule | string | null,  // API
 }
 
 

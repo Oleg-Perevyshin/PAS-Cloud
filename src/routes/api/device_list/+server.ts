@@ -3,7 +3,6 @@ import type { RequestHandler } from '@sveltejs/kit'
 import { prisma } from '$lib/Prisma'
 import { ResponseManager } from '$lib/utils/ResponseManager'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
-import { FormatDate } from '$lib/utils/Common'
 
 export const GET: RequestHandler = async (event) => {
   /* Получаем язык, проверяем токены запросившего пользователя и активацию аккаунте */
@@ -53,14 +52,8 @@ export const GET: RequestHandler = async (event) => {
       DevFW: ud.Device.DevFW,
       TagID: ud.TagID,
       IsOnline: ud.Device.IsOnline,
-      CatDevName: ud.Device.Catalog.CatalogName,
-      CatBrief: ud.Device.Catalog.Brief,
-      CatDescription: ud.Device.Catalog.Description,
       CatIcon: ud.Device.Catalog.Icon,
       CatVerFW: ud.Device.Catalog.VerFW,
-      CatMeta: ud.Device.Catalog.MetaData,
-      CatCreated: FormatDate(ud.Device.Catalog.Created.toISOString()),
-      CatUpdated: FormatDate(ud.Device.Catalog.Updated.toISOString()),
     }))
     const responseData = { user_devices: devices }
     return new Response(JSON.stringify(ResponseManager('OK_GET_USER_DEVICE_LIST', lang, responseData)), { status: 200 })

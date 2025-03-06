@@ -14,7 +14,6 @@
   import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
   import { addMessage } from '../../../stores'
 
-  
   let UserData: IUser | undefined = $state()
   let currentLang: string | undefined = $state('ru')
   let currentTheme: string | undefined = $state()
@@ -23,7 +22,7 @@
   let selectedTag: IOptionUI | null = $state(null)
   let selectedTags: (IOptionUI | null)[] = $state([])
   let filteredDevices: IUser['Devices'] = $state([])
-  
+
   /* Подписка на изменения в UserStore и Language */
   let isDataFetched = false
   onMount(() => {
@@ -35,7 +34,7 @@
           id: 'tag-all',
           name: t('dashboard.device.reset', currentLang),
           value: 'tag-all',
-          color: 'bg-pink-400 border-2 !border-pink-400'
+          color: 'bg-pink-400 border-2 !border-pink-400',
         }
       }),
       Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
@@ -212,24 +211,24 @@
             color: tag.color,
           })) || []),
         ].reduce<IOptionUI[]>((acc, tag, index) => {
-          acc.push(tag);
+          acc.push(tag)
           if (index === 2) {
             acc.push({
               id: 'tag-all',
               name: t('dashboard.device.reset', currentLang),
               value: 'tag-all',
               color: 'bg-pink-400 border-2 !border-pink-400',
-            });
+            })
           }
-          return acc;
+          return acc
         }, [])}
         value={selectedTag?.value}
-        onChange={value => {
+        onChange={(value) => {
           selectedTag = value
           if (value.value === 'tag-all') {
-            filterDevicesByTag(null);
+            filterDevicesByTag(null)
           } else {
-            filterDevicesByTag(value);
+            filterDevicesByTag(value)
           }
         }}
       />
@@ -241,7 +240,6 @@
           onClick={() => getDeviceList(true)}
         />
       </div>
-     
     </div>
 
     <!-- Блок отображения устройств -->
@@ -308,6 +306,7 @@
                       <strong>DevID:</strong>
                       <a href={`/products/${device.DevID}`} class="text-blue-600 hover:underline"> {device.DevID} </a>
                     </p>
+                    <p>{device.DevFW} | {device.CatVerFW}</p>
                     <div class="my-4 flex flex-col items-center justify-center gap-4">
                       <Button
                         onClick={() => openModal(UserData!.UserID, UserData!.Devices[index].DevSN)}

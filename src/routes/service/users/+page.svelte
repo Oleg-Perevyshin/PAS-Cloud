@@ -20,17 +20,17 @@
   import IconProfile from '$lib/appIcons/MenuDashboardProfile.svelte'
 
   /* Подписки */
-  let currentLang: string | undefined = $state()
-  let UserData: IUser | undefined = $state()
-  let UserDataTemp: IUserTemp | undefined = $state()
-  let currentTheme: string | undefined = $state()
+  let currentLang: string = $state('ru')
+  let UserData: IUser | null = $state(null)
+  let UserDataTemp: IUserTemp | null = $state(null)
+  let currentTheme: string = $state('light')
   onMount(() => {
     /* Подписки */
     const unsubscribe = {
-      language: Language.subscribe((value) => (currentLang = value)),
-      user: UserStore.subscribe((value) => (UserData = value)),
-      userTemp: UserStoreTemp.subscribe((value) => (UserDataTemp = value)),
-      theme: ThemeStore.subscribe((value) => (currentTheme = value)),
+      Language: Language.subscribe((value) => (currentLang = value)),
+      User: UserStore.subscribe((value) => (UserData = value)),
+      UserTemp: UserStoreTemp.subscribe((value) => (UserDataTemp = value)),
+      Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
     }
 
     /* Получаем список пользователей */
@@ -155,8 +155,8 @@
     } catch (error) {
       console.error(`Ошибка удаления аккаунта: `, error)
     } finally {
-      // Очищаем все
       UserClearTemp()
+      UserDataTemp = null
       showModalDelete = false
       LoaderStore.set(false)
     }
@@ -166,6 +166,9 @@
   let selectedRole: IOptionUI | null = $state(null)
   let showModalEdit = $state(false)
   const handleUserEdit = (user: IUserTemp) => {
+    if (!user) {
+      console.log('handleUserEdit no user', user)
+    }
     UserDataTemp = { ...user }
     const userTempRole = UserDataTemp.Role
     if (userTempRole === undefined) {
@@ -197,6 +200,7 @@
   const cancelEdit = () => {
     showModalEdit = false
     UserClearTemp()
+    UserDataTemp = null
   }
 
   /* Поиск профиля в базе данных */
@@ -457,6 +461,7 @@
     onCancel={() => {
       showModalDelete = false
       UserClearTemp()
+      UserDataTemp = null
     }}
   />
 {/if}

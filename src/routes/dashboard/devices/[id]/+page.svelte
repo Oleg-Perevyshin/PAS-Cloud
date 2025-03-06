@@ -200,13 +200,17 @@
         const { API } = responseData.catalog
         let parsedAPI
         try {
-          parsedAPI = yaml.load(API)
+          if (API) {
+            parsedAPI = yaml.load(API as string)
+          } else {
+            throw new Error(`Ошибка API для модуля: ${module.DevSN}`)
+          }
         } catch {
           throw new Error(`Ошибка парсинга YAML для модуля: ${module.DevSN}`)
         }
 
         const moduleData: IDeviceModule = {
-          ...parsedAPI,
+          ...parsedAPI || {},
           DevID: responseData.catalog.CatalogID || '',
           Icon: responseData.catalog.Icon || '',
           Brief: responseData.catalog.Brief || '',
@@ -369,7 +373,7 @@
                     })
                   }
                   selectedModule = module
-                  
+
                   /* Сбрасываем флаг чтоб получить ответ */
                   moduleConfigFetched = false
                 }}
@@ -450,7 +454,7 @@
                           transition:slide={{ duration: 300 }}
                         >
                           <button
-                            class={`flex w-full flex-col items-center justify-between cursor-pointer`}
+                            class={`flex w-full cursor-pointer flex-col items-center justify-between`}
                             onclick={() => {
                               isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`] =
                                 !isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`]

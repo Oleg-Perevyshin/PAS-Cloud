@@ -71,7 +71,7 @@
 
   /* Функция для сброса прогресс-бара */
   const resetProgressBar = () => {
-    progressBarValue = 50;
+    progressBarValue = 50
   }
 
   /* Функция для увеличения значения прогресс-бара */
@@ -121,7 +121,7 @@
   <br />
 
   <ProgressBar id="testProgressBar" label="Component - ProgressBar" className="" bind:value={progressBarValue} />
-  <div class="flex mt-4">
+  <div class="mt-4 flex">
     <Button onClick={decreaseProgressBar} label="-10" className="m-1" />
     <Button onClick={resetProgressBar} label="Сбросить" className="m-1" />
     <Button onClick={increaseProgressBar} label="+10" className="m-1" />

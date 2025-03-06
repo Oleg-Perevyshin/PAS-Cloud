@@ -28,7 +28,6 @@ export const GET: RequestHandler = async (event) => {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
-    
     /* Проверяем токены запросившего пользователя или серийный номер устройства */
     const { requester_user, status } = await ValidateUser(event)
     if (status === 401 && !ValidateDevSN(DevSNParam)) {
@@ -96,45 +95,35 @@ export const GET: RequestHandler = async (event) => {
       fileBuffer = Buffer.from(selectedVersion.Firmware)
       fileName = `${device.CatalogID}-Firmware-v${VerFWParam}.bin`
       contentType = 'application/octet-stream'
-    }
-    
-    else if (TypeDataParam === 'Manual') {
+    } else if (TypeDataParam === 'Manual') {
       if (!selectedVersion.Manual) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(selectedVersion.Manual)
       fileName = `${device.CatalogID}-Manual-v${VerFWParam}.pdf`
       contentType = 'application/pdf'
-    }
-    
-    else if (TypeDataParam === 'MetaData') {
+    } else if (TypeDataParam === 'MetaData') {
       if (!selectedVersion.MetaData) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(JSON.stringify(selectedVersion.MetaData))
       fileName = `${device.CatalogID}-MetaData.json`
       contentType = 'application/json'
-    }
-    
-    else if (TypeDataParam === 'API') {
+    } else if (TypeDataParam === 'API') {
       if (!selectedVersion.API) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(selectedVersion.API)
       fileName = `${device.CatalogID}-API-v${VerFWParam}.yaml`
       contentType = 'application/x-yaml'
-    }
-    
-    else if (TypeDataParam === 'Icon') {
+    } else if (TypeDataParam === 'Icon') {
       if (!device.Icon) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(device.Icon)
       fileName = `${device.CatalogID}-Icon.svg`
       contentType = 'image/svg+xml'
-    }
-    
-    else {
+    } else {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 

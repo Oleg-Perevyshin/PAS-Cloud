@@ -2,7 +2,7 @@
 import type { RequestHandler } from '@sveltejs/kit'
 import { prisma } from '$lib/Prisma'
 import { ResponseManager } from '$lib/utils/ResponseManager'
-import { ValidateDevSN, FormatDate } from '$lib/utils/Common'
+import { ValidateDevSN } from '$lib/utils/Common'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
 
 export const PATCH: RequestHandler = async (event) => {
@@ -88,14 +88,9 @@ export const PATCH: RequestHandler = async (event) => {
       DevName: updatedUserDevice.Device.DevName,
       DevFW: updatedUserDevice.Device.DevFW,
       TagID: updatedUserDevice.TagID,
-      CatDevName: updatedUserDevice.Device.Catalog.CatalogName,
-      CatBrief: updatedUserDevice.Device.Catalog.Brief,
-      CatDescription: updatedUserDevice.Device.Catalog.Description,
+      IsOnline: updatedUserDevice.Device.IsOnline,
       CatIcon: updatedUserDevice.Device.Catalog.Icon,
       CatVerFW: updatedUserDevice.Device.Catalog.VerFW,
-      CatMetaData: updatedUserDevice.Device.Catalog.MetaData,
-      CatCreated: FormatDate(updatedUserDevice.Device.Catalog.Created.toISOString()),
-      CatUpdated: FormatDate(updatedUserDevice.Device.Catalog.Updated.toISOString()),
     }
     const responseData = { user_device: response }
     return new Response(JSON.stringify(ResponseManager('OK_USER_UPDATE_DEVICE', lang, responseData)), { status: 200 })

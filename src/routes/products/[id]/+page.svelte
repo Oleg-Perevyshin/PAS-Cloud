@@ -167,9 +167,11 @@
 
           <!-- Блок для скачивания инструкции, прошивки и файла API -->
           <div class="grid grid-cols-1 justify-items-center gap-2 md:grid-cols-3">
-            <p class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
+            <p
+              class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
               ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-500'}
-            `}>
+            `}
+            >
               <a
                 href={`/api/catalog_file?CatalogID=${CatalogID}&TypeData=Manual&VerFW=${SelectedVerFWs?.name}`}
                 class="!text-blue-600 hover:underline"
@@ -179,16 +181,20 @@
                 <strong>{t('products.manual', currentLang)}</strong>
               </a>
             </p>
-            <p class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
+            <p
+              class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
               ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-500'}
-            `}>
+            `}
+            >
               <button class="text-blue-600 hover:underline" onclick={() => downloadFile('Firmware')}>
                 <strong>{t('products.firmware', currentLang)}</strong>
               </button>
             </p>
-            <p class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
+            <p
+              class={`col-span-1 mx-4 flex w-48 flex-col rounded-2xl border border-gray-400 p-2 px-4
               ${currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-500'}
-            `}>
+            `}
+            >
               <button class="text-blue-600 hover:underline" onclick={() => downloadFile('API')}>
                 <strong>{t('products.api', currentLang)}</strong>
               </button>
