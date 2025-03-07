@@ -20,6 +20,7 @@
   import { API_CatalogDevice } from '$lib/utils/API'
 
   import Paragraph from '$lib/components/UI/Paragraph.svelte'
+  import HR from '$lib/components/UI/HR.svelte'
   import Button from '$lib/components/UI/Button.svelte'
   import Input from '$lib/components/UI/Input.svelte'
   import Select from '$lib/components/UI/Select.svelte'
@@ -153,12 +154,25 @@
             if (typeof ModuleConfig === 'object' && ModuleConfig !== null) {
               Object.entries(ModuleConfig).forEach(([key, value]: [string, string | number | null]) => {
                 const dynamicKey = `${ModuleConfig.DevSN}_${key}`
+
+                dynamicValues[dynamicKey] = JSON.stringify(value)
                 dynamicValues[dynamicKey] = value
+                // if (Array.isArray(value)) {
+                //   dynamicValues[dynamicKey] = JSON.stringify(value)
+                // } else {
+                //   dynamicValues[dynamicKey] = value
+                // }
+
+                // DeviceStore.update((store) => ({
+                //   ...store,
+                //   dynamicValues: { ...store.dynamicValues, [dynamicKey]: dynamicValues[dynamicKey] },
+                // }))
+
                 DeviceStore.update((store) => ({
                   ...store,
                   dynamicValues: { ...store.dynamicValues, [dynamicKey]: value },
                 }))
-                // console.log(`Установлено значение: ${dynamicKey} = ${value}`)
+                console.log(`Установлено значение: ${dynamicKey} = ${JSON.stringify(dynamicValues[dynamicKey])}`)
               })
             } else {
               console.error('ModuleConfig не является объектом или пуст')
@@ -210,7 +224,7 @@
         }
 
         const moduleData: IDeviceModule = {
-          ...parsedAPI || {},
+          ...(parsedAPI || {}),
           DevID: responseData.catalog.CatalogID || '',
           Icon: responseData.catalog.Icon || '',
           Brief: responseData.catalog.Brief || '',
@@ -293,6 +307,7 @@
             const newValue = value.SelectedValue
             DeviceStore.setDynamicValue(dynamicKey, newValue)
             dynamicValues[dynamicKey] = newValue
+            console.log(`Key: ${dynamicKey} | Value: ${newValue}`)
           }
           break
         }
@@ -350,7 +365,7 @@
 {#if UserData?.Role && ['ENGINEER', 'MANAGER', 'ADMIN'].includes(UserData.Role)}
   <div class="flex h-full flex-col">
     <h2 class="sticky top-0">{t('common.controls', currentLang)} {currentDevice?.DevName}</h2>
-    <p class="text-xs text-gray-400">{currentDevice?.DevSN}</p>
+    <p class="text-gray-400">{currentDevice?.DevSN}</p>
     <hr class="my-2 border-gray-300" />
     {#if currentDevice && currentDevice.IsOnline && isInitialized}
       <!-- Блок кнопок для выбора конкретного модуля в изделии -->
@@ -359,9 +374,9 @@
           {#if currentDevice.Modules.length > 0}
             {#each currentDevice.Modules as module}
               <button
-                class={`m-1 w-52 cursor-pointer rounded-2xl border-3 p-1
+                class={`m-1 w-58 cursor-pointer rounded-2xl border-3 p-1
               ${selectedModule && selectedModule.DevSN === module.DevSN ? 'border-blue-400' : 'border-gray-400'}
-              ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-600'}
+              ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}
             `}
                 onclick={() => {
                   if (DevSN && DevGroupID) {
@@ -400,7 +415,7 @@
         <!-- Верхнее поле -->
         <div
           class={`flex h-auto w-full flex-col justify-center border-b border-gray-400 p-1
-            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
         >
           {#if selectedModule}
             <div class="m-1 flex flex-col items-center rounded-2xl">
@@ -416,7 +431,7 @@
         <!-- Содержимое выбранного модуля -->
         <div
           class={`flex flex-grow flex-col items-center justify-start overflow-y-auto
-            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
         >
           <!-- Отображение содержимого выбранного модуля -->
           {#if selectedModule}
@@ -424,17 +439,16 @@
               <!-- Массив блоков, которые имеет модуль -->
               {#each selectedModule.UIBlocks as block, blockIndex}
                 <div
-                  class={`m-2 flex w-72 flex-col items-center justify-center rounded-2xl border border-gray-400
+                  class={`m-2 flex w-80 flex-col items-center justify-center rounded-2xl border border-gray-400
                 shadow transition-shadow duration-250 hover:shadow
               `}
                 >
                   <button
-                    class={`
-                  flex w-full flex-col items-center justify-between border last:rounded-b-2xl last:border-b-0
-                  ${currentTheme === 'light' ? '!bg-yellow-100' : '!bg-yellow-700'}
-                  ${isExpandedBlock[`${selectedModule.DevSN}_${blockIndex}`] ? 'rounded-t-2xl' : 'rounded-2xl'}
-                  cursor-pointer
-                `}
+                    class={`flex w-full flex-col items-center justify-between border last:rounded-b-2xl last:border-b-0
+                    ${currentTheme === 'light' ? '!bg-yellow-100' : '!bg-yellow-700'}
+                    ${isExpandedBlock[`${selectedModule.DevSN}_${blockIndex}`] ? 'rounded-t-2xl' : 'rounded-2xl'}
+                    cursor-pointer
+                  `}
                     onclick={() => {
                       isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`] = !isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`]
                     }}
@@ -475,6 +489,8 @@
                                       value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
                                       className={component.ClassName}
                                     />
+                                  {:else if component.Type === 'HR'}
+                                    <HR id={component.UiID} label={component.Label} className={component.ClassName} />
                                   {:else if component.Type === 'ProgressBar'}
                                     <ProgressBar
                                       id={component.UiID}
@@ -518,16 +534,29 @@
                                       props={component.Props}
                                       value={{
                                         id: component.UiID,
-                                        name: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]),
+                                        name: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
+                                        value: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
                                         color: '',
                                       }}
-                                      options={component.Options}
+                                      options={(() => {
+                                        const optionKey = `${selectedModule.DevSN}_${component.Options}`
+                                        const optionsValue = dynamicValues[optionKey]
+                                        if (Array.isArray(optionsValue)) {
+                                          return optionsValue.map((item) => ({
+                                            id: item.id,
+                                            name: item.name,
+                                            value: item.value || '',
+                                            color: item.color || '',
+                                          }))
+                                        }
+                                        return []
+                                      })()}
                                       className={component.ClassName}
                                       onUpdate={(value: IOptionUI | null) => {
                                         const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
                                         handleUIComponentEvent(component.EventHandler, {
                                           DynamicVariable: dynamicKey,
-                                          SelectedValue: value?.name ?? null,
+                                          SelectedValue: value?.value ?? null,
                                         })
                                       }}
                                     />
@@ -550,14 +579,31 @@
                                     <ButtonGroup
                                       id={component.UiID}
                                       label={component.Label}
-                                      value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
+                                      value={{
+                                        id: component.UiID,
+                                        name: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
+                                        value: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
+                                        color: '',
+                                      }}
                                       props={component.Props}
-                                      options={component.Options}
+                                      options={(() => {
+                                        const optionKey = `${selectedModule.DevSN}_${component.Options}`
+                                        const optionsValue = dynamicValues[optionKey]
+                                        if (Array.isArray(optionsValue)) {
+                                          return optionsValue.map((item) => ({
+                                            id: item.id,
+                                            name: item.name,
+                                            value: item.value || '',
+                                            color: item.color || '',
+                                          }))
+                                        }
+                                        return []
+                                      })()}
                                       onChange={(value) => {
                                         const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
                                         handleUIComponentEvent(component.EventHandler, {
                                           DynamicVariable: dynamicKey,
-                                          SelectedValue: value.id ?? null,
+                                          SelectedValue: value.value ?? null,
                                         })
                                       }}
                                     />
@@ -581,7 +627,7 @@
         <!-- Нижнее поле для сводной информации -->
         <div
           class={`flex h-8 items-center justify-center border-t border-gray-400
-            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
         >
           <p class="text-justify font-semibold text-fuchsia-400">
             {StatusData?.Status.Title}: {StatusData?.Status.Message}

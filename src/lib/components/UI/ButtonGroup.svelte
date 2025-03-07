@@ -5,7 +5,7 @@
   interface Props {
     id?: string
     label?: string
-    value?: string | number | boolean | null
+    value?: IOptionUI | null
     options?: IOptionUI[]
     className?: string
     props?: {
@@ -17,8 +17,8 @@
   let {
     id = '',
     label = '',
-    value = null,
     options = [],
+    value = { id: '', name: '', value: '', color: '' },
     className = '',
     props = {
       disabled: false,
@@ -40,16 +40,16 @@
 </script>
 
 <div {id} class={`relative inline-block w-full border-0 px-4 ${className}`}>
-  {#if label}
-    <p class="mx-4 block font-semibold">{label}</p>
-  {/if}
+  <label for={id} class="mx-4 block font-semibold">{label}</label>
   <div class="flex flex-row items-stretch">
     {#each options as item, index}
       <button
+        id={item.id}
+        value={item.value}
         type="button"
         class={`flex-1 cursor-pointer border border-gray-400 bg-blue-300 px-2 py-1 text-center transition duration-300
           select-none hover:opacity-75 hover:shadow-lg
-          ${item.id === value ? 'opacity-100' : 'opacity-25'}
+          ${item.value === value?.value ? 'opacity-100' : 'opacity-25'}
           ${index === 0 ? 'rounded-l-full' : ''}
           ${index === options.length - 1 ? 'rounded-r-full' : ''}
           ${item.color}

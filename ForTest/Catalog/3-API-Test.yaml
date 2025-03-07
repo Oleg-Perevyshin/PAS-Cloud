@@ -4,19 +4,74 @@ DevName: WiFi Module
 Description: Basic WiFi Module
 DevFW:
 UIBlocks:
-  - BlockID: WebSettings
-    Label: Web Settings
-    Description: General Web Settings
+  - BlockID: Service
+    Label: Service
+    Description: Service Actions
     Parameters:
-      - ParamID: WebAccess
-        Label: Web Access
-        Description: Access to Web Interface
+      - ParamID: SystemInfo
+        Label: System Info
+        Description: Device Information
+        UIComponents:
+          - Type: Paragraph
+            UiID: DevRun
+            Label: Number of Device Starts
+            ClassName:
+      - ParamID: SystemActions
+        Label: System Actions
+        Description: Restart and Restore Default Configuration
+        UIComponents:
+          - Type: Button
+            UiID: Restart
+            Label: Restart Module
+            ClassName: m-2 w-full
+            EventHandler:
+              Action: setValue
+              Header: SYS
+              Argument: Restart
+              Variables: [Restart]
+          - Type: Button
+            UiID: DefaultConfig
+            Label: Reset to Default Config
+            ClassName: m-2 w-full
+            EventHandler:
+              Action: setValue
+              Header: SYS
+              Argument: DefaultConfig
+              Variables: [DefaultConfig]
+      - ParamID: UpdateActions
+        Label: Update Actions
+        Description: Device Update Manager
         UIComponents:
           - Type: Input
-            UiID: WebUser
-            Label: User Name
+            UiID: SrvURL
+            Label: URL to Server Update
             EventHandler:
               Action: updateValue
               Header: SET
-              Argument: WebUser
-              Variables: [WebUser]
+              Argument: SrvURL
+              Variables: [SrvURL]
+          - Type: Input
+            UiID: DevID
+            Label: Device ID
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DevID
+              Variables: [DevID]
+          - Type: Select
+            UiID: VerFWs
+            Label: Versions
+            ClassName: w-64
+            Options: Versions
+            EventHandler:
+              Action: updateValue
+              Variables: [VerFW]
+          - Type: Button
+            UiID: UpdateByID
+            Label: Update Module By ID
+            ClassName: m-2
+            EventHandler:
+              Action: setValues
+              Header: SYS
+              Argument: UpdateByID
+              Variables: [SrvURL, DevID, VerFW]

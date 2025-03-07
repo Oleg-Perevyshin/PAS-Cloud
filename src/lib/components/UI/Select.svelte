@@ -8,13 +8,13 @@
   interface Props {
     id?: string
     label?: string
+    value?: IOptionUI | null
+    options?: IOptionUI[]
     props?: {
       currentLang?: string
       bgColor?: string
       disabled?: boolean
     }
-    value?: IOptionUI | null
-    options?: IOptionUI[]
     className?: string
 
     onUpdate?: (value: IOptionUI | null) => void
@@ -22,7 +22,7 @@
 
   let {
     options = [],
-    value = { id: '', name: '', color: '' },
+    value = { id: '', name: '', value: '', color: 'bg-gray-400' },
     label = '',
     props = {
       currentLang: 'ru',
@@ -86,13 +86,13 @@
       event.preventDefault()
     }
   }
-  // relative m-2 inline-block cursor-pointer
 </script>
 
-<div class={`relative inline-block cursor-pointer ${className}`}>
+<div class={`relative inline-block w-full cursor-pointer px-4 ${className}`}>
   <label for={id} class="mx-4 block font-semibold">{label}</label>
   <button
     {id}
+    value={value?.value}
     class={`w-full rounded-2xl border border-gray-400 p-1 text-center
       duration-300 hover:shadow-lg
       ${value?.color}
@@ -110,11 +110,13 @@
   {#if isDropdownOpen}
     <div
       class={`absolute top-full left-1/2 z-50 -translate-x-1/2 transform rounded-b-2xl border border-gray-400`}
-      style="width: calc(100% - 1.5rem);"
+      style="width: calc(100% - 3.5rem);"
       transition:slide={{ duration: 300 }}
     >
       {#each options as option, index}
         <button
+          id={option?.id}
+          value={option.value}
           class={`flex h-full w-full cursor-pointer items-center justify-center p-1
             opacity-100 transition duration-300 hover:underline
             ${props.bgColor} ${option.color} ${index === options.length - 1 ? 'rounded-b-2xl' : ''}`}

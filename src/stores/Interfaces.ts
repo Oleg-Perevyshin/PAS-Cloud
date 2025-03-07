@@ -6,7 +6,7 @@ import type { UserRole } from '../enums'
 export interface IOptionUI {
   id: string
   name: string
-  value?: string
+  value?: string | number
   color?: string
 }
 /**
@@ -338,7 +338,7 @@ export interface IUIComponent {
   Label?: string                          // Название компонента
   ClassName?: string                      // Стили оформления
   RegExp?: string                         // Регулярное выражение для Input и подобных
-  Options?: IOptionUI[]                   // Опции для элемента Select
+  Options?: IOptionUI[]                   // Опции элемента
   Props?: object                          // Дополнительные свойства (у каждого компонента свой набор, смотреть в компонентах)
   EventHandler?: IUIComponentHandler      // Обработчик событий
 }

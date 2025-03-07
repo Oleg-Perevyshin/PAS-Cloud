@@ -348,7 +348,7 @@
     <div class="flex flex-grow flex-col overflow-hidden rounded-2xl border border-gray-400">
       <!-- Заголовок таблицы -->
       <div
-        class={`sticky top-0 z-10 grid grid-cols-5 rounded-t-2xl border-gray-400 ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+        class={`sticky top-0 z-10 grid grid-cols-5 rounded-t-2xl border-gray-400 ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
         style="grid-template-columns: 10rem 10rem 20rem 15rem 1fr;"
       >
         <div class="border-r border-b border-gray-400 p-2 font-semibold">{t('service.user.icon', currentLang)}</div>
@@ -374,7 +374,7 @@
 
       <!-- Тело таблицы с прокруткой -->
       <div
-        class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+        class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
         bind:this={container}
         onscroll={handleScroll}
       >
@@ -443,7 +443,7 @@
 
       <!-- Нижнее поле для сводной информации -->
       <div
-        class={`z-10 flex h-8 items-center justify-center rounded-b-2xl border-t border-gray-400 ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+        class={`z-10 flex h-8 items-center justify-center rounded-b-2xl border-t border-gray-400 ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
       >
         <strong>{t('service.user.user_num')} {user_list.length}</strong>
       </div>
@@ -545,7 +545,7 @@
           <!-- Первая колонка -->
           <div
             class={`m-2 flex max-w-[30rem] min-w-[20rem] flex-grow flex-col items-center p-2 
-            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
           >
             <label for="avatar" class="mb-1 block font-semibold">{t('service.user.avatar', currentLang)}</label>
             <div class="flex h-48 w-48 flex-shrink-0 items-center justify-center">
@@ -606,7 +606,7 @@
           <!-- Вторая колонка -->
           <div
             class={`m-2 flex max-w-[30rem] min-w-[20rem] flex-grow flex-col items-center p-2 
-            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
           >
             <Input
               id="firstName"
@@ -667,7 +667,7 @@
         <div class="flex flex-col flex-wrap justify-center gap-4 md:flex-row">
           <div
             class={`m-2 flex max-w-[30rem] min-w-[20rem] flex-grow flex-col items-center p-2
-            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
           >
             <Input
               id="country"
@@ -713,7 +713,7 @@
         <div class="flex flex-col flex-wrap justify-center gap-4 md:flex-row">
           <div
             class={`m-2 flex max-w-[30rem] min-w-[20rem] flex-grow flex-col items-center p-2
-            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+            ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
           >
             <p class="mb-2 text-xl font-medium">{t('service.user.title_tags', currentLang)}</p>
             {#if UserDataTemp && Array.isArray(UserDataTemp.Tags)}

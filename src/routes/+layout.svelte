@@ -87,7 +87,7 @@
   <!-- Header -->
   <div
     class={`m-2 mt-4 mr-4 ml-4 flex h-20 items-center justify-between rounded-xl p-1
-    ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-800'}`}
+    ${currentTheme === 'light' ? 'bg-white' : 'bg-gray-800'}`}
   >
     <LogoModule />
     <div class="ml-auto flex items-center">
@@ -104,7 +104,7 @@
     <Navigation />
 
     <!-- Основной контент с модальным окном загрузчика -->
-    <main class={`relative m-2 mr-4 flex-1 overflow-hidden rounded-xl p-4 ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-800'}`}>
+    <main class={`relative m-2 mr-4 flex-1 overflow-hidden rounded-xl p-4 ${currentTheme === 'light' ? 'bg-white' : 'bg-gray-800'}`}>
       {@render children_render?.()}
       <Loader show={loading} />
 
@@ -120,7 +120,7 @@
   <!-- Footer -->
   <div
     class={`m-2 mr-4 mb-4 ml-4 flex h-10 items-center justify-center rounded-xl p-4 shadow-md
-    ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-800'}`}
+    ${currentTheme === 'light' ? 'bg-white' : 'bg-gray-800'}`}
   >
     <p class={`font-semibold`}>
       {t('common.footer', currentLang)}

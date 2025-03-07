@@ -311,7 +311,7 @@
       <!-- Заголовок таблицы -->
       <div
         class={`grid-cols-6" sticky top-0 grid rounded-t-2xl border-gray-400
-        ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+        ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
         style="grid-template-columns: 6rem 5rem 10rem 5rem 15rem 1fr;"
       >
         <div class="border-r border-b border-gray-400 p-2 font-semibold">{t('catalog.icon', currentLang)}</div>
@@ -340,7 +340,7 @@
 
       <!-- Тело таблицы с прокруткой -->
       <div
-        class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+        class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
         bind:this={container}
         onscroll={handleScroll}
       >
@@ -386,7 +386,7 @@
       <!-- Нижнее поле для сводной информации -->
       <div
         class={`flex h-8 items-center justify-center rounded-b-2xl border-t border-gray-400
-        ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+        ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
       >
         <strong>{t('catalog.nums')} {catalogDeviceList.length}</strong>
       </div>

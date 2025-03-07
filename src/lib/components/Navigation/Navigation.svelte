@@ -53,7 +53,7 @@
 
 <nav
   class={`m-2 ml-4 flex flex-col items-center rounded-xl p-2 text-center transition-all duration-500 select-none
-       ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-800'} overflow-y-auto `}
+       ${currentTheme === 'light' ? 'bg-white' : 'bg-gray-800'} overflow-y-auto `}
   style="width: {isExpanded ? '16rem' : '7em'};"
 >
   <!-- Кнопки сварачивания меню -->

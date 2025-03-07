@@ -76,7 +76,7 @@
   <!-- Заголовок таблицы -->
   <div
     class={`sticky top-0 grid grid-cols-5 rounded-t-2xl border-gray-400
-    ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+    ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
     style="grid-template-columns: 6rem 5rem 10rem 5rem 1fr;"
   >
     <div class="border-r border-b border-gray-400 p-2 font-semibold">{t('catalog.icon', currentLang)}</div>
@@ -101,7 +101,7 @@
   </div>
 
   <!-- Тело таблицы с прокруткой -->
-  <div class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`} bind:this={container} onscroll={onScroll}>
+  <div class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`} bind:this={container} onscroll={onScroll}>
     {#each catalogDeviceList as device}
       <div class="grid grid-cols-5 items-center overflow-y-auto border-b border-gray-400" style="grid-template-columns: 6rem 5rem 10rem 5rem 1fr;">
         <div class="flex h-full flex-shrink-0 items-center justify-center overflow-hidden border-r border-gray-400">
@@ -127,7 +127,7 @@
   <!-- Информация о количестве устройств -->
   <div
     class={`flex h-8 items-center justify-center rounded-b-2xl border-t border-gray-400
-    ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+    ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
   >
     <strong>{t('catalog.nums')} {catalogDeviceList.length}</strong>
   </div>

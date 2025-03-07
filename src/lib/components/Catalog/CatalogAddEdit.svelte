@@ -186,7 +186,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
     <div
       class={`flex w-[75%] flex-col overflow-auto rounded-2xl p-5 text-center
-      ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
+      ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-800'}`}
     >
       {#if isEditing}
         <h2>{t('service.catalog.title_edit', currentLang)}</h2>
@@ -197,7 +197,7 @@
       <!-- Иконка, CatalogID, CatalogName, Created, Updated, VerFW -->
       <div
         class={`m-1 flex items-start rounded-2xl border border-gray-400 p-2
-        ${currentTheme === 'light' ? 'bg-gray-100' : 'bg-gray-600'}`}
+        ${currentTheme === 'light' ? 'bg-gray-100' : 'bg-gray-700'}`}
       >
         <!-- Иконка -->
         <div class="flex h-40 w-40 flex-shrink-0 items-center justify-center">
@@ -353,8 +353,8 @@
 
       <!-- Поля Brief, Description, Firmware, Manual, API -->
       <div
-        class={`m-1 rounded-2xl border border-gray-400 p-2
-        ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-600'}`}
+        class={`m-1 mt-2 rounded-2xl border border-gray-400 p-2
+        ${currentTheme === 'light' ? 'bg-gray-50' : 'bg-gray-700'}`}
       >
         <Input
           id="Brief"

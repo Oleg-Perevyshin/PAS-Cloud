@@ -33,13 +33,7 @@ UIBlocks:
             Label: HTTP Protocol
             Description: Protocol
             ClassName:
-            Options:
-              - id: 0
-                name: http
-                color: bg-lime-400 border-2 !border-lime-400
-              - id: 1
-                name: https
-                color: bg-emerald-400 border-2 !border-emerald-400
+            Options: WebHttpMode-S
             EventHandler:
               Action: updateValue
               Header: SET
@@ -96,16 +90,7 @@ UIBlocks:
             UiID: DevWiFiMode
             Label: Device WiFi Mode
             ClassName: w-64
-            Options:
-              - id: 1
-                name: STA
-                color: bg-lime-400
-              - id: 2
-                name: AP
-                color: bg-red-400
-              - id: 3
-                name: APSTA
-                color: bg-orange-400
+            Options: DevWiFiMode-S
             EventHandler:
               Action: setValue
               Header: SET
@@ -136,13 +121,7 @@ UIBlocks:
             Label: STA IP Mode
             Description:
             ClassName:
-            Options:
-              - id: 0
-                name: Dynamic
-                color:
-              - id: 1
-                name: Static
-                color:
+            Options: StaIPMode-S
             EventHandler:
               Action: updateValue
               Header: SET
@@ -234,11 +213,40 @@ UIBlocks:
               Header: SET
               Argument: WiFiSettings
               Variables: [ApSSID, ApPSK, ApIP, ApMS, ApGW]
-
   - BlockID: Service
     Label: Service
     Description: Service Actions
     Parameters:
+      - ParamID: SystemInfo
+        Label: System Info
+        Description: Device Information
+        UIComponents:
+          - Type: Paragraph
+            UiID: DevRun
+            Label: Number of Device Starts
+            ClassName:
+      - ParamID: SystemActions
+        Label: System Actions
+        Description: Restart and Restore Default Configuration
+        UIComponents:
+          - Type: Button
+            UiID: Restart
+            Label: Restart Module
+            ClassName: m-2 w-full
+            EventHandler:
+              Action: setValue
+              Header: SYS
+              Argument: Restart
+              Variables: [Restart]
+          - Type: Button
+            UiID: DefaultConfig
+            Label: Reset to Default Config
+            ClassName: m-2 w-full
+            EventHandler:
+              Action: setValue
+              Header: SYS
+              Argument: DefaultConfig
+              Variables: [DefaultConfig]
       - ParamID: StatusLog
         Label: Status Log Params
         Description: Parameters for Status Log
@@ -251,19 +259,7 @@ UIBlocks:
             UiID: DebLogLevel
             Label: Log. Level
             ClassName: w-full
-            Options:
-              - id: Off
-                name: Off
-                color: bg-stone-400 border-2 !border-stone-400
-              - id: Error
-                name: Error
-                color: bg-red-400 border-2 !border-red-400
-              - id: Warning
-                name: Warning
-                color: bg-orange-400 border-2 !border-orange-400
-              - id: All
-                name: All
-                color: bg-lime-400 border-2 !border-lime-400
+            Options: DebLogLevel-S
             EventHandler:
               Action: setValue
               Header: SET
@@ -282,27 +278,14 @@ UIBlocks:
               Header: SET
               Argument: DebLedTime
               Variables: [DebLedTime]
-          - Type: Button
-            UiID: Restart
-            Label: Restart Module
-            ClassName: mt-4
-            EventHandler:
-              Action: setValue
-              Header: SYS
-              Argument: Restart
-              Variables: [Restart]
-          - Type: Button
-            UiID: DefaultConfig
-            Label: Reset to Default Config
-            ClassName: mt-4
-            EventHandler:
-              Action: setValue
-              Header: SYS
-              Argument: DefaultConfig
-              Variables: [DefaultConfig]
+      - ParamID: UpdateActions
+        Label: Update Actions
+        Description: Device Update Manager
+        UIComponents:
           - Type: Input
             UiID: SrvURL
             Label: URL to Server Update
+            ClassName:
             EventHandler:
               Action: updateValue
               Header: SET
@@ -311,23 +294,24 @@ UIBlocks:
           - Type: Input
             UiID: DevID
             Label: Device ID
+            ClassName:
             EventHandler:
               Action: updateValue
               Header: SET
               Argument: DevID
               Variables: [DevID]
           - Type: Select
-            UiID: VerFWs
+            UiID: VerFW
             Label: Versions
-            ClassName: w-64
-            Options: Versions
+            ClassName:
+            Options: VerFW-S
             EventHandler:
               Action: updateValue
               Variables: [VerFW]
           - Type: Button
             UiID: UpdateByID
             Label: Update Module By ID
-            ClassName: mt-4
+            ClassName: m-2
             EventHandler:
               Action: setValues
               Header: SYS

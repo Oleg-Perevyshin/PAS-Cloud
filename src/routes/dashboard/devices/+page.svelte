@@ -245,7 +245,7 @@
     <!-- Блок отображения устройств -->
     <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-400">
       <!-- Тело блока устройств -->
-      <div class={`flex flex-grow flex-col items-center justify-start overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}>
+      <div class={`flex flex-grow flex-col items-center justify-start overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
         <div class="mx-auto flex flex-wrap items-start justify-center p-2">
           {#if UserData && filteredDevices && filteredDevices.length > 0}
             {#each filteredDevices as device, index}
@@ -328,7 +328,7 @@
       <!-- Нижнее поле для сводной информации -->
       <div
         class={`flex h-8 items-center justify-center rounded-b-2xl border-t border-gray-400
-        ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-600'}`}
+        ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
       >
         <strong>{t('dashboard.device.devs_num')} {filteredDevices.length}</strong>
       </div>
