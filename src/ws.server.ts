@@ -21,31 +21,27 @@ const wsGroups = new Map<string, Set<WebSocket>>()
  */
 const clientsGroups = new Map<WebSocket, Set<string>>()
 
-/**
- * Все клиенты WebSocket
- */
-// const clients = new Map<WebSocket, { userID?: string; devSN?: string; lastPing: number }>()
-
-/* Отправить сообщение в группу */
-enum SendOptions {
-  ToRequester /* Отправить только запрашивающему */,
-  ToGroup /* Отправить всей группе */,
-  ToGroupExceptRequester /* Отправить всем, кроме запрашивающего */,
-}
+/* Карта для хранения клиентов */
+const clients = new Map<WebSocket, { userID?: string; devSN?: string }>()
 
 /* Отправляем пакет клиентам (в группы) */
-const sendToGroup = (GroupID: string, message: Uint8Array | null, option: SendOptions, requester?: WebSocket) => {
+const sendToGroup = (
+  GroupID: string,
+  message: Uint8Array | null,
+  option: 'ToRequester' | 'ToGroup' | 'ToGroupExceptRequester',
+  requester?: WebSocket,
+) => {
   if (!message) {
     return console.warn(`sendToGroup Нет сообщения для передачи`)
   }
   const wsGroup = wsGroups.get(GroupID)
   wsGroup?.forEach((client: WebSocket) => {
     if (client.readyState === client.OPEN) {
-      if (option === SendOptions.ToRequester && client === requester) {
+      if (option === 'ToRequester' && client === requester) {
         client.send(message)
-      } else if (option === SendOptions.ToGroup) {
+      } else if (option === 'ToGroup') {
         client.send(message)
-      } else if (option === SendOptions.ToGroupExceptRequester && client !== requester) {
+      } else if (option === 'ToGroupExceptRequester' && client !== requester) {
         client.send(message)
       }
     }
@@ -170,7 +166,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
             }
             joinGroup(ws, groupID)
             /* Отвечаем всем в группе */
-            sendToGroup(groupID, createGroupResponsePacket, SendOptions.ToGroup, ws)
+            sendToGroup(groupID, createGroupResponsePacket, 'ToGroup', ws)
           } else {
             handleError(new Error(`Ошибка SYS JoinGroup: VALUE.GroupID undefined`))
           }
@@ -200,7 +196,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
         GroupID,
       } as ILeaveGroup)
       if (LeaveGroupResponse) {
-        sendToGroup(GroupID, LeaveGroupResponse, SendOptions.ToGroup)
+        sendToGroup(GroupID, LeaveGroupResponse, 'ToGroup')
         leaveGroups(ws, GroupID)
       }
       break
@@ -238,7 +234,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
               wsGroups.set(groupID, new Set<WebSocket>())
             }
             joinGroup(ws, groupID)
-            sendToGroup(groupID, createdGroup, SendOptions.ToGroup)
+            sendToGroup(groupID, createdGroup, 'ToGroup')
           } else {
             console.warn('Ошибка Connection: VALUE.GroupID undefined')
           }
@@ -263,7 +259,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
               }
               joinGroup(ws, existingGroup.GroupID)
               /* Отвечаем всем в группе */
-              sendToGroup(ClientID, groupResponse, SendOptions.ToGroup)
+              sendToGroup(ClientID, groupResponse, 'ToGroup')
             }
           }
         } else {
@@ -282,7 +278,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
       }
       try {
         const groupResponse = (await GetGroupList(ClientID)) as Uint8Array
-        sendToGroup(GroupID, groupResponse, SendOptions.ToRequester, ws)
+        sendToGroup(GroupID, groupResponse, 'ToRequester', ws)
       } catch (error) {
         handleError(new Error(`Обработчик GET GroupList: ${error}`))
       }
@@ -300,7 +296,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
         const deleteGroupResponse = await DeleteGroup(ClientID, GroupID)
         const clientGroupResponse = await prisma.group.findUnique({ where: { GroupName: ClientID } })
         if (deleteGroupResponse && clientGroupResponse) {
-          sendToGroup(clientGroupResponse.GroupID, deleteGroupResponse, SendOptions.ToGroup)
+          sendToGroup(clientGroupResponse.GroupID, deleteGroupResponse, 'ToGroup')
           leaveGroups(ws, GroupID)
         }
       } catch (error) {
@@ -311,7 +307,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
 
     /* Сообщение о состоянии, не записываем в БД */
     case 'Status': {
-      const { DevSN, GroupID, GroupName, Status } = JSON.parse(value.toString())
+      const { DevSN, GroupID, Status } = JSON.parse(value.toString())
       if (!DevSN || !GroupID || !Status) {
         handleError(new Error(`Обработчик SYS Status: Неверный набор данных`))
       }
@@ -322,7 +318,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
         Status: Status,
       })
       if (groupResponse) {
-        sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+        sendToGroup(GroupID, groupResponse, 'ToGroupExceptRequester', ws)
       }
       break
     }
@@ -343,7 +339,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
         }
         if (groupResponse) {
           groupResponse = EncryptWebSocketPacket('SYS', argument, { ClientID, DevSN, GroupID, ...Data })
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+          sendToGroup(GroupID, groupResponse, 'ToGroupExceptRequester', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик SYS GroupMessage: ${error}`))
@@ -375,7 +371,7 @@ const handlerGET = async (ws: WebSocket, argument: string, value: string) => {
         }
         if (groupResponse) {
           groupResponse = EncryptWebSocketPacket('GET', 'ModuleList', { ClientID, DevSN, GroupID })
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+          sendToGroup(GroupID, groupResponse, 'ToGroupExceptRequester', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик GET ModuleList: ${error}`))
@@ -403,7 +399,7 @@ const handlerGET = async (ws: WebSocket, argument: string, value: string) => {
         }
         if (groupResponse) {
           groupResponse = EncryptWebSocketPacket('GET', 'ModuleConfig', { ClientID, DevSN, ModuleSN, GroupID })
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+          sendToGroup(GroupID, groupResponse, 'ToGroupExceptRequester', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик GET ModuleConfig: ${error}`))
@@ -421,7 +417,7 @@ const handlerGET = async (ws: WebSocket, argument: string, value: string) => {
       try {
         const groupResponse = await GetMessages(ClientID, GroupID, Cursor || null, 25)
         if (groupResponse) {
-          sendToGroup(GroupID, groupResponse, SendOptions.ToRequester, ws)
+          sendToGroup(GroupID, groupResponse, 'ToRequester', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик GET MessagesFromGroup: ${error}`))
@@ -454,7 +450,7 @@ const handlerSET = async (ws: WebSocket, argument: string, value: string) => {
           groupResponse = await SetMessage(null, DevSN, GroupID, 'GroupMessage', Message)
         }
         if (groupResponse) {
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroup, ws)
+          sendToGroup(GroupID, groupResponse, 'ToGroup', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик SET GroupMessage: ${error}`))
@@ -472,7 +468,7 @@ const handlerSET = async (ws: WebSocket, argument: string, value: string) => {
       try {
         const groupResponse = await DeleteMessage(ClientID, MessageID)
         if (groupResponse) {
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroup)
+          sendToGroup(GroupID, groupResponse, 'ToGroup')
         }
       } catch (error) {
         handleError(new Error(`Обработчик SET DeleteMessage: ${error}`))
@@ -496,7 +492,7 @@ const handlerSET = async (ws: WebSocket, argument: string, value: string) => {
         }
         if (groupResponse) {
           groupResponse = EncryptWebSocketPacket('SET', argument, { ClientID, DevSN, GroupID, ...Data })
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+          sendToGroup(GroupID, groupResponse, 'ToGroupExceptRequester', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик SET GroupMessage: ${error}`))
@@ -539,7 +535,7 @@ const handlerOK = async (ws: WebSocket, argument: string, value: string) => {
             GroupID: GroupID,
             ModuleList: ModuleList,
           })
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+          sendToGroup(GroupID, groupResponse, 'ToGroupExceptRequester', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик OK ModuleList: ${error}`))
@@ -566,7 +562,7 @@ const handlerOK = async (ws: WebSocket, argument: string, value: string) => {
             GroupID: GroupID,
             ModuleConfig: ModuleConfig,
           })
-          sendToGroup(GroupID, groupResponse, SendOptions.ToGroupExceptRequester, ws)
+          sendToGroup(GroupID, groupResponse, 'ToGroupExceptRequester', ws)
         }
       } catch (error) {
         handleError(new Error(`Обработчик OK ModuleConfig: ${error}`))
@@ -591,15 +587,12 @@ const wss = new WebSocketServer({ noServer: true })
 
 /* Обработчик событий WebSocket */
 wss.on('connection', async (ws, req) => {
-  /* Извлекаем параметры из URL */
+  /* Попытка подключения, извлекаем параметры из запроса */
   const { query } = parse(req.url || '', true)
   const UserID = (query.UserID as string) || undefined
   const DevSN = (query.DevSN as string) || undefined
   const DevName = (query.DevName as string) || undefined
   const DevFW = (query.DevFW as string) || undefined
-
-  /* Добавляем клиента в карту */
-  // clients.set(ws, { userID: UserID, devSN: DevSN, lastPing: Date.now() })
 
   /* Отключаем клиента от всех групп, если подключен */
   leaveGroups(ws)
@@ -676,7 +669,7 @@ wss.on('connection', async (ws, req) => {
             GroupID,
             GroupName,
           })
-          sendToGroup(GroupID, packet, SendOptions.ToRequester, ws)
+          sendToGroup(GroupID, packet, 'ToRequester', ws)
         } else {
           console.warn('Ошибка Connection: VALUE.GroupID не существует')
         }
@@ -708,26 +701,18 @@ wss.on('connection', async (ws, req) => {
   }
 
   /* Проверяем параметры подключения */
-  const clientConnected = UserID && (await handleGroupConnection('UserID', UserID))
-  const deviceConnected = DevSN && (await handleGroupConnection('DevSN', DevSN))
-  if (!clientConnected && !deviceConnected) {
-    console.error('Невалидный UserID или DevSN')
-    ws.close(1008, 'Invalid connection parameters')
-  }
-  if (clientConnected) {
-    console.info(`Пользователь ${UserID} подключился к WebSocket`)
-  }
-  if (deviceConnected) {
-    console.info(`Изделие ${DevSN} подключилось к WebSocket`)
-  }
-
-  /* Отправляем список групп клиенту (пользователю) */
-  if (UserID) {
+  if (UserID && (await handleGroupConnection('UserID', UserID))) {
     const groupResponse = (await GetGroupList(UserID)) as Uint8Array
     const createGroupResponse = DecryptWebSocketPacket(new Uint8Array(groupResponse)) as IWebSocketPacket
     if (createGroupResponse && createGroupResponse.VALUE && 'GroupID' in createGroupResponse.VALUE) {
-      sendToGroup(createGroupResponse.VALUE.GroupID as string, groupResponse, SendOptions.ToGroup)
+      sendToGroup(createGroupResponse.VALUE.GroupID as string, groupResponse, 'ToGroup')
     }
+    console.info(`Пользователь ${UserID} подключился к WebSocket`)
+  } else if (DevSN && (await handleGroupConnection('DevSN', DevSN))) {
+    console.info(`Изделие ${DevSN} подключилось к WebSocket`)
+  } else {
+    ws.close(1008, 'Invalid connection parameters')
+    console.error('Получен невалидный UserID или DevSN при попытке подключения')
   }
 
   // logGroups('CONNECTION')
@@ -788,59 +773,86 @@ wss.on('connection', async (ws, req) => {
     }
   })
 
-  /* Закрыто соединение WebSocket */
-  ws.on('close', async () => {
-    /* Выходим из всех групп */
-    leaveGroups(ws)
-    // clients.delete(ws)
+  /* Отслеживание состояния подкючения клиентов */
+  /* Добавляем клиента в карту и инициализируем переменные */
+  clients.set(ws, { userID: UserID, devSN: DevSN })
 
-    /* Проверяем пользователя в базе данных, если есть - устанавливаем флаг IsOnline в false */
-    if (UserID) {
-      try {
-        const closedUser = await prisma.user.updateMany({
-          where: { UserID },
+  const pingInterval = 30000
+  const pingTimeoutDuration = 5000
+  let timeout: NodeJS.Timeout
+
+  const handlePong = () => {
+    /* Очищаем таймер при получении pong */
+    clearTimeout(timeout)
+  }
+  ws.on('pong', handlePong)
+
+  /* Функция для обновления статуса IsOnline в БД */
+  const updateOnlineStatus = async (id: string, type: 'user' | 'device') => {
+    try {
+      const updateData = type === 'user' ? { UserID: id } : { DevSN: id }
+      let closedRecord
+      if (type === 'user') {
+        closedRecord = await prisma.user.updateMany({
+          where: updateData,
           data: { IsOnline: false },
         })
-        if (closedUser.count > 0) {
-          console.info(`Пользователь ${UserID} отключился от WebSocket`)
-        }
-      } catch (error) {
-        console.error(`Ошибка установки флага IsOnline для пользователя: ${error}`)
+      } else if (type === 'device') {
+        closedRecord = await prisma.device.updateMany({
+          where: updateData,
+          data: { IsOnline: false },
+        })
       }
+      if (closedRecord && closedRecord.count > 0) {
+        console.info(`${type === 'user' ? 'Пользователь' : 'Изделие'} ${id} отключился от WebSocket`)
+      }
+    } catch (error) {
+      console.error(`Ошибка установки флага IsOnline для ${type}: ${error}`)
+    }
+  }
+
+  const pingTimer = setInterval(() => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.ping();
+      timeout = setTimeout(async () => {
+        ws.terminate();
+        clearInterval(pingTimer);
+        clients.delete(ws);
+        leaveGroups(ws);
+        if (UserID) {
+          await updateOnlineStatus(UserID, 'user');
+        } else if (DevSN) {
+          await updateOnlineStatus(DevSN, 'device');
+        } else {
+          console.error(`Что-то отключилось от WebSocket и это не имеет UserID или DevSN`);
+        }
+      }, pingTimeoutDuration);
+    }
+  }, pingInterval)
+
+  /* Соединение WebSocket закрыто (корректно) */
+  ws.on('close', async () => {
+    /* Очищаем таймер, удаляем клиента из карты, выходим из всех групп и удаляем слушателей при закрытии */
+    clearInterval(pingTimer)
+    clients.delete(ws)
+    leaveGroups(ws)
+    ws.removeListener('pong', handlePong)
+    /* Проверяем клиента в базе данных, если есть - устанавливаем флаг IsOnline в false */
+    if (UserID) {
+      updateOnlineStatus(UserID, 'user')
     } else if (DevSN) {
-      /* Проверяем изделие в базе данных, если есть - устанавливаем флаг IsOnline в false */
-      // try {
-      //   const closedDevice = await prisma.device.updateMany({
-      //     where: { DevSN },
-      //     data: { IsOnline: false },
-      //   })
-      //   if (closedDevice.count > 0) {
-      //     console.info(`Изделие ${DevSN} отключилось от WebSocket`)
-      //   }
-      // } catch (error) {
-      //   console.error(`Ошибка установки флага IsOnline для устройства: ${error}`)
-      // }
+      updateOnlineStatus(DevSN, 'device')
     } else {
-      console.warn(`Что то отключилось от WebSocket`)
+      console.error(`Что-то отключилось от WebSocket и это не имеет UserID или DevSN`)
     }
   })
 
   /* Ошибки в WebSocket */
   ws.on('error', (error) => {
+    clearInterval(pingTimer) // Очищаем таймер в случае ошибки
     console.error(`Ошибка WebSocket: ${error}`)
   })
 })
-
-// /* Таймаут для проверки "мертвых" соединений */
-// setInterval(() => {
-//   const now = Date.now()
-//   clients.forEach((clientInfo, ws) => {
-//     if (now - clientInfo.lastPing > 30000) {
-//       console.warn(`Пользователь ${clientInfo.userID || clientInfo.devSN} не отвечает, отключение...`)
-//       ws.close()
-//     }
-//   })
-// }, 10000)
 
 /* Инициализация WebSocket как плагина */
 export default async function WebSocketPlugin(server: Server) {
@@ -850,9 +862,9 @@ export default async function WebSocketPlugin(server: Server) {
       where: { GroupName: 'System' },
     })
     if (!existingGroup) {
-      const groupSystem = await CreateGroup('SYSTEM_WS_USER', null, 'System')
+      const groupSystem = await CreateGroup('SYSTEM_WEBSOCKET_USER', null, 'System')
       if (!groupSystem) {
-        console.error(`Ошибка инициализации WebSocket: создание группы System`)
+        console.error(`Ошибка инициализации WebSocket: группа System не создана`)
       }
     }
   } catch (error) {
@@ -861,7 +873,7 @@ export default async function WebSocketPlugin(server: Server) {
 
   /* Загрузка и инициализация всех групп из базы данных */
   try {
-    const groupResponse = await GetGroupList('SYSTEM_WS_USER')
+    const groupResponse = await GetGroupList('SYSTEM_WEBSOCKET_USER')
     if (Array.isArray(groupResponse)) {
       groupResponse.forEach(({ GroupID }) => {
         if (GroupID && !wsGroups.has(GroupID)) {

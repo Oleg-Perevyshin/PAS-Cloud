@@ -83,7 +83,7 @@
         props={{ bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800', textAlignment: 'center' }}
         icon={IconMenuCompany}
         iconProps={{ width: '2rem', height: '2rem' }}
-        className="m-1 h-12 w-[95%] rounded-2xl text-left"
+        className="m-1 h-12 w-[95%]"
       />
 
       {#if UserData?.IsOnline}
@@ -93,7 +93,7 @@
           props={{ bgColor: currentTheme === 'light' ? 'bg-fuchsia-200' : 'bg-fuchsia-800', textAlignment: 'center' }}
           icon={IconMenuInfo}
           iconProps={{ width: '2rem', height: '2rem' }}
-          className="m-1 h-12 w-[95%] rounded-2xl text-left"
+          className="m-1 h-12 w-[95%]"
         />
 
         <Button
@@ -102,7 +102,7 @@
           props={{ bgColor: currentTheme === 'light' ? 'bg-orange-200' : 'bg-orange-800', textAlignment: 'center' }}
           icon={IconMenuCatalog}
           iconProps={{ width: '2rem', height: '2rem' }}
-          className="m-1 mt-4 h-12 w-[95%] rounded-2xl text-left"
+          className="m-1 mt-4 h-12 w-[95%]"
         />
 
         <Button
@@ -111,16 +111,7 @@
           props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800', textAlignment: 'center' }}
           icon={IconMenuDashboard}
           iconProps={{ width: '2rem', height: '2rem' }}
-          className="m-1 h-12 w-[95%] rounded-2xl text-left"
-        />
-
-        <Button
-          onClick={() => changePage('/chat')}
-          label="..."
-          props={{ bgColor: currentTheme === 'light' ? 'bg-yellow-200' : 'bg-yellow-800', textAlignment: 'center' }}
-          icon={IconMenuChat}
-          iconProps={{ width: '2rem', height: '2rem' }}
-          className="m-1 h-12 w-[95%] rounded-2xl text-left"
+          className="m-1 h-12 w-[95%]"
         />
 
         {#if UserData?.Role && ['MANAGER', 'ADMIN'].includes(UserData.Role)}
@@ -130,7 +121,7 @@
             props={{ bgColor: currentTheme === 'light' ? 'bg-red-200' : 'bg-red-800', textAlignment: 'center' }}
             icon={IconService}
             iconProps={{ width: '2rem', height: '2rem' }}
-            className="m-1 mt-4 h-12 w-[95%] rounded-2xl text-left"
+            className="m-1 mt-4 h-12 w-[95%]"
           />
         {/if}
       {/if}

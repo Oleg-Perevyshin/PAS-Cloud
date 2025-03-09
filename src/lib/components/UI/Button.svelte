@@ -51,7 +51,7 @@
 <!-- Разметка компонента -->
 <button
   {id}
-  class={`cursor-pointer rounded-2xl border border-gray-400 px-4 py-1 font-medium select-none
+  class={`relative mx-4 inline-block cursor-pointer items-center rounded-2xl border border-gray-400 px-2 py-1 font-medium select-none
     ${props.disabled ? 'cursor-not-allowed opacity-60' : ''}
     transition duration-300 hover:shadow-lg
     ${props.bgColor} ${props.textColor}
@@ -71,3 +71,28 @@
     </span>
   </span>
 </button>
+
+<!-- <div class={`relative inline-block w-full items-center border-0 px-4`}>
+  <button
+    {id}
+    class={`cursor-pointer relative inline-block items-center rounded-2xl border border-gray-400 w-full px-2 py-1 font-medium select-none
+      ${props.disabled ? 'cursor-not-allowed opacity-60' : ''}
+      transition duration-300 hover:shadow-lg
+      ${props.bgColor} ${props.textColor}
+      ${!props.disabled ? props.hoverBgColor : ''} ${!props.disabled ? props.activeBgColor : ''}
+      ${className}
+    `}
+    onclick={props.disabled ? undefined : onClick}
+    disabled={props.disabled}
+  >
+    <span class="flex items-center">
+      {#if icon}
+        {@const IconComponent = icon}
+        <IconComponent {...iconProps} />
+      {/if}
+      <span class={`flex-1 text-${props.textAlignment}`}>
+        {label}
+      </span>
+    </span>
+  </button>
+</div> -->

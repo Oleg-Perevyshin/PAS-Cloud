@@ -49,7 +49,7 @@
         type="button"
         class={`flex-1 cursor-pointer border border-gray-400 bg-blue-300 px-2 py-1 text-center transition duration-300
           select-none hover:opacity-75 hover:shadow-lg
-          ${item.value === value?.value ? 'opacity-100' : 'opacity-25'}
+          ${String(item.value) === value?.value ? 'opacity-100' : 'opacity-25'}
           ${index === 0 ? 'rounded-l-full' : ''}
           ${index === options.length - 1 ? 'rounded-r-full' : ''}
           ${item.color}

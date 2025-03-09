@@ -155,13 +155,13 @@
               Object.entries(ModuleConfig).forEach(([key, value]: [string, string | number | null]) => {
                 const dynamicKey = `${ModuleConfig.DevSN}_${key}`
 
-                dynamicValues[dynamicKey] = JSON.stringify(value)
-                dynamicValues[dynamicKey] = value
-                // if (Array.isArray(value)) {
-                //   dynamicValues[dynamicKey] = JSON.stringify(value)
-                // } else {
-                //   dynamicValues[dynamicKey] = value
-                // }
+                // dynamicValues[dynamicKey] = JSON.stringify(value)
+                // dynamicValues[dynamicKey] = value
+                if (Array.isArray(value)) {
+                  dynamicValues[dynamicKey] = JSON.stringify(value)
+                } else {
+                  dynamicValues[dynamicKey] = value
+                }
 
                 // DeviceStore.update((store) => ({
                 //   ...store,
@@ -172,7 +172,7 @@
                   ...store,
                   dynamicValues: { ...store.dynamicValues, [dynamicKey]: value },
                 }))
-                console.log(`Установлено значение: ${dynamicKey} = ${JSON.stringify(dynamicValues[dynamicKey])}`)
+                // console.log(`Установлено значение: ${dynamicKey} = ${JSON.stringify(dynamicValues[dynamicKey])}`)
               })
             } else {
               console.error('ModuleConfig не является объектом или пуст')
@@ -305,9 +305,19 @@
           if (value?.DynamicVariable) {
             const dynamicKey = value.DynamicVariable
             const newValue = value.SelectedValue
-            DeviceStore.setDynamicValue(dynamicKey, newValue)
+
+            let valueToStore: string | number
+            if (typeof newValue === 'number' || typeof newValue === 'boolean') {
+              valueToStore = Number(newValue)
+            } else if (newValue === null || newValue === undefined) {
+              valueToStore = ''
+            } else {
+              valueToStore = String(newValue)
+            }
+
+            DeviceStore.setDynamicValue(dynamicKey, valueToStore)
             dynamicValues[dynamicKey] = newValue
-            console.log(`Key: ${dynamicKey} | Value: ${newValue}`)
+            console.log(`Key: ${dynamicKey} | Value: ${valueToStore}`)
           }
           break
         }
@@ -498,6 +508,21 @@
                                       className={component.ClassName}
                                       bind:value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
                                     />
+                                  {:else if component.Type === 'Input'}
+                                    <Input
+                                      id={component.UiID}
+                                      props={component.Props}
+                                      label={component.Label}
+                                      className={component.ClassName}
+                                      bind:value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
+                                      onUpdate={(value) => {
+                                        const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
+                                        handleUIComponentEvent(component.EventHandler, {
+                                          DynamicVariable: dynamicKey,
+                                          SelectedValue: value,
+                                        })
+                                      }}
+                                    />
                                   {:else if component.Type === 'Button'}
                                     <Button
                                       id={component.UiID}
@@ -512,18 +537,35 @@
                                         })
                                       }}
                                     />
-                                  {:else if component.Type === 'Input'}
-                                    <Input
+                                  {:else if component.Type === 'ButtonGroup'}
+                                    <ButtonGroup
                                       id={component.UiID}
-                                      props={component.Props}
                                       label={component.Label}
-                                      className={component.ClassName}
-                                      bind:value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
-                                      onUpdate={(value) => {
+                                      value={{
+                                        id: component.UiID,
+                                        name: '',
+                                        value: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
+                                        color: '',
+                                      }}
+                                      props={component.Props}
+                                      options={(() => {
+                                        const optionKey = `${selectedModule.DevSN}_${component.Options}`
+                                        const optionsValue = dynamicValues[optionKey]
+                                        if (Array.isArray(optionsValue)) {
+                                          return optionsValue.map((item) => ({
+                                            id: item.id,
+                                            name: item.name,
+                                            value: item.value,
+                                            color: item.color,
+                                          }))
+                                        }
+                                        return []
+                                      })()}
+                                      onChange={(value) => {
                                         const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
                                         handleUIComponentEvent(component.EventHandler, {
                                           DynamicVariable: dynamicKey,
-                                          SelectedValue: value,
+                                          SelectedValue: value.value ?? null,
                                         })
                                       }}
                                     />
@@ -572,38 +614,6 @@
                                         handleUIComponentEvent(component.EventHandler, {
                                           DynamicVariable: dynamicKey,
                                           SelectedValue: value,
-                                        })
-                                      }}
-                                    />
-                                  {:else if component.Type === 'ButtonGroup'}
-                                    <ButtonGroup
-                                      id={component.UiID}
-                                      label={component.Label}
-                                      value={{
-                                        id: component.UiID,
-                                        name: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
-                                        value: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
-                                        color: '',
-                                      }}
-                                      props={component.Props}
-                                      options={(() => {
-                                        const optionKey = `${selectedModule.DevSN}_${component.Options}`
-                                        const optionsValue = dynamicValues[optionKey]
-                                        if (Array.isArray(optionsValue)) {
-                                          return optionsValue.map((item) => ({
-                                            id: item.id,
-                                            name: item.name,
-                                            value: item.value || '',
-                                            color: item.color || '',
-                                          }))
-                                        }
-                                        return []
-                                      })()}
-                                      onChange={(value) => {
-                                        const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
-                                        handleUIComponentEvent(component.EventHandler, {
-                                          DynamicVariable: dynamicKey,
-                                          SelectedValue: value.value ?? null,
                                         })
                                       }}
                                     />

@@ -37,6 +37,6 @@
     props={{ bgColor: currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800', textAlignment: 'center' }}
     icon={IconMenuCompany}
     iconProps={{ width: '2rem', height: '2rem' }}
-    className="m-1 h-12 w-[95%] rounded-2xl text-left"
+    className="m-1 h-12 w-[95%]"
   />
 </div>

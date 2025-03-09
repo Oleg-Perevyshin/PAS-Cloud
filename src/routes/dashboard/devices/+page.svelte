@@ -222,7 +222,7 @@
           }
           return acc
         }, [])}
-        value={selectedTag?.value}
+        value={selectedTag}
         onChange={(value) => {
           selectedTag = value
           if (value.value === 'tag-all') {
@@ -252,7 +252,7 @@
               <!-- Карточка устройства -->
               <div
                 class={`
-                  m-1 flex w-64 flex-col rounded-2xl border-4
+                  m-1 flex w-72 flex-col rounded-2xl border-4
                   ${UserData.Tags.find((tag) => tag.value === device.TagID)?.color || 'border-gray-400'}
                   shadow transition-shadow duration-250 hover:shadow
                   ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}

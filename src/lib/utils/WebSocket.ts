@@ -93,7 +93,7 @@ export const CreateGroup = async (UserID: string | null, DeviceID: string | null
   }
 
   /* Если это системный пользователь, сразу создаем групп */
-  if (UserID === 'SYSTEM_WS_USER') {
+  if (UserID === 'SYSTEM_WEBSOCKET_USER') {
     const newGroup = await prisma.group.create({
       data: {
         GroupID: await GenerateUniqueID('group', 3, 4),
@@ -127,7 +127,7 @@ export const CreateGroup = async (UserID: string | null, DeviceID: string | null
     }
   } else if (!DeviceID) {
     const packet = EncryptWebSocketPacket('ER!', 'CreateGroup', {
-      ClientID: UserID || DeviceID || 'SYSTEM_WS_USER',
+      ClientID: UserID || DeviceID || 'SYSTEM_WEBSOCKET_USER',
       GroupID: '',
       GroupName: null,
     } as ICreateGroup)
@@ -168,7 +168,7 @@ export const CreateGroup = async (UserID: string | null, DeviceID: string | null
  */
 export const GetGroupList = async (ClientID: string): Promise<Uint8Array | { GroupID: string; GroupName: string }[]> => {
   /* Если это системный пользователь, сразу возвращаем список групп */
-  if (ClientID === 'SYSTEM_WS_USER') {
+  if (ClientID === 'SYSTEM_WEBSOCKET_USER') {
     return await prisma.group.findMany({
       select: {
         GroupID: true,

@@ -117,7 +117,7 @@
       props={{ bgColor: currentTheme === 'light' ? 'bg-orange-200' : 'bg-orange-800', textAlignment: 'center' }}
       icon={IconMenuCatalog}
       iconProps={{ width: '2rem', height: '2rem' }}
-      className="m-1 mt-4 h-12 w-[95%] rounded-2xl text-left"
+      className="m-1 mt-4 h-12 w-[95%]"
     />
 
     <!-- Кнопки подменю -->
@@ -130,7 +130,7 @@
             props={{ bgColor: button.bgColor, textColor: button.textColor, textAlignment: 'center' }}
             icon={button.icon}
             iconProps={{ width: '1.5rem', height: '1.5rem' }}
-            className="m-0 h-10 w-[80%] rounded-2xl text-right"
+            className="m-0 h-10 !w-[80%]"
           />
         </div>
       {/each}

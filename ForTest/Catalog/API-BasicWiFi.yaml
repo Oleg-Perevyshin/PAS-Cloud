@@ -15,6 +15,7 @@ UIBlocks:
           - Type: Input
             UiID: WebUser
             Label: User Name
+            Props: { maxLength: 16 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -23,6 +24,7 @@ UIBlocks:
           - Type: Input
             UiID: WebPsw
             Label: Password
+            Props: { maxLength: 16 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -55,6 +57,7 @@ UIBlocks:
           - Type: Input
             UiID: DevName
             Label: Device Name
+            Props: { maxLength: 17 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -63,6 +66,7 @@ UIBlocks:
           - Type: Input
             UiID: DevHostName
             Label: Host Name
+            Props: { maxLength: 32 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -77,7 +81,6 @@ UIBlocks:
               Header: SET
               Argument: WebSettings
               Variables: [DevName, DevHostName]
-
   - BlockID: WiFiSettings
     Label: WiFi Settings
     Description: General WiFi Settings
@@ -103,6 +106,7 @@ UIBlocks:
           - Type: Input
             UiID: StaSSID
             Label: STA SSID
+            Props: { maxLength: 32 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -111,6 +115,7 @@ UIBlocks:
           - Type: Input
             UiID: StaPSK
             Label: STA Password
+            Props: { maxLength: 64 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -130,6 +135,7 @@ UIBlocks:
           - Type: Input
             UiID: StaIP
             Label: STA IP Address
+            Props: { maxLength: 15 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -138,6 +144,7 @@ UIBlocks:
           - Type: Input
             UiID: StaMS
             Label: STA Mask
+            Props: { maxLength: 15 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -146,6 +153,7 @@ UIBlocks:
           - Type: Input
             UiID: StaGW
             Label: STA Gateway
+            Props: { maxLength: 15 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -167,6 +175,7 @@ UIBlocks:
           - Type: Input
             UiID: ApSSID
             Label: AP SSID
+            Props: { maxLength: 32 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -175,6 +184,7 @@ UIBlocks:
           - Type: Input
             UiID: ApPSK
             Label: AP Password
+            Props: { maxLength: 64 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -183,6 +193,7 @@ UIBlocks:
           - Type: Input
             UiID: ApIP
             Label: AP IP Address
+            Props: { maxLength: 15 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -191,6 +202,7 @@ UIBlocks:
           - Type: Input
             UiID: ApMS
             Label: AP Mask
+            Props: { maxLength: 15 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -199,6 +211,7 @@ UIBlocks:
           - Type: Input
             UiID: ApGW
             Label: AP Gateway
+            Props: { maxLength: 15 }
             EventHandler:
               Action: updateValue
               Header: SET
@@ -285,6 +298,7 @@ UIBlocks:
           - Type: Input
             UiID: SrvURL
             Label: URL to Server Update
+            Props: { maxLength: 64 }
             ClassName:
             EventHandler:
               Action: updateValue
@@ -294,6 +308,7 @@ UIBlocks:
           - Type: Input
             UiID: DevID
             Label: Device ID
+            Props: { maxLength: 4 }
             ClassName:
             EventHandler:
               Action: updateValue
