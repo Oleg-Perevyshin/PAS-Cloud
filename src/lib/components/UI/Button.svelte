@@ -51,12 +51,13 @@
 <!-- Разметка компонента -->
 <button
   {id}
-  class={`relative mx-4 inline-block cursor-pointer items-center rounded-2xl border border-gray-400 px-2 py-1 font-medium select-none
+  class={`relative inline-block cursor-pointer items-center rounded-2xl border border-gray-400 font-medium select-none
     ${props.disabled ? 'cursor-not-allowed opacity-60' : ''}
     transition duration-300 hover:shadow-lg
     ${props.bgColor} ${props.textColor}
     ${!props.disabled ? props.hoverBgColor : ''} ${!props.disabled ? props.activeBgColor : ''}
     ${className}
+    mx-4 px-2 py-1
   `}
   onclick={props.disabled ? undefined : onClick}
   disabled={props.disabled}

@@ -34,7 +34,7 @@
           id: 'tag-all',
           name: t('dashboard.device.reset', currentLang),
           value: 'tag-all',
-          color: 'bg-pink-400 border-2 !border-pink-400',
+          color: 'bg-gray-400 border-2 !border-gray-400',
         }
       }),
       Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
@@ -217,7 +217,7 @@
               id: 'tag-all',
               name: t('dashboard.device.reset', currentLang),
               value: 'tag-all',
-              color: 'bg-pink-400 border-2 !border-pink-400',
+              color: 'bg-gray-400 border-2 !border-gray-400',
             })
           }
           return acc

@@ -147,32 +147,8 @@ export const EncryptWebSocketPacket = (header: string, argument: string, value: 
   const encoder = new TextEncoder()
   const dataBytes = encoder.encode(JsonPacketAsString)
 
-  /* Рассчитываем контрольную сумму CRC-16/Modbus */
-  const crc16ModBus = (data: Uint8Array): number => {
-    let crc = 0xffff
-    for (let i = 0; i < data.length; i++) {
-      crc ^= data[i]
-      for (let j = 0; j < 8; j++) {
-        const lsb = crc & 0x0001
-        crc >>= 1
-        if (lsb) {
-          crc ^= 0xa001
-        }
-      }
-    }
-    return crc
-  }
+  /* Вычисляем CRC16 байтового представления JSON пакета */
   const crcValue = crc16ModBus(dataBytes)
-
-  /* Функция шифрования данных */
-  const cryptData = (inputData: Uint8Array, key: number): Uint8Array => {
-    const keyBytes = new Uint8Array([key & 0xff, (key >> 8) & 0xff])
-    const outputData = new Uint8Array(inputData.length)
-    for (let i = 0; i < inputData.length; i++) {
-      outputData[i] = inputData[i] ^ keyBytes[i % keyBytes.length]
-    }
-    return outputData
-  }
 
   /* Шифруем данные (ключ - CRC16 исходного массива Байт) */
   const encryptedData = cryptData(dataBytes, crcValue)
@@ -182,7 +158,6 @@ export const EncryptWebSocketPacket = (header: string, argument: string, value: 
   finalPacket[0] = (crcValue >> 8) & 0xff
   finalPacket.set(encryptedData, 1)
   finalPacket[encryptedData.length + 1] = crcValue & 0xff
-
   return finalPacket
 }
 
@@ -208,32 +183,6 @@ export const DecryptWebSocketPacket = (encryptedPacket: Uint8Array): object | nu
   const receivedCrc = (encryptedPacket[0] << 8) | encryptedPacket[encryptedPacket.length - 1]
   const receivedEncryptedData = encryptedPacket.slice(1, encryptedPacket.length - 1)
 
-  /* Функция расшифровки данных */
-  const cryptData = (inputData: Uint8Array, key: number): Uint8Array => {
-    const keyBytes = new Uint8Array([key & 0xff, (key >> 8) & 0xff])
-    const outputData = new Uint8Array(inputData.length)
-    for (let i = 0; i < inputData.length; i++) {
-      outputData[i] = inputData[i] ^ keyBytes[i % keyBytes.length]
-    }
-    return outputData
-  }
-
-  /* Рассчитываем контрольную сумму CRC-16/Modbus */
-  const crc16ModBus = (data: Uint8Array): number => {
-    let crc = 0xffff
-    for (let i = 0; i < data.length; i++) {
-      crc ^= data[i]
-      for (let j = 0; j < 8; j++) {
-        const lsb = crc & 0x0001
-        crc >>= 1
-        if (lsb) {
-          crc ^= 0xa001
-        }
-      }
-    }
-    return crc
-  }
-
   /* Расшифровка данных */
   const decryptedData = cryptData(receivedEncryptedData, receivedCrc)
   const calcCrcValue = crc16ModBus(decryptedData)
@@ -251,4 +200,31 @@ export const DecryptWebSocketPacket = (encryptedPacket: Uint8Array): object | nu
   } catch (error) {
     return console.error(`DecryptWebSocketPacket: Ошибки расшифровки пакета ${error}`), null
   }
+}
+
+/* ********************************************************************************************* */
+/* Рассчитываем контрольную сумму CRC-16/Modbus */
+const crc16ModBus = (data: Uint8Array): number => {
+  let crc = 0xffff
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data[i]
+    for (let j = 0; j < 8; j++) {
+      const lsb = crc & 0x0001
+      crc >>= 1
+      if (lsb) {
+        crc ^= 0xa001
+      }
+    }
+  }
+  return crc
+}
+
+/* Функция шифрования данных */
+const cryptData = (inputData: Uint8Array, key: number): Uint8Array => {
+  const keyBytes = new Uint8Array([key & 0xff, (key >> 8) & 0xff])
+  const outputData = new Uint8Array(inputData.length)
+  for (let i = 0; i < inputData.length; i++) {
+    outputData[i] = inputData[i] ^ keyBytes[i % keyBytes.length]
+  }
+  return outputData
 }

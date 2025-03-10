@@ -804,7 +804,7 @@ wss.on('connection', async (ws, req) => {
         })
       }
       if (closedRecord && closedRecord.count > 0) {
-        console.info(`${type === 'user' ? 'Пользователь' : 'Изделие'} ${id} отключился от WebSocket`)
+        console.info(`Произошло отключение от WebSocket: ${type === 'user' ? 'Пользователь' : 'Изделие'} ${id}`)
       }
     } catch (error) {
       console.error(`Ошибка установки флага IsOnline для ${type}: ${error}`)
@@ -813,20 +813,20 @@ wss.on('connection', async (ws, req) => {
 
   const pingTimer = setInterval(() => {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.ping();
+      ws.ping()
       timeout = setTimeout(async () => {
-        ws.terminate();
-        clearInterval(pingTimer);
-        clients.delete(ws);
-        leaveGroups(ws);
+        ws.terminate()
+        clearInterval(pingTimer)
+        clients.delete(ws)
+        leaveGroups(ws)
         if (UserID) {
-          await updateOnlineStatus(UserID, 'user');
+          await updateOnlineStatus(UserID, 'user')
         } else if (DevSN) {
-          await updateOnlineStatus(DevSN, 'device');
+          await updateOnlineStatus(DevSN, 'device')
         } else {
-          console.error(`Что-то отключилось от WebSocket и это не имеет UserID или DevSN`);
+          console.error(`Что-то отключилось от WebSocket и это не имеет UserID или DevSN`)
         }
-      }, pingTimeoutDuration);
+      }, pingTimeoutDuration)
     }
   }, pingInterval)
 

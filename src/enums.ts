@@ -4,31 +4,31 @@ import { t } from '$lib/locales/i18n'
 
 /* Роли пользователей */
 export const DEFAULT_ROLES = [
-  { id: 'USER', name: t('service.user.roles.user'), color: 'bg-stone border-blue-400' },
-  { id: 'ENGINEER', name: t('service.user.roles.engineer'), color: 'bg-white border-blue-400' },
-  { id: 'MANAGER', name: t('service.user.roles.manager'), color: 'bg-white border-blue-400' },
-  { id: 'ADMIN', name: t('service.user.roles.admin'), color: 'bg-white border-blue-400' },
+  { id: 'USER', name: t('service.user.roles.user'), color: '' },
+  { id: 'ENGINEER', name: t('service.user.roles.engineer'), color: '' },
+  { id: 'MANAGER', name: t('service.user.roles.manager'), color: '' },
+  { id: 'ADMIN', name: t('service.user.roles.admin'), color: '' },
 ]
 export type UserRole = (typeof DEFAULT_ROLES)[number]['id']
 
 /* Значения для Select DevID */
 export const OPTION_DEV_CATEGORY = [
-  { id: '0', name: t('common.devid.development'), color: '!border-blue-400 !bg-stone-400' },
-  { id: '1', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '2', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '3', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '4', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '5', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '6', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '7', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '8', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: '9', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: 'A', name: t('common.devid.module'), color: '!border-blue-400 !bg-cyan-400' },
-  { id: 'B', name: t('common.devid.water'), color: '!border-blue-400 !bg-violet-400' },
-  { id: 'C', name: t('common.devid.ground'), color: '!border-blue-400 !bg-violet-400' },
-  { id: 'D', name: t('common.devid.air'), color: '!border-blue-400 !bg-violet-400' },
-  { id: 'E', name: t('common.devid.space'), color: '!border-blue-400 !bg-violet-400' },
-  { id: 'F', name: t('common.devid.system'), color: '!border-blue-400 !bg-orange-400' },
+  { id: '0', name: t('common.devid.development'), color: '!bg-stone-400' },
+  { id: '1', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '2', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '3', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '4', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '5', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '6', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '7', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '8', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: '9', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: 'A', name: t('common.devid.module'), color: '!bg-cyan-400' },
+  { id: 'B', name: t('common.devid.water'), color: '!bg-violet-400' },
+  { id: 'C', name: t('common.devid.ground'), color: '!bg-violet-400' },
+  { id: 'D', name: t('common.devid.air'), color: '!bg-violet-400' },
+  { id: 'E', name: t('common.devid.space'), color: '!bg-violet-400' },
+  { id: 'F', name: t('common.devid.system'), color: '!bg-orange-400' },
 ]
 export const OPTION_DEVID = [
   { id: '0', name: '0', color: '!border-blue-400' },
@@ -58,39 +58,6 @@ export const DEFAULT_TAGS = [
   { id: 'tag-5', name: 'Tag 5', value: 'tag-5', color: 'bg-sky-400 border-2 !border-sky-400' },
   { id: 'tag-6', name: 'Tag 6', value: 'tag-6', color: 'bg-fuchsia-400 border-2 !border-fuchsia-400' },
 ]
-
-/* Заголовки для пакета WebSocket */
-export const DEFAULT_OPTION_WS_HEADER = [
-  { id: '1', name: 'SYS', color: 'bg-fuchsia-300 !border-fuchsia-300' },
-  { id: '2', name: 'GET', color: 'bg-blue-300 !border-blue-300' },
-  { id: '3', name: 'SET', color: 'bg-yellow-300 !border-yellow-300' },
-  { id: '4', name: 'OK!', color: 'bg-lime-300 !border-lime-300' },
-  { id: '5', name: 'ER!', color: 'bg-red-300 !border-red-300' },
-]
-export enum HeaderOptions {
-  SYS = 'SYS',
-  GET = 'GET',
-  SET = 'SET',
-  OK = 'OK!',
-  ER = 'ER!',
-}
-export const ARGUMENT_OPTIONS_MAP: Record<HeaderOptions, { id: string; name: string; color: string }[]> = {
-  [HeaderOptions.SYS]: [
-    { id: '1', name: 'Restart', color: 'bg-fuchsia-300 !border-fuchsia-300' },
-    { id: '2', name: 'DefConfig', color: 'bg-fuchsia-300 !border-fuchsia-300' },
-  ],
-  [HeaderOptions.GET]: [
-    { id: '1', name: 'Config', color: 'bg-blue-300 !border-blue-300' },
-    { id: '2', name: 'DevList', color: 'bg-blue-300 !border-blue-300' },
-    { id: '3', name: 'APList', color: 'bg-blue-300 !border-blue-300' },
-  ],
-  [HeaderOptions.SET]: [
-    { id: '1', name: 'WiFiConfig', color: 'bg-yellow-300 !border-yellow-300' },
-    { id: '2', name: 'SetMessagesToGroup', color: 'bg-yellow-300 !border-yellow-300' },
-  ],
-  [HeaderOptions.OK]: [{ id: '1', name: 'Config', color: 'bg-lime-300 !border-lime-300' }],
-  [HeaderOptions.ER]: [{ id: '1', name: 'Config', color: 'bg-red-300 !border-red-300' }],
-}
 
 /* Все возможные именованные цвета из Tailwind */
 // { id: 'tag-1', name: 'Tag 1', color: 'bg-stone-400 border-2 !border-stone-400' },

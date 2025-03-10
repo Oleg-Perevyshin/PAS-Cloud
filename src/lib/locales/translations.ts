@@ -114,7 +114,7 @@ const translations: Translations = {
     /* Устройства пользователя */
     'dashboard.device.title': 'Устройства пользователя',
     'dashboard.device.tags': 'Селектор устройств',
-    'dashboard.device.reset': 'Сброс',
+    'dashboard.device.reset': 'Все устройства',
     'dashboard.device.add_device': 'Регистрация устройств',
     'dashboard.device.device_sn': 'Серийный номер',
     'dashboard.device.err_data': 'Данные неверны',

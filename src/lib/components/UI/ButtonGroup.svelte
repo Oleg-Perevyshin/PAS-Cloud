@@ -47,12 +47,12 @@
         id={item.id}
         value={item.value}
         type="button"
-        class={`flex-1 cursor-pointer border border-gray-400 bg-blue-300 px-2 py-1 text-center transition duration-300
-          select-none hover:opacity-75 hover:shadow-lg
-          ${String(item.value) === value?.value ? 'opacity-100' : 'opacity-25'}
+        class={`flex-1 cursor-pointer px-2 py-1 text-center transition duration-300
+          select-none hover:shadow-lg
           ${index === 0 ? 'rounded-l-full' : ''}
           ${index === options.length - 1 ? 'rounded-r-full' : ''}
           ${item.color}
+          ${String(item.value) === value?.value ? 'text-xl font-bold text-white opacity-100' : 'opacity-75'}
         `}
         onclick={() => updateValue(item)}
         disabled={props.disabled}

@@ -315,7 +315,7 @@
           ${currentTheme === 'light' ? 'bg-yellow-100' : 'bg-yellow-700'}`}
         >
           <!-- Заголовок сообщения (автор, дата, кнопка удаления) -->
-          <div class={`mb-2 flex w-full flex-row items-center justify-center border-b`}>
+          <div class={`flex w-full flex-row items-center justify-end border-b`}>
             <Button
               className={`mx-2 border-0 rounded-2xl`}
               onClick={() => {
@@ -340,7 +340,7 @@
                 }
               }}
               props={{ bgColor: currentTheme === 'light' ? 'bg-red-200' : 'bg-red-900' }}
-              className="absolute right-0 top-0 border-0 rounded-none rounded-tr-2xl"
+              className="absolute right-0 top-0 ml-4 border-0 rounded-none rounded-tr-2xl"
               icon={IconDelete}
               iconProps={{ width: '1.5rem', height: '1.5rem' }}
             />

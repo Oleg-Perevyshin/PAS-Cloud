@@ -1,32 +1,55 @@
 <!-- src/routes/test/+page.svelte -->
 <script lang="ts">
+  import { onMount } from 'svelte'
+  import { t, Language } from '$lib/locales/i18n'
+  import type { IWebSocketPacket, IOptionUI } from '../../stores/Interfaces'
   import Slider from '$lib/components/UI/Slider.svelte'
   import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
   import Input from '$lib/components/UI/Input.svelte'
   import Button from '$lib/components/UI/Button.svelte'
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
-  import type { IWebSocketPacket, IOptionUI } from '../../stores/Interfaces'
+  import ColorPicker from '$lib/components/UI/ColorPicker.svelte'
 
   import { EncryptWebSocketPacket, DecryptWebSocketPacket } from '$lib/utils/Common'
+  import { DEFAULT_TAGS } from '../../enums'
+
+  let currentLang: string = $state('ru')
+  onMount(() => {
+    const subscriptions = {
+      Language: Language.subscribe((value) => (currentLang = value)),
+    }
+
+    return () => {
+      Object.values(subscriptions).forEach((unsubscribe) => unsubscribe())
+    }
+  })
 
   const RadioGroupOption = [
-    { id: '1', name: 'B1', color: 'bg-stone-400 border-2 !border-stone-400' },
-    { id: '2', name: 'B2', color: 'bg-red-400 border-2 !border-red-400' },
-    { id: '3', name: 'B3', color: 'bg-orange-400 border-2 !border-orange-400' },
-    { id: '4', name: 'B4', color: 'bg-yellow-400 border-2 !border-yellow-400' },
-    { id: '5', name: 'B5', color: 'bg-lime-400 border-2 !border-lime-400' },
-    { id: '6', name: 'B6', color: 'bg-emerald-400 border-2 !border-emerald-400' },
-    { id: '7', name: 'B7', color: 'bg-cyan-400 border-2 !border-cyan-400' },
-    { id: '8', name: 'B8', color: 'bg-blue-400 border-2 !border-blue-400' },
-    { id: '9', name: 'B9', color: 'bg-violet-400 border-2 !border-violet-400' },
-    { id: '10', name: 'B10', color: 'bg-fuchsia-400 border-2 !border-fuchsia-400' },
+    { id: 'tag-1', name: 'Tag 1', color: 'bg-stone-400 border-2 !border-stone-400' },
+    { id: 'tag-2', name: 'Tag 2', color: 'bg-red-400 border-2 !border-red-400' },
+    { id: 'tag-3', name: 'Tag 3', color: 'bg-orange-400 border-2 !border-orange-400' },
+    { id: 'tag-4', name: 'Tag 4', color: 'bg-amber-400 border-2 !border-amber-400' },
+    { id: 'tag-5', name: 'Tag 5', color: 'bg-yellow-400 border-2 !border-yellow-400' },
+    { id: 'tag-6', name: 'Tag 6', color: 'bg-lime-400 border-2 !border-lime-400' },
+    { id: 'tag-7', name: 'Tag 7', color: 'bg-green-400 border-2 !border-green-400' },
+    { id: 'tag-8', name: 'Tag 8', color: 'bg-emerald-400 border-2 !border-emerald-400' },
+    { id: 'tag-9', name: 'Tag 9', color: 'bg-teal-400 border-2 !border-teal-400' },
+    { id: 'tag-10', name: 'Tag 10', color: 'bg-cyan-400 border-2 !border-cyan-400' },
+    { id: 'tag-11', name: 'Tag 11', color: 'bg-sky-400 border-2 !border-sky-400' },
+    { id: 'tag-12', name: 'Tag 12', color: 'bg-blue-400 border-2 !border-blue-400' },
+    { id: 'tag-13', name: 'Tag 13', color: 'bg-indigo-400 border-2 !border-indigo-400' },
+    { id: 'tag-14', name: 'Tag 14', color: 'bg-violet-400 border-2 !border-violet-400' },
+    { id: 'tag-15', name: 'Tag 15', color: 'bg-purple-400 border-2 !border-purple-400' },
+    { id: 'tag-16', name: 'Tag 16', color: 'bg-fuchsia-400 border-2 !border-fuchsia-400' },
+    { id: 'tag-17', name: 'Tag 17', color: 'bg-pink-400 border-2 !border-pink-400' },
+    { id: 'tag-18', name: 'Tag 18', color: 'bg-rose-400 border-2 !border-rose-400' },
   ]
 
-  let radioButtonValue: string | null = $state('7')
+  let radioButtonValue: IOptionUI | null = $state({ id: '7', name: 'B7', color: 'bg-cyan-400 border-2 !border-cyan-400' })
 
   const handleRadioButton = (value: IOptionUI) => {
     console.log('ButtonGroup Value:', value)
-    radioButtonValue = value.id
+    radioButtonValue = value
   }
 
   let sliderValue: number | null = $state(23)
@@ -80,6 +103,13 @@
       progressBarValue += 10
     }
   }
+
+  /* Начальное значение цвета */
+   let colorValue = $state({ r: 127, g: 127, b: 127 })
+   const handleColorUpdate = (newColor: { r: number, g: number, b: number }) => {
+    colorValue = newColor
+    console.log('Color Value:', $state.snapshot(colorValue))
+  }
 </script>
 
 <div class="flex h-full flex-col items-center overflow-hidden">
@@ -89,11 +119,21 @@
   </div>
 
   <ButtonGroup
-    id="TestButtonGroup"
+    id="TestButtonGroup-1"
     label="Component - ButtonGroup"
     className="m-4"
     options={RadioGroupOption}
-    value={radioButtonValue ?? ''}
+    value={radioButtonValue}
+    onChange={handleRadioButton}
+    props={{ disabled: false }}
+  />
+
+  <ButtonGroup
+    id="TestButtonGroup-2"
+    label="Default Tags"
+    className="m-4"
+    options={DEFAULT_TAGS}
+    value={radioButtonValue}
     onChange={handleRadioButton}
     props={{ disabled: false }}
   />
@@ -126,4 +166,15 @@
     <Button onClick={resetProgressBar} label="Сбросить" className="m-1" />
     <Button onClick={increaseProgressBar} label="+10" className="m-1" />
   </div>
+
+  <br />
+
+  <ColorPicker
+    id='ColorPicker'
+    label='Test Color Picker'
+    {currentLang}
+    className="w-full"
+    bind:value={colorValue}
+    onUpdate={handleColorUpdate}
+  />
 </div>
