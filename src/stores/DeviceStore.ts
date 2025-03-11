@@ -5,7 +5,7 @@ import type { IDevice } from './Interfaces'
 /* Определяем интерфейс для объединенного стора */
 interface IDeviceComplete {
   apiData: IDevice | null
-  dynamicValues: { [key: string]: string | number | boolean | null }
+  dynamicValues: { [key: string]: string | number | number[] | boolean | null }
 }
 
 const createDeviceStore = () => {
@@ -20,7 +20,7 @@ const createDeviceStore = () => {
     update,
     reset: () => set({ apiData: null, dynamicValues: {} }),
 
-    setDynamicValue: (key: string, value: string | number | boolean | null) =>
+    setDynamicValue: (key: string, value: string | number | number[] | boolean | null) =>
       update((store) => ({
         ...store,
         dynamicValues: {
@@ -35,7 +35,7 @@ const createDeviceStore = () => {
         return { ...store, dynamicValues }
       }),
 
-    getDynamicValue: (key: string): string | number | boolean | null => {
+    getDynamicValue: (key: string): string | number | number[] | boolean | null => {
       const store = get({ subscribe })
       return store.dynamicValues[key] ?? null
     },

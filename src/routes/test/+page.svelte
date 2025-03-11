@@ -105,8 +105,8 @@
   }
 
   /* Начальное значение цвета */
-   let colorValue = $state({ r: 127, g: 127, b: 127 })
-   const handleColorUpdate = (newColor: { r: number, g: number, b: number }) => {
+  let colorValue = $state({ r: 255, g: 255, b: 0 })
+  const handleColorUpdate = (newColor: { r: number; g: number; b: number }) => {
     colorValue = newColor
     console.log('Color Value:', $state.snapshot(colorValue))
   }
@@ -169,12 +169,5 @@
 
   <br />
 
-  <ColorPicker
-    id='ColorPicker'
-    label='Test Color Picker'
-    {currentLang}
-    className="w-full"
-    bind:value={colorValue}
-    onUpdate={handleColorUpdate}
-  />
+  <ColorPicker id="ColorPicker" label="Test Color Picker" className="w-full" bind:value={colorValue} onUpdate={handleColorUpdate} />
 </div>

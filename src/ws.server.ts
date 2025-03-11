@@ -798,10 +798,10 @@ wss.on('connection', async (ws, req) => {
           data: { IsOnline: false },
         })
       } else if (type === 'device') {
-        closedRecord = await prisma.device.updateMany({
-          where: updateData,
-          data: { IsOnline: false },
-        })
+        // closedRecord = await prisma.device.updateMany({
+        //   where: updateData,
+        //   data: { IsOnline: false },
+        // })
       }
       if (closedRecord && closedRecord.count > 0) {
         console.info(`Произошло отключение от WebSocket: ${type === 'user' ? 'Пользователь' : 'Изделие'} ${id}`)

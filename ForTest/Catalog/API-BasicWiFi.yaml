@@ -274,7 +274,7 @@ UIBlocks:
             ClassName: w-full
             Options: DebLogLevel-S
             EventHandler:
-              Action: setValue
+              Action: updateValue
               Header: SET
               Argument: DebLogLevel
               Variables: [DebLogLevel]
@@ -287,10 +287,28 @@ UIBlocks:
               max: 1000
               step: 25
             EventHandler:
-              Action: setValue
+              Action: updateValue
               Header: SET
               Argument: DebLedTime
               Variables: [DebLedTime]
+          - Type: ColorPicker
+            UiID: DebLedColor
+            Label: Led Color
+            ClassName: w-full
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DebLedColor
+              Variables: [DebLedColor]
+          - Type: Button
+            UiID: SaveDebLog
+            Label: Save
+            ClassName: mt-4
+            EventHandler:
+              Action: setValues
+              Header: SET
+              Argument: DebLog
+              Variables: [DebLogLevel, DebLedTime, DebLedColor]
       - ParamID: UpdateActions
         Label: Update Actions
         Description: Device Update Manager

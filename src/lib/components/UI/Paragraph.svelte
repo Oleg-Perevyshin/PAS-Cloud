@@ -7,7 +7,7 @@
   interface Props {
     id: string
     label?: string
-    value?: string | number | boolean | null
+    value?: string | number | number[] | boolean | null
     className?: string
   }
 

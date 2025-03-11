@@ -52,7 +52,7 @@
           ${index === 0 ? 'rounded-l-full' : ''}
           ${index === options.length - 1 ? 'rounded-r-full' : ''}
           ${item.color}
-          ${String(item.value) === value?.value ? 'text-xl font-bold text-white opacity-100' : 'opacity-75'}
+          ${String(item.value) === value?.value ? 'font-bold text-white opacity-100' : 'opacity-75'}
         `}
         onclick={() => updateValue(item)}
         disabled={props.disabled}

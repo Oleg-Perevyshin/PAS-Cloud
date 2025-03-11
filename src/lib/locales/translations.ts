@@ -73,6 +73,10 @@ const translations: Translations = {
     'common.devid.space': 'Космос',
     'common.devid.system': 'Оснастка',
 
+    /* КОМПОНЕНТЫ */
+    'component.colorpicker.hex': 'HEX код (RGB)',
+    'component.colorpicker.brightness': 'Яркость',
+
     /* КОМПАНИЯ */
     'company.title': 'Облачный ресурс ОАО "Пеленг": Инновационное решение для управления данными',
 

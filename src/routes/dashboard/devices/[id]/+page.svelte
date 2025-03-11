@@ -27,6 +27,7 @@
   import Slider from '$lib/components/UI/Slider.svelte'
   import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
+  import ColorPicker from '$lib/components/UI/ColorPicker.svelte'
 
   const DevSN = $page.params.id
   let DevGroupID: string | null = $state(null)
@@ -47,7 +48,7 @@
   let moduleConfigFetched = false
 
   /* Динамические переменные */
-  let dynamicValues: { [key: string]: string | number | boolean | null } = $state({})
+  let dynamicValues: { [key: string]: string | number | number[] | boolean | null } = $state({})
 
   onMount(() => {
     /* Подписки на состояние */
@@ -291,7 +292,7 @@
     handler: IUIComponentHandler | null | undefined,
     value: {
       DynamicVariable: string
-      SelectedValue: string | number | null
+      SelectedValue: string | number | number[] | null
     } | null,
   ) => {
     if (handler && handler.Action) {
@@ -305,19 +306,18 @@
           if (value?.DynamicVariable) {
             const dynamicKey = value.DynamicVariable
             const newValue = value.SelectedValue
-
-            let valueToStore: string | number
-            if (typeof newValue === 'number' || typeof newValue === 'boolean') {
+            let valueToStore: string | number | number[]
+            if (Array.isArray(newValue)) {
+              valueToStore = newValue.map(num => Number(num))
+            } else if (typeof newValue === 'number' || typeof newValue === 'boolean') {
               valueToStore = Number(newValue)
             } else if (newValue === null || newValue === undefined) {
               valueToStore = ''
             } else {
               valueToStore = String(newValue)
             }
-
             DeviceStore.setDynamicValue(dynamicKey, valueToStore)
             dynamicValues[dynamicKey] = newValue
-            console.log(`Key: ${dynamicKey} | Value: ${valueToStore}`)
           }
           break
         }
@@ -325,13 +325,17 @@
         /* Обновление значения динамической переменной в сторе и отправка в WebSocket */
         case 'setValue': {
           if (handler.Header && handler.Argument && handler.Variables && value?.DynamicVariable) {
-            const packetValue: { [key: string]: string | number | boolean | null } = {}
+            const packetValue: { [key: string]: string | number | number[] | boolean | null } = {}
             const parts = value.DynamicVariable.split('_')
             const DevSN = parts[0]
             const dynamicKey = value.DynamicVariable
             const newValue = value.SelectedValue
+            if (Array.isArray(newValue)) {
+              packetValue[parts[1]] = newValue.map(num => Number(num))
+            } else {
+              packetValue[parts[1]] = newValue
+            }
             DeviceStore.setDynamicValue(dynamicKey, newValue)
-            packetValue[parts[1]] = newValue
             WebSocketStore.sendPacket(handler.Header, handler.Argument, {
               ClientID: UserData?.UserID,
               DevSN: DevSN,
@@ -345,13 +349,17 @@
         /* Обновление значений динамических переменных в сторе и отправка в WebSocket */
         case 'setValues': {
           if (handler.Header && handler.Argument && handler.Variables && value?.DynamicVariable) {
-            const packetValue: { [key: string]: string | number | boolean | null } = {}
+            const packetValue: { [key: string]: string | number | number[] | boolean | null } = {}
             const parts = value.DynamicVariable.split('_')
             const DevSN = parts[0]
             handler.Variables.forEach((varName) => {
               const dynamicKey = `${DevSN}_${varName}`
               const dynamicValue = get(DeviceStore).dynamicValues[dynamicKey]
-              packetValue[varName] = dynamicValue
+              if (Array.isArray(dynamicValue)) {
+                packetValue[varName] = dynamicValue.map(num => Number(num))
+              } else {
+                packetValue[varName] = dynamicValue
+              }
               DeviceStore.setDynamicValue(dynamicKey, dynamicValue)
             })
             WebSocketStore.sendPacket(handler.Header, handler.Argument, {
@@ -369,6 +377,22 @@
       }
     }
   }
+
+  /* Универсальный преобразователь типов для UI компонентов */
+  // const adaptValue = (value: string | number | boolean | number[] | null, expectedType: string) => {
+  //   switch (expectedType) {
+  //     case 'string':
+  //       return value !== null && value !== undefined ? String(value) : null
+  //     case 'number':
+  //       return value !== null ? Number(value) : 0
+  //     case 'number[]':
+  //       return Array.isArray(value) ? value : (value !== null ? [Number(value)] : [])
+  //     case 'boolean':
+  //       return Boolean(value)
+  //     default:
+  //       return value
+  //   }
+  // }
 </script>
 
 <!-- Разметка компонента -->
@@ -612,6 +636,20 @@
                                       onUpdate={(value) => {
                                         const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
                                         handleUIComponentEvent(component.EventHandler, {
+                                          DynamicVariable: dynamicKey,
+                                          SelectedValue: value,
+                                        })
+                                      }}
+                                    />
+                                  {:else if component.Type === 'ColorPicker'}
+                                    <ColorPicker
+                                      id={component.UiID}
+                                      label={component.Label}
+                                      className={component.ClassName}
+                                      bind:value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
+                                      onUpdate={(value) => {
+                                      const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
+                                      handleUIComponentEvent(component.EventHandler, {
                                           DynamicVariable: dynamicKey,
                                           SelectedValue: value,
                                         })
