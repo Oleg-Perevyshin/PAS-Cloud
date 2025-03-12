@@ -308,7 +308,7 @@
             const newValue = value.SelectedValue
             let valueToStore: string | number | number[]
             if (Array.isArray(newValue)) {
-              valueToStore = newValue.map(num => Number(num))
+              valueToStore = newValue.map((num) => Number(num))
             } else if (typeof newValue === 'number' || typeof newValue === 'boolean') {
               valueToStore = Number(newValue)
             } else if (newValue === null || newValue === undefined) {
@@ -331,7 +331,7 @@
             const dynamicKey = value.DynamicVariable
             const newValue = value.SelectedValue
             if (Array.isArray(newValue)) {
-              packetValue[parts[1]] = newValue.map(num => Number(num))
+              packetValue[parts[1]] = newValue.map((num) => Number(num))
             } else {
               packetValue[parts[1]] = newValue
             }
@@ -356,7 +356,7 @@
               const dynamicKey = `${DevSN}_${varName}`
               const dynamicValue = get(DeviceStore).dynamicValues[dynamicKey]
               if (Array.isArray(dynamicValue)) {
-                packetValue[varName] = dynamicValue.map(num => Number(num))
+                packetValue[varName] = dynamicValue.map((num) => Number(num))
               } else {
                 packetValue[varName] = dynamicValue
               }
@@ -515,7 +515,7 @@
                             {#each parameter.UIComponents as component}
                               <!-- Содержимое блока с настройками и UI компонентами -->
                               {#if isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`]}
-                                <div class={`flex w-full flex-col items-center justify-center last:mb-4`} transition:slide={{ duration: 300 }}>
+                                <div class={`flex flex-col items-center justify-center last:mb-4`} transition:slide={{ duration: 300 }}>
                                   {#if component.Type === 'Paragraph'}
                                     <Paragraph
                                       id={component.UiID}
@@ -648,8 +648,8 @@
                                       className={component.ClassName}
                                       bind:value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
                                       onUpdate={(value) => {
-                                      const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
-                                      handleUIComponentEvent(component.EventHandler, {
+                                        const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
+                                        handleUIComponentEvent(component.EventHandler, {
                                           DynamicVariable: dynamicKey,
                                           SelectedValue: value,
                                         })

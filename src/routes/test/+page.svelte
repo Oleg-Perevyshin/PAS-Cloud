@@ -105,10 +105,9 @@
   }
 
   /* Начальное значение цвета */
-  let colorValue = $state({ r: 255, g: 255, b: 0 })
-  const handleColorUpdate = (newColor: { r: number; g: number; b: number }) => {
+  let colorValue = $state([150, 250, 50])
+  const handleColorUpdate = (newColor: number[]) => {
     colorValue = newColor
-    console.log('Color Value:', $state.snapshot(colorValue))
   }
 </script>
 

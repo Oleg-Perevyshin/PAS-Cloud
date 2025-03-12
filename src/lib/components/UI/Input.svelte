@@ -137,7 +137,7 @@
     <input
       class={`h-auto w-full cursor-pointer rounded-2xl border border-blue-400 px-4 py-1 text-center text-base
         duration-300 hover:shadow-lg focus:border-blue-400 focus:outline-none
-        ${props.disabled ? 'cursor-not-allowed opacity-60' : ''}
+        ${props.disabled ? 'cursor-not-allowed opacity-75' : ''}
         ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}
         ${!isValid ? 'invalid' : ''}
       `}

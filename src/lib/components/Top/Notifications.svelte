@@ -34,7 +34,7 @@
 <div class="relative mx-4 flex items-start">
   <!-- Уведомление о новых личных сообщениях -->
   <button
-    class="flex cursor-pointer items-center opacity-100 transition-opacity duration-300 hover:opacity-50"
+    class="flex cursor-pointer items-center opacity-100 transition-opacity duration-300 hover:opacity-75"
     onclick={() => changePage('/dashboard/chat')}
     aria-label="Notifications"
   >

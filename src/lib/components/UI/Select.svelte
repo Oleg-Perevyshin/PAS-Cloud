@@ -96,7 +96,7 @@
     class={`w-full rounded-2xl border border-gray-400 p-1 text-center
       duration-300 hover:shadow-lg
       ${value?.color}
-      ${props.disabled ? 'cursor-not-allowed opacity-50' : ''}
+      ${props.disabled ? 'cursor-not-allowed opacity-75' : ''}
       ${props.bgColor}`}
     onclick={toggleDropdown}
     onkeydown={handleKeydown}

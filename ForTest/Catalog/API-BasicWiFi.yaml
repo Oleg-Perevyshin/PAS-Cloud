@@ -245,7 +245,7 @@ UIBlocks:
           - Type: Button
             UiID: Restart
             Label: Restart Module
-            ClassName: m-2 w-full
+            ClassName:
             EventHandler:
               Action: setValue
               Header: SYS
@@ -254,7 +254,7 @@ UIBlocks:
           - Type: Button
             UiID: DefaultConfig
             Label: Reset to Default Config
-            ClassName: m-2 w-full
+            ClassName:
             EventHandler:
               Action: setValue
               Header: SYS

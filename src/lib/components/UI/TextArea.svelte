@@ -73,7 +73,7 @@
     class={`relative resize-none rounded-2xl border border-blue-400 px-4 py-1 text-justify text-base
     opacity-100 transition duration-300 hover:opacity-75 hover:shadow-lg
     ${className}
-    ${props.disabled ? 'cursor-not-allowed opacity-60' : ''}
+    ${props.disabled ? 'cursor-not-allowed opacity-75' : ''}
     ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}`}
     {id}
     bind:value
