@@ -457,6 +457,9 @@
                 <p class="text-center font-semibold">{selectedModule.DevName} | {selectedModule?.DevID}</p>
               </a>
               <p class="text-xs text-gray-400">{selectedModule?.DevSN}</p>
+              <p class="text-justify font-semibold text-fuchsia-400">
+                {StatusData?.Status.Title}: {StatusData?.Status.Message}
+              </p>
             </div>
           {:else}
             <h5>{t('dashboard.device.selectmodule')}</h5>
