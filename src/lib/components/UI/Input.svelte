@@ -12,7 +12,7 @@
     label?: string
     className?: string
     type?: string
-    value?: string | number | boolean | null
+    value?: boolean | string | number | number[] | object | null
     info?: string
     props?: {
       lableAlign?: string
@@ -99,7 +99,7 @@
     const inputValue = (event.target as HTMLInputElement).value
     const cleanedValue = allowOnly ? inputValue.replace(allowOnly, '') : inputValue
     value = cleanedValue
-    isValid = !validate || validate(inputValue)
+    isValid = !validate || validate(cleanedValue)
     onUpdate(value)
   }
 

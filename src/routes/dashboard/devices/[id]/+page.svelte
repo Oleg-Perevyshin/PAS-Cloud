@@ -28,6 +28,7 @@
   import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
   import ColorPicker from '$lib/components/UI/ColorPicker.svelte'
+  import Switch from '$lib/components/UI/Switch.svelte'
 
   const DevSN = $page.params.id
   let DevGroupID: string | null = $state(null)
@@ -48,7 +49,7 @@
   let moduleConfigFetched = false
 
   /* Динамические переменные */
-  let dynamicValues: { [key: string]: string | number | number[] | boolean | null } = $state({})
+  let dynamicValues: { [key: string]: boolean | string | number | number[] | object | null } = $state({})
 
   onMount(() => {
     /* Подписки на состояние */
@@ -292,7 +293,7 @@
     handler: IUIComponentHandler | null | undefined,
     value: {
       DynamicVariable: string
-      SelectedValue: string | number | number[] | null
+      SelectedValue: boolean | string | number | number[] | object | null
     } | null,
   ) => {
     if (handler && handler.Action) {
@@ -325,7 +326,7 @@
         /* Обновление значения динамической переменной в сторе и отправка в WebSocket */
         case 'setValue': {
           if (handler.Header && handler.Argument && handler.Variables && value?.DynamicVariable) {
-            const packetValue: { [key: string]: string | number | number[] | boolean | null } = {}
+            const packetValue: { [key: string]: boolean | string | number | number[] | object | null } = {}
             const parts = value.DynamicVariable.split('_')
             const DevSN = parts[0]
             const dynamicKey = value.DynamicVariable
@@ -349,7 +350,7 @@
         /* Обновление значений динамических переменных в сторе и отправка в WebSocket */
         case 'setValues': {
           if (handler.Header && handler.Argument && handler.Variables && value?.DynamicVariable) {
-            const packetValue: { [key: string]: string | number | number[] | boolean | null } = {}
+            const packetValue: { [key: string]: boolean | string | number | number[] | object | null } = {}
             const parts = value.DynamicVariable.split('_')
             const DevSN = parts[0]
             handler.Variables.forEach((varName) => {
@@ -631,6 +632,21 @@
                                     />
                                   {:else if component.Type === 'Slider'}
                                     <Slider
+                                      id={component.UiID}
+                                      label={component.Label}
+                                      props={component.Props}
+                                      className={component.ClassName}
+                                      value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]}
+                                      onUpdate={(value) => {
+                                        const dynamicKey = `${selectedModule?.DevSN}_${component.UiID}`
+                                        handleUIComponentEvent(component.EventHandler, {
+                                          DynamicVariable: dynamicKey,
+                                          SelectedValue: value,
+                                        })
+                                      }}
+                                    />
+                                  {:else if component.Type === 'Switch'}
+                                    <Switch
                                       id={component.UiID}
                                       label={component.Label}
                                       props={component.Props}

@@ -88,7 +88,7 @@
 
 <!-- Основной контент -->
 {#if UserData?.IsOnline}
-  <div class="flex w-full h-full flex-col items-center overflow-hidden">
+  <div class="flex h-full w-full flex-col items-center overflow-hidden">
     <div class="sticky top-0">
       <h2>{t('dashboard.profile.title', currentLang)}</h2>
     </div>
@@ -96,7 +96,7 @@
     <div class="flex flex-wrap items-start overflow-y-auto">
       <!-- Основные данные -->
       <div
-        class={`m-2 flex flex-col items-center rounded-2xl border p-4 flex-1 min-w-[20rem]
+        class={`m-2 flex min-w-[20rem] flex-1 flex-col items-center rounded-2xl border p-4
       ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}`}
       >
         <p class="text-xl font-medium">{t('dashboard.profile.main', currentLang)}</p>
@@ -177,7 +177,7 @@
 
       <!-- Адрес -->
       <div
-        class={`m-2 flex flex-col items-center rounded-2xl border p-4 flex-1 min-w-[20rem]
+        class={`m-2 flex min-w-[20rem] flex-1 flex-col items-center rounded-2xl border p-4
       ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}`}
       >
         <p class="text-xl font-medium">{t('dashboard.profile.location', currentLang)}</p>
@@ -234,7 +234,7 @@
 
       <!-- Теги -->
       <div
-        class={`m-2 flex flex-col items-center rounded-2xl border p-4 flex-1 min-w-[20rem]
+        class={`m-2 flex min-w-[20rem] flex-1 flex-col items-center rounded-2xl border p-4
       ${currentTheme === 'light' ? '!bg-white' : '!bg-gray-700'}`}
       >
         <p class="text-xl font-medium">{t('dashboard.profile.tags', currentLang)}</p>

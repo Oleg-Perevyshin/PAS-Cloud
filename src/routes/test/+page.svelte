@@ -1,7 +1,5 @@
 <!-- src/routes/test/+page.svelte -->
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import { t, Language } from '$lib/locales/i18n'
   import type { IWebSocketPacket, IOptionUI } from '../../stores/Interfaces'
   import Slider from '$lib/components/UI/Slider.svelte'
   import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
@@ -9,20 +7,10 @@
   import Button from '$lib/components/UI/Button.svelte'
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
   import ColorPicker from '$lib/components/UI/ColorPicker.svelte'
+  import Switch from '$lib/components/UI/Switch.svelte'
 
   import { EncryptWebSocketPacket, DecryptWebSocketPacket } from '$lib/utils/Common'
   import { DEFAULT_TAGS } from '../../enums'
-
-  let currentLang: string = $state('ru')
-  onMount(() => {
-    const subscriptions = {
-      Language: Language.subscribe((value) => (currentLang = value)),
-    }
-
-    return () => {
-      Object.values(subscriptions).forEach((unsubscribe) => unsubscribe())
-    }
-  })
 
   const RadioGroupOption = [
     { id: 'tag-1', name: 'Tag 1', color: 'bg-stone-400 border-2 !border-stone-400' },
@@ -46,7 +34,6 @@
   ]
 
   let radioButtonValue: IOptionUI | null = $state({ id: '7', name: 'B7', color: 'bg-cyan-400 border-2 !border-cyan-400' })
-
   const handleRadioButton = (value: IOptionUI) => {
     console.log('ButtonGroup Value:', value)
     radioButtonValue = value
@@ -66,15 +53,12 @@
     if (!packHeader || !packArgument) {
       return console.log(`Поле Header или Argument не может быть пустым`)
     }
-
     const parsedValue = JSON.parse(packValue)
     if (!parsedValue) {
       return console.error('Ошибка содержимого поля Value')
     }
-
     const EncryptResponse = EncryptWebSocketPacket(packHeader, packArgument, parsedValue) as Uint8Array
     const DecryptResponse = DecryptWebSocketPacket(new Uint8Array(EncryptResponse)) as IWebSocketPacket
-
     console.info('Encrypt Data:', EncryptResponse)
     console.info('Decrypt Data:', DecryptResponse)
   }
@@ -91,13 +75,9 @@
       progressBarValue -= 10
     }
   }
-
-  /* Функция для сброса прогресс-бара */
   const resetProgressBar = () => {
     progressBarValue = 50
   }
-
-  /* Функция для увеличения значения прогресс-бара */
   const increaseProgressBar = () => {
     if (progressBarValue < 100) {
       progressBarValue += 10
@@ -108,6 +88,13 @@
   let colorValue = $state([150, 250, 50])
   const handleColorUpdate = (newColor: number[]) => {
     colorValue = newColor
+  }
+
+  /* Switch */
+  let switchValue: boolean | null = $state(false)
+  const toggleSwitch = (value: boolean | number) => {
+    // console.log('toggleSwitch Value:', value)
+    switchValue = !!value
   }
 </script>
 
@@ -169,4 +156,8 @@
   <br />
 
   <ColorPicker id="ColorPicker" label="Test Color Picker" className="w-full" bind:value={colorValue} onUpdate={handleColorUpdate} />
+
+  <br />
+
+  <Switch id="Switch" label="Test Switch" value={switchValue} className="" onUpdate={toggleSwitch} />
 </div>

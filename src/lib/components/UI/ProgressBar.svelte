@@ -1,33 +1,43 @@
 <!-- $lib/components/UI/ProgressBar.svelte -->
 <script lang="ts">
-  // import { onMount } from 'svelte'
-  // import { t, Language } from '$lib/locales/i18n'
-  // import { ThemeStore } from '../../../stores'
-
   interface Props {
     id: string
     label?: string
-    value?: string | number | boolean | null
+    value?: boolean | string | number | number[] | object | null
+    props?: {
+      min?: number
+      max?: number
+      units?: string
+    }
     className?: string
   }
 
-  let { id = '', label = '', value = $bindable(0), className = '' }: Props = $props()
+  let {
+    id = '',
+    label = '',
+    value = $bindable(0),
+    props = {
+      min: 0,
+      max: 100,
+      units: '%',
+    },
+    className = '',
+  }: Props = $props()
 
-  // let currentLang: string | undefined = $state()
-  // let currentTheme: string | undefined = $state()
+  let numericValue = $state(0)
+  const min = props.min ?? 0
+  const max = props.max ?? 100
 
-  // onMount(() => {
-  //   /* Подписки на состояние */
-  //   const subscriptions = {
-  //     Language: Language.subscribe((value) => (currentLang = value)),
-  //     Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
-  //   }
-
-  //   /* Очистка подписок и обработчиков событий */
-  //   return () => {
-  //     Object.values(subscriptions).forEach((unsubscribe) => unsubscribe())
-  //   }
-  // })
+  if (typeof value === 'number' && !isNaN(value)) {
+    numericValue = Math.max(min, Math.min(max, value))
+  } else if (typeof value === 'string') {
+    const parsedValue = parseFloat(value)
+    if (!isNaN(parsedValue)) {
+      numericValue = Math.max(min, Math.min(max, parsedValue))
+    }
+  } else {
+    numericValue = min
+  }
 </script>
 
 <div {id} class={`relative inline-block w-full border-0 px-2 ${className}`}>
@@ -38,6 +48,6 @@
     <div class="relative h-4 w-full rounded bg-gray-200">
       <div class="absolute top-0 left-0 h-full rounded bg-blue-500" style="width: {value}%;"></div>
     </div>
-    <span class="ml-2 font-semibold">{value}%</span>
+    <span class="ml-2 font-semibold">{numericValue}{props.units}</span>
   </div>
 </div>

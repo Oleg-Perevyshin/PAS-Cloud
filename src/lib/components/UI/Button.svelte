@@ -51,7 +51,7 @@
 <!-- Разметка компонента -->
 <button
   {id}
-  class={`relative inline-block cursor-pointer items-center rounded-2xl border border-gray-400 font-medium select-none px-2 py-1
+  class={`relative inline-block cursor-pointer items-center rounded-2xl border border-gray-400 px-2 py-1 font-medium select-none
     ${props.disabled ? 'cursor-not-allowed opacity-75' : ''}
     transition duration-300 hover:shadow-lg
     ${props.bgColor} ${props.textColor}

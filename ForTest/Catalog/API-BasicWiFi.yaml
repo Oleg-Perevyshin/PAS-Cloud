@@ -226,6 +226,32 @@ UIBlocks:
               Header: SET
               Argument: WiFiSettings
               Variables: [ApSSID, ApPSK, ApIP, ApMS, ApGW]
+  - BlockID: Control
+    Label: Control
+    Description: Control Panel
+    Parameters:
+      - ParamID: TestRelay
+        Label: Test Relay
+        Description: Test Relay Module
+        UIComponents:
+          - Type: Switch
+            UiID: R1
+            Label: Relay 1
+            ClassName:
+            EventHandler:
+              Action: setValue
+              Header: SET
+              Argument: R1
+              Variables: [R1]
+          - Type: Switch
+            UiID: R2
+            Label: Relay 2
+            ClassName:
+            EventHandler:
+              Action: setValue
+              Header: SET
+              Argument: R2
+              Variables: [R2]
   - BlockID: Service
     Label: Service
     Description: Service Actions
@@ -341,6 +367,15 @@ UIBlocks:
             EventHandler:
               Action: updateValue
               Variables: [VerFW]
+          - Type: Button
+            UiID: CheckUpdate
+            Label: Check Update
+            ClassName: m-2
+            EventHandler:
+              Action: setValues
+              Header: SYS
+              Argument: CheckUpdate
+              Variables: [SrvURL, DevID]
           - Type: Button
             UiID: UpdateByID
             Label: Update Module By ID

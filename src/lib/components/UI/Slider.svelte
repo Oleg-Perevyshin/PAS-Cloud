@@ -3,13 +3,13 @@
   interface Props {
     id?: string
     label?: string
+    value?: boolean | string | number | number[] | object | null
     props?: {
       min?: number
       max?: number
       step?: number
       disabled?: boolean
     }
-    value?: string | number | boolean | null
     className?: string
     onUpdate?: (value: number) => void
   }
@@ -37,9 +37,15 @@
     ...props,
   }
 
+  let numericValue = $state(0)
+  if (typeof value === 'number') {
+    numericValue = Math.max(props.min!, Math.min(props.max!, value))
+  }
+
   function updateValue(event: Event) {
-    value = Number((event.target as HTMLInputElement).value)
-    onUpdate(value)
+    numericValue = Number((event.target as HTMLInputElement).value)
+    numericValue = Math.max(props.min!, Math.min(props.max!, numericValue))
+    onUpdate(numericValue)
   }
 </script>
 
@@ -54,7 +60,7 @@
       max={props.max}
       step={props.step}
       disabled={props.disabled}
-      bind:value
+      bind:value={numericValue}
       onchange={updateValue}
       class={`h-1 w-full cursor-pointer appearance-none bg-gray-500 ${props.disabled ? 'cursor-not-allowed opacity-50' : ''} 
         rounded-l-full rounded-r-full focus:ring-0 focus:outline-none`}

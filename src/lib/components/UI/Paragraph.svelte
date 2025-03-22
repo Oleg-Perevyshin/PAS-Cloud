@@ -2,24 +2,21 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { t, Language } from '$lib/locales/i18n'
-  import { ThemeStore } from '../../../stores'
 
   interface Props {
     id: string
     label?: string
-    value?: string | number | number[] | boolean | null
+    value?: boolean | string | number | number[] | object | null
     className?: string
   }
 
   let { id = '', label = '', value = null, className = '' }: Props = $props()
 
   let currentLang: string | undefined = $state()
-  let currentTheme: string | undefined = $state()
   onMount(() => {
     /* Подписки на состояние */
     const subscriptions = {
       Language: Language.subscribe((value) => (currentLang = value)),
-      Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
     }
 
     /* Очистка подписок и обработчиков событий */

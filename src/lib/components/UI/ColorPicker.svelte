@@ -5,14 +5,14 @@
   interface Props {
     id: string
     label?: string
-    value: number[]
+    value: boolean | string | number | number[] | object | null
     className?: string
     onUpdate?: (value: number[]) => void
   }
 
   let { id = '', label = '', value = $bindable([0, 0, 0]), className = '', onUpdate = () => {} }: Props = $props()
 
-  let rgb = $state(value || [0, 0, 0])
+  let rgb = $state(Array.isArray(value) ? value : [0, 0, 0])
   let colorPalette: string[] = $state([])
   let colorStripStyle = $state('')
   let isDragging = false
@@ -25,20 +25,6 @@
 
   const generateColorPalette = () => {
     colorPalette = []
-    /* Генерация оттенков серого */
-    // for (let i = 0; i <= 100; i++) {
-    //   const r = Math.round((255 * i) / 100)
-    //   const g = Math.round((255 * i) / 100)
-    //   const b = Math.round((255 * i) / 100)
-    //   colorPalette.push(`rgb(${r}, ${g}, ${b})`)
-    // }
-    /* Генерация основных цветов со смешиванием */
-    // for (let h = 0; h < 360; h++) {
-    //   for (let l = 0.4; l <= 1; l += 0.1) {
-    //     const color = hslToRgb(h / 360, 1, l);
-    //     colorPalette.push(`rgb(${color.r}, ${color.g}, ${color.b})`);
-    //   }
-    // }
     for (let h = 0; h < 360; h++) {
       const color = hslToRgb(h / 360, 1, 0.5)
       colorPalette.push(`rgb(${color.r}, ${color.g}, ${color.b})`)
