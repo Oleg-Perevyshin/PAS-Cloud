@@ -61,7 +61,7 @@
       step={props.step}
       disabled={props.disabled}
       bind:value={numericValue}
-      onchange={updateValue}
+      oninput={updateValue}
       class={`h-1 w-full cursor-pointer appearance-none bg-gray-500 ${props.disabled ? 'cursor-not-allowed opacity-50' : ''} 
         rounded-l-full rounded-r-full focus:ring-0 focus:outline-none`}
     />
