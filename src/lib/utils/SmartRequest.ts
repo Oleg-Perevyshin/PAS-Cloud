@@ -64,7 +64,6 @@ export const SmartRequest = async (url: string, config: IRequestConfig) => {
     }
 
     if (responseData.status.code === 401) {
-      addMessage('SmartRequest: Пользователь не авторизован')
       localStorage.clear()
       UserClear()
       UserClearTemp()
