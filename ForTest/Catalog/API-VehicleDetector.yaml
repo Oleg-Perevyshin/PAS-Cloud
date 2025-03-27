@@ -1,0 +1,387 @@
+DevID: FFFF
+DevSN:
+DevName: WiFi Module
+Description: Basic WiFi Module
+DevFW:
+UIBlocks:
+  - BlockID: WebSettings
+    Label: Web Settings
+    Description: General Web Settings
+    Parameters:
+      - ParamID: WebAccess
+        Label: Web Access
+        Description: Access to Web Interface
+        UIComponents:
+          - Type: Input
+            UiID: WebUser
+            Label: User Name
+            Props: { maxLength: 16 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: WebUser
+              Variables: [WebUser]
+          - Type: Input
+            UiID: WebPsw
+            Label: Password
+            Props: { maxLength: 16 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: WebPsw
+              Variables: [WebPsw]
+          - Type: ButtonGroup
+            UiID: WebHttpMode
+            Label: HTTP Protocol
+            Description: Protocol
+            ClassName:
+            Options: WebHttpMode-S
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: WebHttpMode
+              Variables: [WebHttpMode]
+          - Type: Button
+            UiID: SaveWebAccess
+            Label: Save
+            ClassName: mt-4
+            EventHandler:
+              Action: setValues
+              Header: SET
+              Argument: WebSettings
+              Variables: [WebUser, WebPsw, WebHttpMode]
+      - ParamID: DevNames
+        Label: Device Names
+        Description: Device Name and Host Name
+        UIComponents:
+          - Type: Input
+            UiID: DevName
+            Label: Device Name
+            Props: { maxLength: 17 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DevName
+              Variables: [DevName]
+          - Type: Input
+            UiID: DevHostName
+            Label: Host Name
+            Props: { maxLength: 32 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DevHostName
+              Variables: [DevHostName]
+          - Type: Button
+            UiID: SaveDevNames
+            Label: Save
+            ClassName: mt-4
+            EventHandler:
+              Action: setValues
+              Header: SET
+              Argument: WebSettings
+              Variables: [DevName, DevHostName]
+  - BlockID: WiFiSettings
+    Label: WiFi Settings
+    Description: General WiFi Settings
+    Parameters:
+      - ParamID: WiFiMode
+        Label: WiFi Mode
+        Description: WiFi Mode (STA, AP, APSTA)
+        UIComponents:
+          - Type: Select
+            UiID: DevWiFiMode
+            Label: Device WiFi Mode
+            ClassName: w-64
+            Options: DevWiFiMode-S
+            EventHandler:
+              Action: setValue
+              Header: SET
+              Argument: WiFiSettings
+              Variables: [DevWiFiMode]
+      - ParamID: STAMode
+        Label: STA Mode
+        Description: Settings for STA Mode
+        UIComponents:
+          - Type: Input
+            UiID: StaSSID
+            Label: STA SSID
+            Props: { maxLength: 32 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: StaSSID
+              Variables: [StaSSID]
+          - Type: Input
+            UiID: StaPSK
+            Label: STA Password
+            Props: { maxLength: 64 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: StaPSK
+              Variables: [StaPSK]
+          - Type: ButtonGroup
+            UiID: StaIPMode
+            Label: STA IP Mode
+            Description:
+            ClassName:
+            Options: StaIPMode-S
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: updateValue
+              Variables: [updateValue]
+          - Type: Input
+            UiID: StaIP
+            Label: STA IP Address
+            Props: { maxLength: 15 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: StaIP
+              Variables: [StaIP]
+          - Type: Input
+            UiID: StaMS
+            Label: STA Mask
+            Props: { maxLength: 15 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: StaMS
+              Variables: [StaMS]
+          - Type: Input
+            UiID: StaGW
+            Label: STA Gateway
+            Props: { maxLength: 15 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: StaGW
+              Variables: [StaGW]
+          - Type: Button
+            UiID: SaveSTAMode
+            Label: Save
+            ClassName: mt-4
+            EventHandler:
+              Action: setValues
+              Header: SET
+              Argument: WiFiSettings
+              Variables: [StaSSID, StaPSK, StaIPMode, StaIP, StaMS, StaGW]
+      - ParamID: APMode
+        Label: AP Mode
+        Description: Settings for AP Mode
+        UIComponents:
+          - Type: Input
+            UiID: ApSSID
+            Label: AP SSID
+            Props: { maxLength: 32 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: ApSSID
+              Variables: [ApSSID]
+          - Type: Input
+            UiID: ApPSK
+            Label: AP Password
+            Props: { maxLength: 64 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: ApPSK
+              Variables: [ApPSK]
+          - Type: Input
+            UiID: ApIP
+            Label: AP IP Address
+            Props: { maxLength: 15 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: ApIP
+              Variables: [ApIP]
+          - Type: Input
+            UiID: ApMS
+            Label: AP Mask
+            Props: { maxLength: 15 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: ApMS
+              Variables: [ApMS]
+          - Type: Input
+            UiID: ApGW
+            Label: AP Gateway
+            Props: { maxLength: 15 }
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: ApGW
+              Variables: [ApGW]
+          - Type: Button
+            UiID: SaveAPMode
+            Label: Save
+            ClassName: mt-4
+            EventHandler:
+              Action: setValues
+              Header: SET
+              Argument: WiFiSettings
+              Variables: [ApSSID, ApPSK, ApIP, ApMS, ApGW]
+  - BlockID: Control
+    Label: Control
+    Description: Control Panel
+    Parameters:
+      - ParamID: TestRelay
+        Label: Test Relay
+        Description: Test Relay Module
+        UIComponents:
+          - Type: Switch
+            UiID: R1
+            Label: Relay 1
+            ClassName:
+            EventHandler:
+              Action: setValue
+              Header: SET
+              Argument: DeviceConfig.R1
+              Variables: [R1]
+          - Type: Switch
+            UiID: R2
+            Label: Relay 2
+            ClassName:
+            EventHandler:
+              Action: setValue
+              Header: SET
+              Argument: DeviceConfig.R2
+              Variables: [R2]
+  - BlockID: Service
+    Label: Service
+    Description: Service Actions
+    Parameters:
+      - ParamID: SystemInfo
+        Label: System Info
+        Description: Device Information
+        UIComponents:
+          - Type: Paragraph
+            UiID: DevRun
+            Label: Number of Device Starts
+            ClassName:
+      - ParamID: SystemActions
+        Label: System Actions
+        Description: Restart and Restore Default Configuration
+        UIComponents:
+          - Type: Button
+            UiID: Restart
+            Label: Restart Module
+            ClassName:
+            EventHandler:
+              Action: setValue
+              Header: SYS
+              Argument: Restart
+              Variables: [Restart]
+          - Type: Button
+            UiID: DefaultConfig
+            Label: Reset to Default Config
+            ClassName:
+            EventHandler:
+              Action: setValue
+              Header: SYS
+              Argument: DefaultConfig
+              Variables: [DefaultConfig]
+      - ParamID: StatusLog
+        Label: Status Log Params
+        Description: Parameters for Status Log
+        UIComponents:
+          - Type: Paragraph
+            UiID: DevRun
+            Label: Device Run
+            ClassName: w-full
+          - Type: ButtonGroup
+            UiID: DebLogLevel
+            Label: Log. Level
+            ClassName: w-full
+            Options: DebLogLevel-S
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DebLogLevel
+              Variables: [DebLogLevel]
+          - Type: Slider
+            UiID: DebLedTime
+            Label: Led Time
+            ClassName: w-full
+            Props:
+              min: 0
+              max: 1000
+              step: 25
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DebLedTime
+              Variables: [DebLedTime]
+          - Type: ColorPicker
+            UiID: DebLedColor
+            Label: Led Color
+            ClassName: w-full
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DebLedColor
+              Variables: [DebLedColor]
+          - Type: Button
+            UiID: SaveDebLog
+            Label: Save
+            ClassName: mt-4
+            EventHandler:
+              Action: setValues
+              Header: SET
+              Argument: DebLog
+              Variables: [DebLogLevel, DebLedTime, DebLedColor]
+      - ParamID: UpdateActions
+        Label: Update Actions
+        Description: Device Update Manager
+        UIComponents:
+          - Type: Input
+            UiID: SrvURL
+            Label: URL to Server Update
+            Props: { maxLength: 64 }
+            ClassName:
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: SrvURL
+              Variables: [SrvURL]
+          - Type: Input
+            UiID: DevID
+            Label: Device ID
+            Props: { maxLength: 4 }
+            ClassName:
+            EventHandler:
+              Action: updateValue
+              Header: SET
+              Argument: DevID
+              Variables: [DevID]
+          - Type: Select
+            UiID: VerFW
+            Label: Versions
+            ClassName:
+            Options: VerFW-S
+            EventHandler:
+              Action: updateValue
+              Variables: [VerFW]
+          - Type: Button
+            UiID: CheckUpdate
+            Label: Check Update
+            ClassName: m-2
+            EventHandler:
+              Action: setValues
+              Header: SYS
+              Argument: CheckUpdate
+              Variables: [SrvURL, DevID]
+          - Type: Button
+            UiID: UpdateByID
+            Label: Update Module By ID
+            ClassName: m-2
+            EventHandler:
+              Action: setValues
+              Header: SYS
+              Argument: UpdateByID
+              Variables: [SrvURL, DevID, VerFW]
