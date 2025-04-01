@@ -1,11 +1,11 @@
 // src/routes/api/catalog_file/+server.ts
 /**
  * Компонент, который возвращает файлы в зависимости от запроса
- * Путь запроса: /api/catalog_file?CatalogID=0000&TypeData=Manual&VerFW=0.1 - запрос от пользователя на получение руководства 0000-Manual-v0.3.pdf
- * Путь запроса: /api/catalog_file?CatalogID=0000&TypeData=Firmware&VerFW=0.3 - запрос от пользователя на получение прошивки 0000-Firmware-v0.3.bin
- * Путь запроса: /api/catalog_file?CatalogID=0000&TypeData=API&VerFW=0.3 - запрос от устройства на получение API
- * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&TypeData=MetaData&VerFW=0.3 - запрос от устройства на получение мета данных
- * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&TypeData=Firmware&VerFW=0.3 - запрос от устройства на получение прошивки
+ * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=Manual&VerFW=0.1 - запрос от пользователя на получение руководства 0000-Manual-v0.3.pdf
+ * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=Firmware&VerFW=0.3 - запрос от пользователя на получение прошивки 0000-Firmware-v0.3.bin
+ * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=API&VerFW=0.3 - запрос от устройства на получение API
+ * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&DataType=MetaData&VerFW=0.3 - запрос от устройства на получение мета данных
+ * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&DataType=Firmware&VerFW=0.3 - запрос от устройства на получение прошивки
  */
 
 import type { RequestHandler } from '@sveltejs/kit'
@@ -22,9 +22,9 @@ export const GET: RequestHandler = async (event) => {
     /* Получаем параметры запроса и проверяем на наличие */
     const CatalogID = event.url.searchParams.get('CatalogID')
     const DevSNParam = event.url.searchParams.get('DevSN')
-    const TypeDataParam = event.url.searchParams.get('TypeData')
+    const DataTypeParam = event.url.searchParams.get('DataType')
     const VerFWParam = event.url.searchParams.get('VerFW')
-    if (!TypeDataParam || !VerFWParam || (!DevSNParam && !CatalogID)) {
+    if (!DataTypeParam || !VerFWParam || (!DevSNParam && !CatalogID)) {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
@@ -88,35 +88,35 @@ export const GET: RequestHandler = async (event) => {
     let contentType: string | null = null
 
     /* Обработка типа данных */
-    if (TypeDataParam === 'Firmware') {
+    if (DataTypeParam === 'Firmware') {
       if (!selectedVersion.Firmware) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(selectedVersion.Firmware)
       fileName = `${device.CatalogID}-Firmware-v${VerFWParam}.bin`
       contentType = 'application/octet-stream'
-    } else if (TypeDataParam === 'Manual') {
+    } else if (DataTypeParam === 'Manual') {
       if (!selectedVersion.Manual) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(selectedVersion.Manual)
       fileName = `${device.CatalogID}-Manual-v${VerFWParam}.pdf`
       contentType = 'application/pdf'
-    } else if (TypeDataParam === 'MetaData') {
+    } else if (DataTypeParam === 'MetaData') {
       if (!selectedVersion.MetaData) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(JSON.stringify(selectedVersion.MetaData))
       fileName = `${device.CatalogID}-MetaData.json`
       contentType = 'application/json'
-    } else if (TypeDataParam === 'API') {
+    } else if (DataTypeParam === 'API') {
       if (!selectedVersion.API) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
       fileBuffer = Buffer.from(selectedVersion.API)
       fileName = `${device.CatalogID}-API-v${VerFWParam}.yaml`
       contentType = 'application/x-yaml'
-    } else if (TypeDataParam === 'Icon') {
+    } else if (DataTypeParam === 'Icon') {
       if (!device.Icon) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }

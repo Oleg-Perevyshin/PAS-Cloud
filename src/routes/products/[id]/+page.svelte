@@ -71,7 +71,7 @@
    */
   const downloadFile = async (type: 'Firmware' | 'Manual' | 'API') => {
     try {
-      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&TypeData=${type}&VerFW=${SelectedVerFWs?.name}`)
+      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&DataType=${type}&VerFW=${SelectedVerFWs?.name}`)
       if (!response.ok) {
         throw new Error('Ошибка получения файла: ' + response.statusText)
       }
@@ -173,7 +173,7 @@
             `}
             >
               <a
-                href={`/api/catalog_file?CatalogID=${CatalogID}&TypeData=Manual&VerFW=${SelectedVerFWs?.name}`}
+                href={`/api/catalog_file?CatalogID=${CatalogID}&DataType=Manual&VerFW=${SelectedVerFWs?.name}`}
                 class="!text-blue-600 hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
