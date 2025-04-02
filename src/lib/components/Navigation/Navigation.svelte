@@ -14,11 +14,9 @@
 
   import IconMenuOpen from '$lib/appIcons/MenuOpen.svelte'
   import IconMenuClose from '$lib/appIcons/MenuClose.svelte'
-
   import IconMenuCompany from '$lib/appIcons/MenuCompany.svelte'
   import IconMenuCatalog from '$lib/appIcons/MenuCatalog.svelte'
   import IconMenuDashboard from '$lib/appIcons/MenuDashboard.svelte'
-  import IconMenuChat from '$lib/appIcons/MenuDashboardChat.svelte'
   import IconMenuInfo from '$lib/appIcons/MenuInfo.svelte'
   import IconService from '$lib/appIcons/MenuService.svelte'
 

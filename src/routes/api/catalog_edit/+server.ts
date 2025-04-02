@@ -47,17 +47,7 @@ export const POST: RequestHandler = async (event) => {
     }
 
     /* Проверяем наличия всех данных об устройстве */
-    const requiredFields: (keyof CandidateDevice)[] = [
-      'CatalogID',
-      'CatalogName',
-      'Brief',
-      'Description',
-      'Icon',
-      'VerFW',
-      'Firmware',
-      'Manual',
-      'API',
-    ]
+    const requiredFields: (keyof CandidateDevice)[] = ['CatalogID', 'CatalogName', 'Brief', 'Description', 'Icon', 'VerFW', 'Firmware', 'Manual', 'API']
     if (!requiredFields.every((field) => candidate_device[field])) {
       return new Response(JSON.stringify(ResponseManager('ER_INSUFFICIENT_DATA_TO_CREATE_DEVICE', lang)), { status: 400 })
     }

@@ -1,7 +1,6 @@
 <!-- $lib/components/Navigation/Company.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { t, Language } from '$lib/locales/i18n'
   import { goto } from '$app/navigation'
   import Button from '../UI/Button.svelte'
   import { ThemeStore } from '../../../stores'
@@ -9,12 +8,10 @@
   /**
    * Подписки
    */
-  let currentLang: string = $state('ru')
   let currentTheme: string = $state('light')
   onMount(() => {
     /* Подписки */
     const unsubscribe = {
-      Language: Language.subscribe((value) => (currentLang = value || 'ru')),
       ThemeStore: ThemeStore.subscribe((value) => (currentTheme = value || 'light')),
     }
 

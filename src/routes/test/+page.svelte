@@ -63,10 +63,10 @@
     console.info('Decrypt Data:', DecryptResponse)
   }
 
-  const handleProgressBar = (value: number) => {
-    console.log('Slider Value:', value)
-    sliderValue = value
-  }
+  // const handleProgressBar = (value: number) => {
+  //   console.log('Slider Value:', value)
+  //   sliderValue = value
+  // }
 
   let progressBarValue: number = $state(50)
   /* Функция для уменьшения значения прогресс-бара */

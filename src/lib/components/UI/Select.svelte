@@ -109,11 +109,11 @@
 
   {#if isDropdownOpen}
     <div
-      class={`absolute top-full left-1/2 z-50 -translate-x-1/2 transform rounded-b-2xl border border-gray-400`}
+      class="absolute top-full left-1/2 z-50 -translate-x-1/2 transform rounded-b-2xl border border-gray-400"
       style="width: calc(100% - 3.5rem);"
       transition:slide={{ duration: 300 }}
     >
-      {#each options as option, index}
+      {#each options as option, index (option.id)}
         <button
           id={option?.id}
           value={option.value}

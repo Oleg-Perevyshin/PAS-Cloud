@@ -52,7 +52,7 @@
   {/if}
   <div class="flex items-center justify-center">
     <div
-      class={`relative inline-flex cursor-pointer items-center`}
+      class="relative inline-flex cursor-pointer items-center"
       role="switch"
       tabindex="0"
       onclick={toggleSwitch}

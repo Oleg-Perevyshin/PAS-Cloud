@@ -1,18 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...$$props}
   ><g
-    ><circle cx="12" cy="2.5" r="1.5" fill="currentColor" opacity=".14" /><circle
-      cx="16.75"
-      cy="3.77"
+    ><circle cx="12" cy="2.5" r="1.5" fill="currentColor" opacity=".14" /><circle cx="16.75" cy="3.77" r="1.5" fill="currentColor" opacity=".29" /><circle
+      cx="20.23"
+      cy="7.25"
       r="1.5"
       fill="currentColor"
-      opacity=".29"
-    /><circle cx="20.23" cy="7.25" r="1.5" fill="currentColor" opacity=".43" /><circle
-      cx="21.5"
-      cy="12"
-      r="1.5"
-      fill="currentColor"
-      opacity=".57"
-    /><circle cx="20.23" cy="16.75" r="1.5" fill="currentColor" opacity=".71" /><circle
+      opacity=".43"
+    /><circle cx="21.5" cy="12" r="1.5" fill="currentColor" opacity=".57" /><circle cx="20.23" cy="16.75" r="1.5" fill="currentColor" opacity=".71" /><circle
       cx="16.75"
       cy="20.23"
       r="1.5"

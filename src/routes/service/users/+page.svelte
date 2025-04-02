@@ -373,12 +373,8 @@
       </div>
 
       <!-- Тело таблицы с прокруткой -->
-      <div
-        class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
-        bind:this={container}
-        onscroll={handleScroll}
-      >
-        {#each user_list as user}
+      <div class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`} bind:this={container} onscroll={handleScroll}>
+        {#each user_list as user (user.UserID)}
           <div class="grid grid-cols-5 items-center border-b border-gray-400" style="grid-template-columns: 10rem 10rem 20rem 15rem 1fr;">
             <div class="flex flex-shrink-0 items-center justify-center overflow-hidden border-r border-gray-400 p-2">
               <div class="flex h-32 w-32 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
@@ -442,9 +438,7 @@
       </div>
 
       <!-- Нижнее поле для сводной информации -->
-      <div
-        class={`z-10 flex h-8 items-center justify-center rounded-b-2xl border-t border-gray-400 ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}
-      >
+      <div class={`z-10 flex h-8 items-center justify-center rounded-b-2xl border-t border-gray-400 ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
         <strong>{t('service.user.user_num')} {user_list.length}</strong>
       </div>
     </div>
@@ -482,13 +476,7 @@
           label={t('service.user.main', currentLang)}
           props={{
             bgColor:
-              activeTab === 'main'
-                ? currentTheme === 'light'
-                  ? 'bg-blue-200'
-                  : 'bg-blue-800'
-                : currentTheme === 'light'
-                  ? 'bg-gray-200'
-                  : 'bg-gray-800',
+              activeTab === 'main' ? (currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800') : currentTheme === 'light' ? 'bg-gray-200' : 'bg-gray-800',
           }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
@@ -497,13 +485,7 @@
           label={t('service.user.location', currentLang)}
           props={{
             bgColor:
-              activeTab === 'location'
-                ? currentTheme === 'light'
-                  ? 'bg-blue-200'
-                  : 'bg-blue-800'
-                : currentTheme === 'light'
-                  ? 'bg-gray-200'
-                  : 'bg-gray-800',
+              activeTab === 'location' ? (currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800') : currentTheme === 'light' ? 'bg-gray-200' : 'bg-gray-800',
           }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
@@ -512,13 +494,7 @@
           label={t('service.user.tags', currentLang)}
           props={{
             bgColor:
-              activeTab === 'tags'
-                ? currentTheme === 'light'
-                  ? 'bg-blue-200'
-                  : 'bg-blue-800'
-                : currentTheme === 'light'
-                  ? 'bg-gray-200'
-                  : 'bg-gray-800',
+              activeTab === 'tags' ? (currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800') : currentTheme === 'light' ? 'bg-gray-200' : 'bg-gray-800',
           }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
@@ -527,13 +503,7 @@
           label={t('service.user.devices', currentLang)}
           props={{
             bgColor:
-              activeTab === 'devices'
-                ? currentTheme === 'light'
-                  ? 'bg-blue-200'
-                  : 'bg-blue-800'
-                : currentTheme === 'light'
-                  ? 'bg-gray-200'
-                  : 'bg-gray-800',
+              activeTab === 'devices' ? (currentTheme === 'light' ? 'bg-blue-200' : 'bg-blue-800') : currentTheme === 'light' ? 'bg-gray-200' : 'bg-gray-800',
           }}
           className="m-2 w-60 h-12 rounded-2xl"
         />
@@ -541,7 +511,7 @@
 
       <!-- Основные данные -->
       {#if activeTab === 'main' && UserDataTemp}
-        <div class={`flex flex-col flex-wrap justify-center gap-4 md:flex-row`}>
+        <div class="flex flex-col flex-wrap justify-center gap-4 md:flex-row">
           <!-- Первая колонка -->
           <div
             class={`m-2 flex max-w-[30rem] min-w-[20rem] flex-grow flex-col items-center p-2 
@@ -561,20 +531,8 @@
                   <img src={`data:image/png;base64,${UserDataTemp.Avatar}`} alt="avatar" class="h-full w-full object-cover" />
                 {/if}
               </button>
-              <input
-                id="avatar"
-                type="file"
-                accept="image/*"
-                class="hidden"
-                onchange={(event) => HandleImageUpload(event, 'Avatar', UserStoreTemp)}
-              />
-              <input
-                id="avatar"
-                type="file"
-                accept="image/*"
-                class="hidden"
-                onchange={(event) => HandleImageUpload(event, 'Avatar', UserStoreTemp)}
-              />
+              <input id="avatar" type="file" accept="image/*" class="hidden" onchange={(event) => HandleImageUpload(event, 'Avatar', UserStoreTemp)} />
+              <input id="avatar" type="file" accept="image/*" class="hidden" onchange={(event) => HandleImageUpload(event, 'Avatar', UserStoreTemp)} />
             </div>
             <Input
               id="userId"
@@ -593,9 +551,7 @@
             <Select
               id="Role"
               label={t('service.user.role', currentLang)}
-              props={currentTheme === 'light'
-                ? { bgColor: '!bg-blue-200', currentLang: currentLang }
-                : { bgColor: '!bg-blue-800', currentLang: currentLang }}
+              props={currentTheme === 'light' ? { bgColor: '!bg-blue-200', currentLang: currentLang } : { bgColor: '!bg-blue-800', currentLang: currentLang }}
               options={DEFAULT_ROLES}
               value={selectedRole}
               onUpdate={(value) => (selectedRole = value)}
@@ -717,7 +673,7 @@
           >
             <p class="mb-2 text-xl font-medium">{t('service.user.title_tags', currentLang)}</p>
             {#if UserDataTemp && Array.isArray(UserDataTemp.Tags)}
-              {#each UserDataTemp.Tags as tag, index}
+              {#each UserDataTemp.Tags as tag, index (tag.id)}
                 <div class="mb-2 flex w-full items-center justify-center">
                   <Input
                     id={`${UserDataTemp.UserID}-Tag-${tag.id}`}
@@ -758,7 +714,7 @@
           <div class="w-full">
             <h3>{t('service.user.devices_list', currentLang)}</h3>
             {#if UserDataTemp && UserDataTemp.Devices.length > 0}
-              {#each UserDataTemp.Devices as device}
+              {#each UserDataTemp.Devices as device (device.DevSN)}
                 <p>{device.DevSN}</p>
               {/each}
             {:else}

@@ -107,7 +107,7 @@
 
 <!-- Разметка компонента -->
 <div class={`relative inline-block ${className}`}>
-  <div class={`flex flex-col items-center`}>
+  <div class="flex flex-col items-center">
     {#if label}
       <label for={id} class="block font-semibold">{label}</label>
     {/if}

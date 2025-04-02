@@ -121,13 +121,7 @@
               <img src={`data:image/png;base64,${$UserStore.Avatar}`} alt="avatar" class="h-full w-full object-cover" />
             {/if}
           </button>
-          <input
-            id="avatar"
-            type="file"
-            accept="image/png, image/jpeg"
-            class="hidden"
-            onchange={(event) => HandleImageUpload(event, 'Avatar', UserStore)}
-          />
+          <input id="avatar" type="file" accept="image/png, image/jpeg" class="hidden" onchange={(event) => HandleImageUpload(event, 'Avatar', UserStore)} />
         </div>
 
         <Input
@@ -239,7 +233,7 @@
       >
         <p class="text-xl font-medium">{t('dashboard.profile.tags', currentLang)}</p>
         {#if Array.isArray(UserData?.Tags)}
-          {#each UserData.Tags as tag, index}
+          {#each UserData.Tags as tag, index (tag.id)}
             <Input
               id={`${UserData.UserID}-Tag-${tag.id}`}
               props={{ maxLength: 20 }}

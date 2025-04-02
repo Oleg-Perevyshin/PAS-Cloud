@@ -28,21 +28,23 @@ export const DELETE: RequestHandler = async (event) => {
       await prisma.catalogVersion.deleteMany({ where: { DeviceID: DevID, VerFW } })
       console.info(`Удалена версия ${VerFW} устройства`)
     } else {
+      /* Устройство удаляется полностью */
+      /* Удаляем все версии */
       await prisma.catalogVersion.deleteMany({ where: { DeviceID: DevID } })
       console.info('Удалены все версии устройства')
+
+      /* Удаляем устройство у всех пользователей */
+      await prisma.userDevice.deleteMany({ where: { Device: { DevID } } })
+      console.info('Устройство удалено у всех пользователей')
+
+      /* Находим устройства по DevID, чтобы получить DevSN */
+      const devices = await prisma.device.findMany({ where: { DevID } })
+      const deviceSNs = devices.map((device) => device.DevSN)
+
+      /* Удаляем устройство из таблицы Devices */
+      await prisma.device.deleteMany({ where: { DevSN: { in: deviceSNs } } })
+      console.info('Устройство удалено из таблицы Devices')
     }
-
-    /* Удаляем устройство у всех пользователей */
-    await prisma.userDevice.deleteMany({ where: { Device: { DevID } } })
-    console.info('Устройство удалено у всех пользователей')
-
-    /* Находим устройства по DevID, чтобы получить DevSN */
-    const devices = await prisma.device.findMany({ where: { DevID } })
-    const deviceSNs = devices.map((device) => device.DevSN)
-
-    /* Удаляем устройство из таблицы Devices */
-    await prisma.device.deleteMany({ where: { DevSN: { in: deviceSNs } } })
-    console.info('Устройство удалено из таблицы Devices')
 
     /* Удаляем устройство из каталога */
     await prisma.catalogDevice.deleteMany({ where: { CatalogID: DevID } })

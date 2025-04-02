@@ -210,9 +210,26 @@
       const moduleRequests = moduleList.map(async (module) => {
         const DevID = module.DevSN.substring(0, 4)
         const responseData = await API_CatalogDevice(DevID, module.DevFW)
+        
+
+        /* Создаем объект модуля со значениями по умолчанию и ошибкой */
+        const moduleData: IDeviceModule = {
+          DevID: '',
+          Icon: '',
+          Brief: '',
+          VerFW: '',
+          Versions: [],
+          DevSN: module.DevSN,
+          DevName: module.DevName,
+          DevFW: module.DevFW,
+          UIBlocks: [],
+          Status: null
+        };
+
         if (!responseData?.catalog) {
-          throw new Error(`Неверные данные для модуля: ${module.DevSN}`)
+          return moduleData;
         }
+
         const { API } = responseData.catalog
         let parsedAPI
         try {
@@ -225,7 +242,8 @@
           throw new Error(`Ошибка парсинга YAML для модуля: ${module.DevSN}`)
         }
 
-        const moduleData: IDeviceModule = {
+        /* Обновляем данные модуля, если они успешно получены */
+        Object.assign(moduleData, {
           ...(parsedAPI || {}),
           DevID: responseData.catalog.CatalogID || '',
           Icon: responseData.catalog.Icon || '',
@@ -235,26 +253,28 @@
           DevSN: module.DevSN || '',
           DevName: module.DevName || '',
           DevFW: module.DevFW || '',
-        } as IDeviceModule
+        })
 
         /* Инициализация динамических переменных для каждого UI-компонента в каждом блоке */
-        moduleData.UIBlocks.forEach((block) => {
-          if (Array.isArray(block.Parameters)) {
-            block.Parameters.forEach((parameter) => {
-              parameter.UIComponents.forEach((component) => {
-                const uniqueKey = `${module.DevSN}_${component.UiID}`
-                DeviceStore.update((current) => ({
-                  ...current,
-                  dynamicValues: {
-                    ...current.dynamicValues,
-                    [uniqueKey]: '',
-                  },
-                }))
-                dynamicKeys.push(uniqueKey)
+        if (Array.isArray(moduleData.UIBlocks)) {
+          moduleData.UIBlocks.forEach((block) => {
+            if (Array.isArray(block.Parameters)) {
+              block.Parameters.forEach((parameter) => {
+                parameter.UIComponents.forEach((component) => {
+                  const uniqueKey = `${module.DevSN}_${component.UiID}`
+                  DeviceStore.update((current) => ({
+                    ...current,
+                    dynamicValues: {
+                      ...current.dynamicValues,
+                      [uniqueKey]: '',
+                    },
+                  }))
+                  dynamicKeys.push(uniqueKey)
+                })
               })
-            })
-          }
-        })
+            }
+          })
+        }
         return moduleData
       })
 
@@ -404,10 +424,10 @@
     <hr class="my-2 border-gray-300" />
     {#if currentDevice && currentDevice.IsOnline && isInitialized}
       <!-- Блок кнопок для выбора конкретного модуля в изделии -->
-      <div class={`overflow-none flex flex-grow flex-col items-center justify-start`}>
+      <div class="overflow-none flex flex-grow flex-col items-center justify-start">
         <div class="mx-auto flex flex-wrap items-start justify-center p-2">
           {#if currentDevice.Modules.length > 0}
-            {#each currentDevice.Modules as module}
+            {#each currentDevice.Modules as module (module.DevSN)}
               <button
                 class={`m-1 w-58 cursor-pointer rounded-2xl border-3 p-1
               ${selectedModule && selectedModule.DevSN === module.DevSN ? 'border-blue-400' : 'border-gray-400'}
@@ -428,11 +448,11 @@
                   moduleConfigFetched = false
                 }}
               >
-                <div class={`flex h-10 items-start justify-between rounded-t-xl`}>
+                <div class="flex h-10 items-start justify-between rounded-t-xl">
                   <div class="mt-1 ml-1 flex h-8 w-8 flex-shrink-0 items-center justify-center">
                     <img src={module.Icon} alt="Device Icon" class="h-full w-full object-cover" />
                   </div>
-                  <div class={`mr-2 flex flex-col justify-center`}>
+                  <div class="mr-2 flex flex-col justify-center">
                     <h5 class="text-right underline">{module.DevName}</h5>
                     <p class="text-right text-xs text-gray-400">
                       {t('dashboard.device.devfw', currentLang)}: {module.DevFW}
@@ -475,11 +495,10 @@
           {#if selectedModule}
             <div class="mx-auto flex flex-wrap items-start justify-center p-2" transition:slide={{ duration: 300 }}>
               <!-- Массив блоков, которые имеет модуль -->
-              {#each selectedModule.UIBlocks as block, blockIndex}
+              {#each selectedModule.UIBlocks as block, blockIndex (block.BlockID)}
                 <div
-                  class={`m-2 flex w-80 flex-col items-center justify-center rounded-2xl border border-gray-400
-                shadow transition-shadow duration-250 hover:shadow
-              `}
+                  class="m-2 flex w-80 flex-col items-center justify-center rounded-2xl border border-gray-400
+                shadow transition-shadow duration-250 hover:shadow"
                 >
                   <button
                     class={`flex w-full flex-col items-center justify-between border last:rounded-b-2xl last:border-b-0
@@ -496,7 +515,7 @@
                   </button>
                   {#if Array.isArray(block.Parameters)}
                     <!-- Массив наборов объединенных параметров -->
-                    {#each block.Parameters as parameter, parameterIndex}
+                    {#each block.Parameters as parameter, parameterIndex (parameter.ParamID)}
                       {#if isExpandedBlock[`${selectedModule?.DevSN}_${blockIndex}`]}
                         <div
                           class={`
@@ -506,7 +525,7 @@
                           transition:slide={{ duration: 300 }}
                         >
                           <button
-                            class={`flex w-full cursor-pointer flex-col items-center justify-between`}
+                            class="flex w-full cursor-pointer flex-col items-center justify-between"
                             onclick={() => {
                               isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`] =
                                 !isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`]
@@ -516,10 +535,10 @@
                             <p class="text-xs text-gray-400">{parameter.Description}</p>
                           </button>
                           {#if Array.isArray(parameter.UIComponents)}
-                            {#each parameter.UIComponents as component}
+                            {#each parameter.UIComponents as component (component.UiID)}
                               <!-- Содержимое блока с настройками и UI компонентами -->
                               {#if isExpandedParameters[`${selectedModule?.DevSN}_${parameterIndex}_${parameter.ParamID}`]}
-                                <div class={`flex flex-col items-center justify-center last:mb-4`} transition:slide={{ duration: 300 }}>
+                                <div class="flex flex-col items-center justify-center last:mb-4" transition:slide={{ duration: 300 }}>
                                   {#if component.Type === 'Paragraph'}
                                     <Paragraph
                                       id={component.UiID}

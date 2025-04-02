@@ -265,7 +265,7 @@
 
       <!-- Блок всех сообщений -->
       <div class="flex h-full w-full flex-1 flex-col overflow-y-auto" id="messageContainer" onscroll={handleScroll} bind:this={container}>
-        {#each MessageList as message, index}
+        {#each MessageList as message, index (message.MessageID)}
           <div
             class={`m-2 flex flex-col rounded-2xl border p-2
             ${(message as IGroupMessage).Author?.UserID === UserData?.UserID ? 'text-right' : 'text-left'}
@@ -277,7 +277,7 @@
             `}
             >
               <Button
-                className={`border-0 rounded-2xl`}
+                className="border-0 rounded-2xl"
                 onClick={() => openModal(`${(message as IGroupMessage).Author?.UserID}`)}
                 label={`${(message as IGroupMessage).Author?.FirstName} ${(message as IGroupMessage).Author?.LastName}`}
               />

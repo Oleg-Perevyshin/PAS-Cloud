@@ -2,11 +2,10 @@
 <script lang="ts">
   interface Props {
     id?: string
-    label?: string
     className?: string
   }
 
-  let { id = '', label = '', className = '' }: Props = $props()
+  let { id = '', className = '' }: Props = $props()
 </script>
 
 <!-- Разметка компонента -->

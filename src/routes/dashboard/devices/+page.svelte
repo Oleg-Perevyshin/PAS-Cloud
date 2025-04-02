@@ -171,7 +171,7 @@
     <h2>{t('dashboard.device.title', currentLang)}</h2>
 
     <!-- Блок добавления устройства -->
-    <div class={`mt-4`}>
+    <div class="mt-4">
       <div class="flex w-full items-center justify-center">
         <Input
           id="add_device"
@@ -198,7 +198,7 @@
     </div>
 
     <!-- Селектор устройств (фильтрация по тегам) -->
-    <div class={`mt-4 flex flex-col items-center`}>
+    <div class="mt-4 flex flex-col items-center">
       <p class="text-xl font-medium">{t('dashboard.device.tags', currentLang)}</p>
       <ButtonGroup
         id="tag-selector"
@@ -248,7 +248,7 @@
       <div class={`flex flex-grow flex-col items-center justify-start overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
         <div class="mx-auto flex flex-wrap items-start justify-center p-2">
           {#if UserData && filteredDevices && filteredDevices.length > 0}
-            {#each filteredDevices as device, index}
+            {#each filteredDevices as device, index (device.DevSN)}
               <!-- Карточка устройства -->
               <div
                 class={`
@@ -338,11 +338,5 @@
 
 <!-- Модальное окно удаления устройства -->
 {#if currentLang}
-  <ConfirmDelete
-    show={showModalDelete}
-    item={deviceToDelete.DevSN}
-    {currentLang}
-    onConfirm={confirmDelete}
-    onCancel={() => (showModalDelete = false)}
-  />
+  <ConfirmDelete show={showModalDelete} item={deviceToDelete.DevSN} {currentLang} onConfirm={confirmDelete} onCancel={() => (showModalDelete = false)} />
 {/if}

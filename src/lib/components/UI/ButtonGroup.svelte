@@ -42,7 +42,7 @@
 <div {id} class={`relative inline-block w-full border-0 px-4 ${className}`}>
   <label for={id} class="mx-4 block font-semibold">{label}</label>
   <div class="flex flex-row items-stretch">
-    {#each options as item, index}
+    {#each options as item, index (item.id)}
       <button
         id={item.id}
         value={item.value}

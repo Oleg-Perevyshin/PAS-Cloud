@@ -122,7 +122,7 @@
 
     <!-- Кнопки подменю -->
     <div bind:this={submenuRef} class="flex w-full flex-col overflow-hidden transition-all duration-500" style="max-height: {submenuHeight};">
-      {#each buttons.filter((button) => UserData?.Role && button.role.includes(UserData.Role)) as button}
+      {#each buttons.filter((button) => UserData?.Role && button.role.includes(UserData.Role)) as button (button.key)}
         <div class="mb-1">
           <Button
             onClick={() => changePage(button.page)}

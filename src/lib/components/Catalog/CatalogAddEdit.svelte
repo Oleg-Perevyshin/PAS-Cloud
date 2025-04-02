@@ -164,7 +164,7 @@
 
   /* Удаление версии устройства из каталога */
   let showModalDelete = $state(false)
-  const handleDeleteDevice = () => {
+  const handleDeleteVersion = () => {
     showModalDelete = true
   }
   const confirmDeleteDevice = async () => {
@@ -298,9 +298,7 @@
               <Select
                 id="Versions"
                 label={t('service.catalog.verfw', currentLang)}
-                props={currentTheme === 'light'
-                  ? { bgColor: '!bg-blue-200', currentLang: currentLang }
-                  : { bgColor: '!bg-blue-800', currentLang: currentLang }}
+                props={currentTheme === 'light' ? { bgColor: '!bg-blue-200', currentLang: currentLang } : { bgColor: '!bg-blue-800', currentLang: currentLang }}
                 options={[
                   ...($CatalogStore.Versions?.map((version) => ({
                     id: version.VerFW || '',
@@ -328,7 +326,7 @@
 
               {#if isEditing}
                 <Button
-                  onClick={() => handleDeleteDevice()}
+                  onClick={() => handleDeleteVersion()}
                   label={t('common.delete', currentLang)}
                   props={currentTheme === 'light' ? { bgColor: 'bg-red-200' } : { bgColor: 'bg-red-900' }}
                   className="mt-2 w-full"

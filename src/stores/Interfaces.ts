@@ -314,7 +314,7 @@ export interface IDeviceModule {
     Created: string
     Updated: string
   }[]
-  Status: IWebSocketValueStatus           // Сообщения со статусом модуля
+  Status: IWebSocketValueStatus | null    // Сообщения со статусом модуля
   UIBlocks: IDeviceBlock[]                // Массив логических блоки для построения Web интерфейса управления
 }
 /* Блок настроек или параметров модуля */

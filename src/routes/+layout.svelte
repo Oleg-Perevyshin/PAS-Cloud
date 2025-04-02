@@ -99,7 +99,7 @@
   </div>
 
   <!-- Center -->
-  <div class={`flex flex-1 overflow-hidden`}>
+  <div class="flex flex-1 overflow-hidden">
     <!-- Панель навигации -->
     <Navigation />
 
@@ -110,7 +110,7 @@
 
       <!-- Всплывающие сообщения состояния -->
       <div class="absolute right-2 bottom-2 z-50 flex w-full flex-col-reverse items-end">
-        {#each messages as message}
+        {#each messages as message (message.id)}
           <MessageModal {message} />
         {/each}
       </div>
@@ -122,7 +122,7 @@
     class={`m-2 mr-4 mb-4 ml-4 flex h-10 items-center justify-center rounded-xl p-4 shadow-md
     ${currentTheme === 'light' ? 'bg-white' : 'bg-gray-800'}`}
   >
-    <p class={`font-semibold`}>
+    <p class="font-semibold">
       {t('common.footer', currentLang)}
       <a href="https://peleng.by" target="_blank" rel="noopener noreferrer">ОАО "Пеленг"</a>
       1974-{new Date().getFullYear()}

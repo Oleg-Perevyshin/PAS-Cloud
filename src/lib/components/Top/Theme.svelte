@@ -29,7 +29,7 @@
 </script>
 
 <div class="mx-4 flex items-center">
-  <button onclick={toggleTheme} class={`flex cursor-pointer items-center opacity-100 transition-opacity duration-300 hover:opacity-75`}>
+  <button onclick={toggleTheme} class="flex cursor-pointer items-center opacity-100 transition-opacity duration-300 hover:opacity-75">
     <IconLightDark width="2rem" height="2rem" />
   </button>
 </div>

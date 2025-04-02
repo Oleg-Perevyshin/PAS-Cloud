@@ -102,7 +102,7 @@
 
   <!-- Тело таблицы с прокруткой -->
   <div class={`flex-grow overflow-y-auto ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`} bind:this={container} onscroll={onScroll}>
-    {#each catalogDeviceList as device}
+    {#each catalogDeviceList as device (device.CatalogID)}
       <div class="grid grid-cols-5 items-center overflow-y-auto border-b border-gray-400" style="grid-template-columns: 6rem 5rem 10rem 5rem 1fr;">
         <div class="flex h-full flex-shrink-0 items-center justify-center overflow-hidden border-r border-gray-400">
           <div class="flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden p-2">

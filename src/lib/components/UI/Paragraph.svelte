@@ -28,10 +28,10 @@
 
 <div {id} class={`relative inline-block border-0 px-2 ${className}`}>
   {#if label}
-    <p class={`mx-4 block font-semibold`}>{label}</p>
+    <p class="mx-4 block font-semibold">{label}</p>
   {/if}
   <div class="flex flex-row items-center">
-    <p class={`h-auto w-full cursor-pointer text-center text-base`}>
+    <p class="h-auto w-full cursor-pointer text-center text-base">
       {value !== null && value !== undefined ? value : t('common.nodata', currentLang)}
     </p>
   </div>

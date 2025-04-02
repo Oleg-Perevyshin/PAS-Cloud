@@ -244,7 +244,7 @@
         />
       {/if}
       <Button
-        label={'Получить сообщения'}
+        label={t('common.get_messages', currentLang)}
         props={{ bgColor: currentTheme === 'light' ? 'bg-lime-200' : 'bg-lime-800' }}
         onClick={getMessages}
         className="w-60 rounded-2xl"
@@ -266,7 +266,7 @@
     <h3>Удалить группу</h3>
     <div class="m-2 flex w-full flex-wrap items-center justify-center">
       {#if groups}
-        {#each groups as group}
+        {#each groups as group (group.GroupID)}
           <Button
             onClick={() => deleteGroup(group.GroupID)}
             label={group.GroupName === UserData?.UserID
@@ -308,16 +308,16 @@
 
     <!-- Блок всех сообщений -->
     <div class="flex h-full w-full flex-1 flex-col overflow-y-auto" id="messageContainer" onscroll={handleScroll} bind:this={container}>
-      {#each MessageList as message, index}
+      {#each MessageList as message, index (message.MessageID)}
         <div
           class={`relative m-2 flex flex-col rounded-2xl border
           ${(message as IGroupMessage).Author?.UserID === UserData?.UserID ? 'items-end text-right' : 'items-start text-left'}
           ${currentTheme === 'light' ? 'bg-yellow-100' : 'bg-yellow-700'}`}
         >
           <!-- Заголовок сообщения (автор, дата, кнопка удаления) -->
-          <div class={`flex w-full flex-row items-center justify-end border-b`}>
+          <div class="flex w-full flex-row items-center justify-end border-b">
             <Button
-              className={`mx-2 border-0 rounded-2xl`}
+              className="mx-2 border-0 rounded-2xl"
               onClick={() => {
                 const userId = (message as IGroupMessage).Author?.UserID
                 if (userId) {

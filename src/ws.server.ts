@@ -25,12 +25,7 @@ const clientsGroups = new Map<WebSocket, Set<string>>()
 const clients = new Map<WebSocket, { userID?: string; devSN?: string }>()
 
 /* Отправляем пакет клиентам (в группы) */
-const sendToGroup = (
-  GroupID: string,
-  message: Uint8Array | null,
-  option: 'ToRequester' | 'ToGroup' | 'ToGroupExceptRequester',
-  requester?: WebSocket,
-) => {
+const sendToGroup = (GroupID: string, message: Uint8Array | null, option: 'ToRequester' | 'ToGroup' | 'ToGroupExceptRequester', requester?: WebSocket) => {
   if (!message) {
     return console.warn(`sendToGroup Нет сообщения для передачи`)
   }

@@ -347,9 +347,7 @@ export const SetMessage = async (
   }
 
   /* Сохраняем сообщение в БД */
-  const messageString = [Argument ? Argument : null, typeof Message === 'object' ? JSON.stringify(Message) : Message || null]
-    .filter(Boolean)
-    .join(' | ')
+  const messageString = [Argument ? Argument : null, typeof Message === 'object' ? JSON.stringify(Message) : Message || null].filter(Boolean).join(' | ')
   const newMessage = await prisma.groupMessage.create({
     data: {
       UserID: ClientID || null,

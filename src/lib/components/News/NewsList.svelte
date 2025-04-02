@@ -67,8 +67,8 @@
 </script>
 
 <!-- Разметка компонента -->
-{#each newsList as news, index}
-  <div class={`flex w-full flex-grow flex-col items-center justify-start`}>
+{#each newsList as news, index (news.NewsID)}
+  <div class="flex w-full flex-grow flex-col items-center justify-start">
     <div class={`m-2 mb-4 w-full overflow-hidden rounded-2xl border ${currentTheme === 'light' ? '!bg-white' : 'bg-gray-700'}`}>
       <div
         class={`mb-2 flex flex-row items-center justify-between border-b px-4
@@ -76,11 +76,7 @@
       >
         <p>
           <strong>{t('news.author', currentLang)}</strong>
-          <Button
-            className={`border-0 rounded-2xl`}
-            onClick={() => openModal(`${news.UserID}`)}
-            label={`${news.Author?.LastName} ${news.Author?.FirstName}`}
-          />
+          <Button className="border-0 rounded-2xl" onClick={() => openModal(`${news.UserID}`)} label={`${news.Author?.LastName} ${news.Author?.FirstName}`} />
         </p>
         <p><strong>{t('news.date', currentLang)}</strong>{news.Updated}</p>
       </div>
