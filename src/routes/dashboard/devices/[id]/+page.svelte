@@ -453,7 +453,7 @@
                     <img src={module.Icon} alt="Device Icon" class="h-full w-full object-cover" />
                   </div>
                   <div class="mr-2 flex flex-col justify-center">
-                    <h5 class="text-right underline">{module.DevName}</h5>
+                    <h5 class="text-right text-xs underline">{module.DevName}</h5>
                     <p class="text-right text-xs text-gray-400">
                       {t('dashboard.device.devfw', currentLang)}: {module.DevFW}
                     </p>
