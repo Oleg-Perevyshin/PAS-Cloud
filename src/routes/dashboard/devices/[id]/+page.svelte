@@ -547,7 +547,7 @@
                                       className={component.ClassName}
                                     />
                                   {:else if component.Type === 'HR'}
-                                    <HR id={component.UiID} label={component.Label} className={component.ClassName} />
+                                    <HR id={component.UiID} className={component.ClassName} />
                                   {:else if component.Type === 'ProgressBar'}
                                     <ProgressBar
                                       id={component.UiID}
