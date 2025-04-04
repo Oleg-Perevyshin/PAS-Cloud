@@ -210,7 +210,6 @@
       const moduleRequests = moduleList.map(async (module) => {
         const DevID = module.DevSN.substring(0, 4)
         const responseData = await API_CatalogDevice(DevID, module.DevFW)
-        
 
         /* Создаем объект модуля со значениями по умолчанию и ошибкой */
         const moduleData: IDeviceModule = {
@@ -223,11 +222,11 @@
           DevName: module.DevName,
           DevFW: module.DevFW,
           UIBlocks: [],
-          Status: null
-        };
+          Status: null,
+        }
 
         if (!responseData?.catalog) {
-          return moduleData;
+          return moduleData
         }
 
         const { API } = responseData.catalog
@@ -351,11 +350,23 @@
             const DevSN = parts[0]
             const dynamicKey = value.DynamicVariable
             const newValue = value.SelectedValue
+
+            /* Определение типа значения и добавление в пакет */
             if (Array.isArray(newValue)) {
               packetValue[parts[1]] = newValue.map((num) => Number(num))
             } else {
-              packetValue[parts[1]] = newValue
+              if (typeof newValue === 'string') {
+                const parsedNumber = Number(newValue)
+                if (!isNaN(parsedNumber)) {
+                  packetValue[parts[1]] = parsedNumber
+                } else {
+                  packetValue[parts[1]] = newValue
+                }
+              } else {
+                packetValue[parts[1]] = newValue
+              }
             }
+
             DeviceStore.setDynamicValue(dynamicKey, newValue)
             WebSocketStore.sendPacket(handler.Header, handler.Argument, {
               ClientID: UserData?.UserID,
@@ -376,11 +387,23 @@
             handler.Variables.forEach((varName) => {
               const dynamicKey = `${DevSN}_${varName}`
               const dynamicValue = get(DeviceStore).dynamicValues[dynamicKey]
-              if (Array.isArray(dynamicValue)) {
+
+              /* Определение типа значения и добавление в пакет */
+              if (typeof dynamicValue === 'number') {
+                packetValue[varName] = dynamicValue
+              } else if (typeof dynamicValue === 'string') {
+                const parsedNumber = Number(dynamicValue)
+                if (!isNaN(parsedNumber)) {
+                  packetValue[varName] = parsedNumber
+                } else {
+                  packetValue[varName] = dynamicValue
+                }
+              } else if (Array.isArray(dynamicValue)) {
                 packetValue[varName] = dynamicValue.map((num) => Number(num))
               } else {
                 packetValue[varName] = dynamicValue
               }
+
               DeviceStore.setDynamicValue(dynamicKey, dynamicValue)
             })
             WebSocketStore.sendPacket(handler.Header, handler.Argument, {
@@ -623,7 +646,13 @@
                                       props={component.Props}
                                       value={{
                                         id: component.UiID,
-                                        name: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
+                                        name: (() => {
+                                          const currentMode = dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''
+                                          const options = dynamicValues[`${selectedModule.DevSN}_${component.UiID}-S`]
+                                          const validOptions: IOptionUI[] = Array.isArray(options) ? options : []
+                                          const selectedOption: IOptionUI | undefined = validOptions.find((option: IOptionUI) => option.value === currentMode)
+                                          return selectedOption ? selectedOption.name : ''
+                                        })(),
                                         value: String(dynamicValues[`${selectedModule.DevSN}_${component.UiID}`] ?? ''),
                                         color: '',
                                       }}
