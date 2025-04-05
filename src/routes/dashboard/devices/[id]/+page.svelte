@@ -29,6 +29,7 @@
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
   import ColorPicker from '$lib/components/UI/ColorPicker.svelte'
   import Switch from '$lib/components/UI/Switch.svelte'
+    import HiddenField from '$lib/components/UI/HiddenField.svelte'
 
   const DevSN = $page.params.id
   let DevGroupID: string | null = $state(null)
@@ -156,20 +157,11 @@
             if (typeof ModuleConfig === 'object' && ModuleConfig !== null) {
               Object.entries(ModuleConfig).forEach(([key, value]: [string, string | number | null]) => {
                 const dynamicKey = `${ModuleConfig.DevSN}_${key}`
-
-                // dynamicValues[dynamicKey] = JSON.stringify(value)
-                // dynamicValues[dynamicKey] = value
                 if (Array.isArray(value)) {
                   dynamicValues[dynamicKey] = JSON.stringify(value)
                 } else {
                   dynamicValues[dynamicKey] = value
                 }
-
-                // DeviceStore.update((store) => ({
-                //   ...store,
-                //   dynamicValues: { ...store.dynamicValues, [dynamicKey]: dynamicValues[dynamicKey] },
-                // }))
-
                 DeviceStore.update((store) => ({
                   ...store,
                   dynamicValues: { ...store.dynamicValues, [dynamicKey]: value },
@@ -261,11 +253,12 @@
               block.Parameters.forEach((parameter) => {
                 parameter.UIComponents.forEach((component) => {
                   const uniqueKey = `${module.DevSN}_${component.UiID}`
+                  const apiValue = component.DefValue
                   DeviceStore.update((current) => ({
                     ...current,
                     dynamicValues: {
                       ...current.dynamicValues,
-                      [uniqueKey]: '',
+                      [uniqueKey]: apiValue !== undefined ? apiValue : '',
                     },
                   }))
                   dynamicKeys.push(uniqueKey)
@@ -571,6 +564,8 @@
                                     />
                                   {:else if component.Type === 'HR'}
                                     <HR id={component.UiID} className={component.ClassName} />
+                                  {:else if component.Type === 'HiddenField'}
+                                    <HiddenField id={component.UiID} bind:value={dynamicValues[`${selectedModule.DevSN}_${component.UiID}`]} />
                                   {:else if component.Type === 'ProgressBar'}
                                     <ProgressBar
                                       id={component.UiID}

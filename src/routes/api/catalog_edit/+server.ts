@@ -79,16 +79,10 @@ export const POST: RequestHandler = async (event) => {
       CatalogID: candidate_device.CatalogID,
       VerFW: candidate_device.VerFW,
       CRC32: crc32(firmwareBytes),
-      Versions: [],
     }
 
     let versionDevice = null
     if (device) {
-      /* Локальный сотрировщик */
-      const sortedVersions = [...new Set([...device.Versions.map((ver) => ver.VerFW), candidate_device.VerFW])].sort((a, b) => {
-        return parseFloat(b) - parseFloat(a)
-      })
-
       versionDevice = await prisma.catalogVersion.upsert({
         where: { DeviceID_VerFW: { DeviceID: device.CatalogID, VerFW: candidate_device.VerFW } },
         create: {
@@ -97,7 +91,7 @@ export const POST: RequestHandler = async (event) => {
           Firmware: firmwareBytes,
           Manual: manualBytes,
           API: apiBytes,
-          MetaData: { ...metaData, Versions: sortedVersions },
+          MetaData: { ...metaData },
           CatalogDevice: { connect: { CatalogID: device.CatalogID } },
         },
         update: {
@@ -105,7 +99,7 @@ export const POST: RequestHandler = async (event) => {
           Firmware: firmwareBytes,
           Manual: manualBytes,
           API: apiBytes,
-          MetaData: { ...metaData, Versions: sortedVersions },
+          MetaData: { ...metaData },
         },
       })
     } else {

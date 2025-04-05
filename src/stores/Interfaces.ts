@@ -340,6 +340,7 @@ export interface IUIComponent {
   RegExp?: string                         // Регулярное выражение для Input и подобных
   Options?: IOptionUI[]                   // Опции элемента
   Props?: object                          // Дополнительные свойства (у каждого компонента свой набор, смотреть в компонентах)
+  DefValue?: boolean | number | string    // Значение по умолчанию
   EventHandler?: IUIComponentHandler      // Обработчик событий
 }
 /* Интерфейс обработчика для UI компонента */
@@ -348,7 +349,6 @@ export interface IUIComponentHandler {
   Header?: string                         // Заголовок пакета
   Argument?: string                       // Аргумент
   Variables?: string[]                    // Массив переменных
-  Payload?: string                        // Дополнительные данные
 }
 
 

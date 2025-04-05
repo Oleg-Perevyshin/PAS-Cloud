@@ -13,6 +13,7 @@ import { prisma } from '$lib/Prisma'
 import { ResponseManager } from '$lib/utils/ResponseManager'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
 import { ValidateDevSN } from '$lib/utils/Common'
+import crc32 from 'crc/crc32'
 
 export const GET: RequestHandler = async (event) => {
   /* Получаем язык */
@@ -83,6 +84,18 @@ export const GET: RequestHandler = async (event) => {
       return new Response(JSON.stringify(ResponseManager('ER_VERSION_NOT_FOUND', lang)), { status: 404 })
     }
 
+    /* Создаем список прошивок из 15 последних в порядке убывания */
+    const allVersions = device.Versions.map((ver) => ver.VerFW)
+      .sort((a, b) => parseFloat(b) - parseFloat(a))
+      .slice(0, 15)
+    /* Собираем ответ с метаданными */
+    const responseData = {
+      CatalogID: device.CatalogID,
+      CRC32: crc32(Buffer.from(selectedVersion.Firmware)),
+      VerFW: selectedVersion.VerFW,
+      Versions: allVersions,
+    }
+
     let fileBuffer: Buffer | string | null = null
     let fileName: string | null = null
     let contentType: string | null = null
@@ -106,7 +119,7 @@ export const GET: RequestHandler = async (event) => {
       if (!selectedVersion.MetaData) {
         return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
       }
-      fileBuffer = Buffer.from(JSON.stringify(selectedVersion.MetaData))
+      fileBuffer = Buffer.from(JSON.stringify(responseData))
       fileName = `${device.CatalogID}-MetaData.json`
       contentType = 'application/json'
     } else if (DataTypeParam === 'API') {
