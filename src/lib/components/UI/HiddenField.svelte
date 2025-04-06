@@ -5,8 +5,8 @@
     value?: boolean | string | number | number[] | object | null
   }
 
-  let { id = '', value = $bindable(null), }: Props = $props()
+  let { id = '', value = $bindable(null) }: Props = $props()
 </script>
 
 <!-- Разметка компонента -->
-<input type="hidden" {id} bind:value class='hidden' />
+<input type="hidden" {id} bind:value class="hidden" />

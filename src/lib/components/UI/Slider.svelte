@@ -49,11 +49,11 @@
   }
 </script>
 
-<div {id} class={`relative inline-block w-full border-0 px-4 ${className}`}>
+<div {id} class={`relative mt-4 inline-block w-full border-0 ${className}`}>
   {#if label}
     <p class="mx-4 block font-semibold">{label}</p>
   {/if}
-  <div class="flex flex-col items-center">
+  <div class="mt-2 flex flex-col items-center">
     <input
       type="range"
       min={props.min}

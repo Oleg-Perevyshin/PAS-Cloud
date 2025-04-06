@@ -273,17 +273,18 @@
           >
             <div
               class={`flex flex-row items-center border-b
-              ${(message as IGroupMessage).Author?.UserID === UserData?.UserID ? 'justify-end' : 'justify-start'}
-            `}
+                ${(message as IGroupMessage).Author?.UserID === UserData?.UserID ? 'justify-end' : 'justify-start'}
+              `}
             >
-              <Button
-                className="border-0 rounded-2xl"
-                onClick={() => openModal(`${(message as IGroupMessage).Author?.UserID}`)}
-                label={`${(message as IGroupMessage).Author?.FirstName} ${(message as IGroupMessage).Author?.LastName}`}
-              />
+              {#if (message as IGroupMessage).Author?.UserID}
+                <Button
+                  className="border-0 rounded-2xl"
+                  onClick={() => openModal(`${(message as IGroupMessage).Author?.UserID}`)}
+                  label={`${(message as IGroupMessage).Author?.FirstName} ${(message as IGroupMessage).Author?.LastName}`}
+                />
+              {/if}
               <p class="px-4">{(message as IGroupMessage).Created}</p>
             </div>
-
             <div
               class={`whitespace-wrap flex w-full flex-row overflow-hidden p-2 text-ellipsis
               ${(message as IGroupMessage).Author?.UserID === UserData?.UserID ? 'justify-end' : 'justify-start'}`}

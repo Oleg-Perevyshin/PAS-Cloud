@@ -589,6 +589,30 @@ wss.on('connection', async (ws, req) => {
   const DevName = (query.DevName as string) || undefined
   const DevFW = (query.DevFW as string) || undefined
 
+  // if (UserID) {
+  //   const existingClient = [...clients.entries()].find(([, value]) => value.userID === UserID)
+  //   if (existingClient) {
+  //     const [oldWs] = existingClient
+  //     if (oldWs) {
+  //       /* Закрываем старое соединение */
+  //       oldWs.close(1008, 'Новое соединение установлено')
+  //       clients.delete(oldWs)
+  //       leaveGroups(oldWs)
+  //     }
+  //   }
+  // } else if (DevSN) {
+  //   const existingClient = [...clients.entries()].find(([, value]) => value.devSN === DevSN)
+  //   if (existingClient) {
+  //     const [oldWs] = existingClient
+  //     if (oldWs) {
+  //       /* Закрываем старое соединение */
+  //       oldWs.close(1008, 'Новое соединение установлено')
+  //       clients.delete(oldWs)
+  //       leaveGroups(oldWs)
+  //     }
+  //   }
+  // }
+
   /* Отключаем клиента от всех групп, если подключен */
   leaveGroups(ws)
 
@@ -706,7 +730,7 @@ wss.on('connection', async (ws, req) => {
   } else if (DevSN && (await handleGroupConnection('DevSN', DevSN))) {
     console.info(`Изделие ${DevSN} подключилось к WebSocket`)
   } else {
-    ws.close(1008, 'Invalid connection parameters')
+    ws.close(1008, 'Неверные параметры соединения')
     console.error('Получен невалидный UserID или DevSN при попытке подключения')
   }
 

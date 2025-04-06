@@ -29,7 +29,7 @@
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
   import ColorPicker from '$lib/components/UI/ColorPicker.svelte'
   import Switch from '$lib/components/UI/Switch.svelte'
-    import HiddenField from '$lib/components/UI/HiddenField.svelte'
+  import HiddenField from '$lib/components/UI/HiddenField.svelte'
 
   const DevSN = $page.params.id
   let DevGroupID: string | null = $state(null)
