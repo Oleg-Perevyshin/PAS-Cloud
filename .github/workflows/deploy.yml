@@ -1,5 +1,7 @@
 # Deploy to Server
-name: Deploy to Server
+# https://github.com/jurassicjs/nuxt3-fullstack-tutorial/blob/main/.github/workflows/deploy-int.yaml
+
+name: Automated Release Deployment
 
 on:
   workflow_dispatch:
@@ -22,10 +24,10 @@ jobs:
           echo "JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}" >> $GITHUB_ENV
           echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> $GITHUB_ENV
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
-          echo "JWT_ACCESS_EXPIRE=${{ vars.JWT_ACCESS_EXPIRE }}" >> $GITHUB_ENV
-          echo "JWT_REFRESH_EXPIRE=${{ vars.JWT_REFRESH_EXPIRE }}" >> $GITHUB_ENV
-          echo "JWT_ACCESS_MAX_AGE=${{ vars.JWT_ACCESS_MAX_AGE }}" >> $GITHUB_ENV
-          echo "JWT_REFRESH_MAX_AGE=${{ vars.JWT_REFRESH_MAX_AGE }}" >> $GITHUB_ENV
+          echo "JWT_ACCESS_EXPIRE=${{ secrets.JWT_ACCESS_EXPIRE }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}" >> $GITHUB_ENV
+          echo "JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: npm install
@@ -36,18 +38,18 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.PRODUCTION_SERVER_DEPLOY_KEY }}" > ~/.ssh/id_ed25519 || { echo "Failed to write SSH key"; exit 1; }
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H cloud.poe-gw.keenetic.pro >> ~/.ssh/known_hosts || { echo "Failed to add known hosts"; exit 1; }
+          echo "${{ secrets.PRODUCTION_SERVER_DEPLOY_KEY }}" > ~/.ssh/id_rsa_cloud || { echo "Failed to write SSH key"; exit 1; }
+          chmod 600 ~/.ssh/id_rsa_cloud
+          ssh-keyscan -H cloud.pas-gw.keenetic.pro >> ~/.ssh/known_hosts || { echo "Failed to add known hosts"; exit 1; }
           cat ~/.ssh/known_hosts  # вывод содержимого known_hosts для отладки
 
       - name: Test SSH connection
-        run: ssh -i ~/.ssh/id_ed25519 poe@cloud.poe-gw.keenetic.pro "echo 'SSH connection successful'"
+        run: ssh -i ~/.ssh/id_rsa_cloud poe@cloud.pas-gw.keenetic.pro "echo 'SSH Connection Successful'"
 
       - name: Create deploy directory
-        run: ssh -i ~/.ssh/id_ed25519 poe@cloud.poe-gw.keenetic.pro "mkdir -p ~/test"
+        run: ssh -i ~/.ssh/id_rsa_cloud poe@cloud.pas-gw.keenetic.pro "mkdir -p ~/cloud_app"
 
       - name: Deploy to server
         run: |
-          rsync -r --delete --exclude=.git ./ poe@cloud.poe-gw.keenetic.pro:~/test
-          ssh -i ~/.ssh/id_ed25519 poe@cloud.poe-gw.keenetic.pro "cd ~/test && npm install --production && pm2 restart cloud_app"
+          rsync -r --delete --exclude=.git ./ poe@cloud.pas-gw.keenetic.pro:~/cloud_app
+          ssh -i ~/.ssh/id_rsa_cloud poe@cloud.poe-gw.keenetic.pro "cd ~/cloud_app && npm install --production && pm2 restart cloud_app"

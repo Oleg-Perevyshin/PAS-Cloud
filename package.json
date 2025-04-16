@@ -8,7 +8,7 @@
   "scripts": {
     "Development": "vite dev --port 2005 --host",
     "-": "",
-    "Build": "cross-env NODE_ENV='production' vite build",
+    "Build": "cross-env NODE_ENV='production' BODY_SIZE_LIMIT='64M' vite build",
     "Preview": "vite preview --port 2005 --host",
     "ProdServer": "--host BODY_SIZE_LIMIT='64M'",
     "--": "",
