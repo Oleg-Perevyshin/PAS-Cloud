@@ -11,7 +11,7 @@ WORKDIR /app
 
 # Копируем package.json в контейнер и устанавливаем зависимости
 COPY package.json .
-RUN npm install
+RUN npm ci
 
 # Копируем файлы в контейнер
 COPY . .
@@ -29,7 +29,6 @@ EXPOSE 2005
 ENV BODY_SIZE_LIMIT=64M
 
 # Команда запуска приложения
-# CMD ["node"]
 CMD ["npm", "run", "preview"]
 
 
