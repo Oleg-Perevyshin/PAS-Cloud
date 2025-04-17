@@ -11,7 +11,7 @@ WORKDIR /app
 
 # Копируем package.json в контейнер и устанавливаем зависимости
 COPY package.json .
-RUN npm ci
+RUN npm install
 
 # Копируем файлы в контейнер
 COPY . .
