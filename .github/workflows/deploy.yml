@@ -8,7 +8,8 @@ on:
 
 jobs:
   install:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       # Извлекаем репозиторий из папки $GITHUB_WORKSPACE
       - name: Checkout Code
@@ -25,7 +26,8 @@ jobs:
         run: npm ci
 
   build:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: install  # Зависимость от джобы установки
     steps:
       # Извлекаем репозиторий (второй раз, чтобы иметь доступ к коду)
@@ -42,7 +44,7 @@ jobs:
           echo "JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}" >> $GITHUB_ENV
           echo "JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}" >> $GITHUB_ENV
           echo "JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}" >> $GITHUB_ENV
-          
+
       # Генерируем Prisma
       - name: Generate Prisma
         run: npx prisma generate
@@ -52,12 +54,24 @@ jobs:
         run: npm run build
 
   deploy:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build  # Зависимость от джобы сборки
     steps:
       # Извлекаем репозиторий (в третий раз для доступа к собранному коду)
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      # Устанавливаем переменные из секретов репозитория
+      - name: Set Environment Variables
+        run: |
+          echo "JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "JWT_ACCESS_EXPIRE=${{ secrets.JWT_ACCESS_EXPIRE }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}" >> $GITHUB_ENV
+          echo "JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}" >> $GITHUB_ENV
 
       # Разворачиваем приложение
       - name: Deploy Application
