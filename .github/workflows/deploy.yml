@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       # Устанавливаем переменные из секретов репозитория
-      - name: Set environment variables
+      - name: Set Environment Variables
         run: |
           echo "JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}" >> $GITHUB_ENV
           echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> $GITHUB_ENV
@@ -38,8 +38,13 @@ jobs:
 
 
       # Собираем проект
-      - name: Build
+      - name: Build Project
         run: npm run Build
+
+      # Разворачиваем приложение
+      - name: Deploy Application
+        run: |
+          echo "Deploying application..."
 
 #      - name: Setup SSH key
 #        run: |
