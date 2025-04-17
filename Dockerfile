@@ -27,6 +27,14 @@ EXPOSE 2005
 
 # Устанавливаем переменную окружения
 ENV BODY_SIZE_LIMIT=64M
+ENV NODE_ENV=production
+ENV JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
+ENV JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+ENV DATABASE_URL=${{ secrets.DATABASE_URL }}
+ENV JWT_ACCESS_EXPIRE=${{ secrets.JWT_ACCESS_EXPIRE }}
+ENV JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}
+ENV JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}
+ENV JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}
 
 # Команда запуска приложения
 CMD ["npm", "run", "preview"]

@@ -28,3 +28,11 @@ jobs:
           file: Dockerfile
           push: false
           tags: mcmega/pas-cloud:latest
+          secrets: |
+            JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
+            JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            JWT_ACCESS_EXPIRE=${{ secrets.JWT_ACCESS_EXPIRE }}
+            JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}
+            JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}
+            JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}
