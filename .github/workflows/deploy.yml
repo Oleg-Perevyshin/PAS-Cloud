@@ -1,18 +1,17 @@
 # Deploy to Server
 # https://github.com/jurassicjs/nuxt3-fullstack-tutorial/blob/main/.github/workflows/deploy-int.yaml
 
-name: Automated Release Deployment
+name: Release Application Deployment
 
 on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  install:
     runs-on: ubuntu-latest
-
     steps:
       # Извлекаем репозиторий из папки $GITHUB_WORKSPACE
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       # Устанавливаем Node.js 
@@ -36,15 +35,31 @@ jobs:
           echo "JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}" >> $GITHUB_ENV
           echo "JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}" >> $GITHUB_ENV
 
+  build:
+    runs-on: ubuntu-latest
+    needs: install  # Зависимость от джобы установки
+    steps:
+      # Извлекаем репозиторий (второй раз, чтобы иметь доступ к коду)
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       # Собираем проект
       - name: Build Project
         run: npm run Build
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Зависимость от джобы сборки
+    steps:
+      # Извлекаем репозиторий (в третий раз для доступа к собранному коду)
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       # Разворачиваем приложение
       - name: Deploy Application
         run: |
           echo "Deploying application..."
+
 
 #      - name: Setup SSH key
 #        run: |
