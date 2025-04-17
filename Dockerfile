@@ -20,7 +20,7 @@ COPY . .
 RUN npx prisma generate
 
 # Собираем проект
-RUN npm run Build
+RUN npm run build
 
 # Порт приложения
 EXPOSE 2005
@@ -30,7 +30,7 @@ ENV BODY_SIZE_LIMIT=64M
 
 # Команда запуска приложения
 # CMD ["node"]
-CMD ["npm", "run", "Preview"]
+CMD ["npm", "run", "preview"]
 
 
 # Сборка и запуск докера

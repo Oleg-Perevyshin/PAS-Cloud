@@ -6,18 +6,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "Development": "vite dev --port 2005 --host",
+    "development": "vite dev --port 2005 --host",
     "-": "",
-    "Build": "cross-env NODE_ENV='production' BODY_SIZE_LIMIT='64M' vite build",
-    "Preview": "vite preview --port 2005 --host",
-    "ProdServer": "--host BODY_SIZE_LIMIT='64M'",
+    "build": "cross-env NODE_ENV='production' BODY_SIZE_LIMIT='64M' vite build",
+    "preview": "vite preview --port 2005 --host",
     "--": "",
     "Formatting": "prettier --write .",
     "CheckApp": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "Lint": "prettier --check . && eslint .",
     "---": "",
     "CheckUpdate": "npx npm-check-updates -u",
-    "PrismaGen": "npx prisma generate",
     "SeedUsers": "tsx prisma/seedUsers.ts"
   },
   "devDependencies": {

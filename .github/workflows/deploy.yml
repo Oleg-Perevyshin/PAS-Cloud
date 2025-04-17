@@ -43,9 +43,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Генерируем Prisma
+      - name: Generate Prisma
+        run: npx prisma generate
+
       # Собираем проект
       - name: Build Project
-        run: npm run Build
+        run: npm run build
 
   deploy:
     runs-on: ubuntu-latest
