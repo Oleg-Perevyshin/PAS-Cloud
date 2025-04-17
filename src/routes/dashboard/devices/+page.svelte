@@ -124,7 +124,7 @@
     }
     LoaderStore.set(true)
     try {
-      await API_UpdateDeviceTagID(UserData.UserID, UserData.Devices[index].DevSN, tag.value, true)
+      await API_UpdateDeviceTagID(UserData.UserID, UserData.Devices[index].DevSN, String(tag.value), true)
       selectedTags[index] = tag
     } catch (error) {
       console.error(`Ошибка updateDeviceTag - обновление TagID устройства ${UserData.Devices[index]?.DevSN}: `, error)

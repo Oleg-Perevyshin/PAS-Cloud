@@ -140,7 +140,7 @@ const createWebSocketStore = () => {
               console.info(`Попытка переподключения к WebSocket для ${UserID}...`)
               connectSocket()
             }
-          }, 5000)
+          }, 2500)
         }
       }
 
@@ -403,8 +403,17 @@ const createWebSocketStore = () => {
   const handlerER = (packet: IWebSocketPacket) => {
     switch (packet.ARGUMENT) {
       case 'WebSocket': {
-        console.warn(`Ошибка WebSocket: ${packet.VALUE.Message}`)
-        break
+        if (packet.VALUE && 'Message' in packet.VALUE) {
+          const message = packet.VALUE.Message;
+          if (typeof message === 'string' && message.trim() !== '') {
+            console.warn(`Ошибка WebSocket: ${message}`);
+          } else {
+            console.warn('Message не является строкой или пустой');
+          }
+        } else {
+          console.warn('VALUE отсутствует или не является объектом');
+        }
+        break;
       }
       default:
         break
