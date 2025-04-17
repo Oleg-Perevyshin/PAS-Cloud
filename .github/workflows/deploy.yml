@@ -24,6 +24,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+  build:
+    runs-on: ubuntu-latest
+    needs: install  # Зависимость от джобы установки
+    steps:
+      # Извлекаем репозиторий (второй раз, чтобы иметь доступ к коду)
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       # Устанавливаем переменные из секретов репозитория
       - name: Set Environment Variables
         run: |
@@ -34,15 +42,7 @@ jobs:
           echo "JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}" >> $GITHUB_ENV
           echo "JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}" >> $GITHUB_ENV
           echo "JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}" >> $GITHUB_ENV
-
-  build:
-    runs-on: ubuntu-latest
-    needs: install  # Зависимость от джобы установки
-    steps:
-      # Извлекаем репозиторий (второй раз, чтобы иметь доступ к коду)
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
+          
       # Генерируем Prisma
       - name: Generate Prisma
         run: npx prisma generate
