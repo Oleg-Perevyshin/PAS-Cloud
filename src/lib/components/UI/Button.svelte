@@ -14,7 +14,7 @@
       activeBgColor?: string
       disabled?: boolean
     }
-    icon?: typeof SvelteComponent | null
+    icon?: (new (...args: any[]) => SvelteComponent) | null
     iconProps?: Record<string, string>
     onClick?: (event: MouseEvent) => void
   }

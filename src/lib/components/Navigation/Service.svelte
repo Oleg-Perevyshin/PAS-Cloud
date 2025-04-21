@@ -67,6 +67,15 @@
         role: ['ADMIN'],
       },
       {
+        key: 'nav.service.ui-constructor',
+        label: '',
+        page: '/service/ui-constructor',
+        icon: IconWebSocket,
+        bgColor: currentTheme === 'light' ? 'bg-red-200' : 'bg-red-800',
+        textColor: '',
+        role: ['MANAGER', 'ADMIN'],
+      },
+      {
         key: 'nav.service.users',
         label: '',
         page: '/service/users',
