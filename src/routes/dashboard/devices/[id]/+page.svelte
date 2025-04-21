@@ -5,7 +5,7 @@
   import { slide } from 'svelte/transition'
   import { t, Language } from '$lib/locales/i18n'
   import * as yaml from 'js-yaml'
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
   import type {
     IUser,
     IDevice,
@@ -31,7 +31,7 @@
   import Switch from '$lib/components/UI/Switch.svelte'
   import HiddenField from '$lib/components/UI/HiddenField.svelte'
 
-  const DevSN = $page.params.id
+  const DevSN = page.params.id
   let DevGroupID: string | null = $state(null)
 
   let isExpandedBlock: { [key: string]: boolean } = $state({})

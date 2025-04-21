@@ -404,16 +404,16 @@ const createWebSocketStore = () => {
     switch (packet.ARGUMENT) {
       case 'WebSocket': {
         if (packet.VALUE && 'Message' in packet.VALUE) {
-          const message = packet.VALUE.Message;
+          const message = packet.VALUE.Message
           if (typeof message === 'string' && message.trim() !== '') {
-            console.warn(`Ошибка WebSocket: ${message}`);
+            console.warn(`Ошибка WebSocket: ${message}`)
           } else {
-            console.warn('Message не является строкой или пустой');
+            console.warn('Message не является строкой или пустой')
           }
         } else {
-          console.warn('VALUE отсутствует или не является объектом');
+          console.warn('VALUE отсутствует или не является объектом')
         }
-        break;
+        break
       }
       default:
         break
