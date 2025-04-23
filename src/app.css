@@ -118,3 +118,90 @@ a:hover {
   text-decoration: underline;
   color: #08f;
 }
+
+/* Цветовая гамма */
+.light-theme {
+  --back-color: #ffffff; /* Чисто белый фон */
+  --font-color: #1e293b; /* Темный сине-серый для текста */
+  --border-color: #c6d1df; /* Светлые серо-голубые границы */
+  --conteiner-color: #f8fafc; /* Очень светлый фон контейнеров */
+  --field-color: #f1f5f9;
+
+  --primary-color: #aaaaaa;
+  --white-color: #ffffff;
+  --red-color: #f87171;
+  --orange-color: #fb923c;
+  --amber-color: #fbbf24;
+  --lime-color: #84cc16;
+  --green-color: #22c55e;
+  --sky-color: #0ea5e9;
+  --blue-color: #3b82f6;
+  --purple-color: #a855f7;
+  --pink-color: #ec4899;
+  --rose-color: #f43f5e;
+}
+
+.dark-theme {
+  --back-color: #0f172a; /* Глубокий сине-черный фон */
+  --font-color: #e2e8f0; /* Мягкий бело-голубой для текста */
+  --border-color: #334155; /* Границы - темный серо-синий */
+  --conteiner-color: #1e293b; /* Основные контейнеры - темный шифер */
+  --field-color: #2d3748; /*цвет маленьких полей, например полей ввода*/
+
+  --primary-color: #666666;
+  --white-color: #d0d0d0;
+  --red-color: #c0392b;
+  --rose-color: #d6336c;
+  --orange-color: #d35400;
+  --amber-color: #e67e22;
+  --lime-color: #5d8c2b;
+  --green-color: #27ae60;
+  --sky-color: #0c7abf;
+  --blue-color: #2980b9;
+  --purple-color: #8e44ad;
+  --pink-color: #c2185b;
+}
+
+.primary {
+  --color: var(--primary-color);
+}
+.white {
+  --color: var(--white-color);
+}
+.red {
+  --color: var(--red-color);
+}
+.orange {
+  --color: var(--orange-color);
+}
+.amber {
+  --color: var(--amber-color);
+}
+.lime {
+  --color: var(--lime-color);
+}
+.green {
+  --color: var(--green-color);
+}
+.sky {
+  --color: var(--sky-color);
+}
+.blue {
+  --color: var(--blue-color);
+}
+.purple {
+  --color: var(--purple-color);
+}
+.pink {
+  --color: var(--pink-color);
+}
+.rose {
+  --color: var(--rose-color);
+}
+
+.dark-theme .arrow,
+.dark-theme .info,
+.dark-theme .icon-eye,
+.dark-theme .icon-eye-slash {
+  filter: invert(0.9);
+}

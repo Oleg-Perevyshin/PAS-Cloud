@@ -60,7 +60,11 @@
     /* Подписки на состояние */
     const subscriptions = {
       Language: Language.subscribe((value) => (currentLang = value)),
-      Theme: ThemeStore.subscribe((value) => (currentTheme = value)),
+      Theme: ThemeStore.subscribe((value) => {
+        currentTheme = value
+        document.body.classList.toggle('dark-theme', value === 'dark')
+        document.body.classList.toggle('light-theme', value === 'light')
+      }),
       Messages: MessagesStore.subscribe((value) => (messages = value)),
       Loader: LoaderStore.subscribe((value) => (loading = value)),
       WebSocket: WebSocketStore.subscribe((state) => {

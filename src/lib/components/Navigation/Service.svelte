@@ -12,6 +12,7 @@
   import IconProfile from '$lib/appIcons/MenuDashboardProfile.svelte'
   import IconNews from '$lib/appIcons/MenuDashboardNews.svelte'
   import IconWebSocket from '$lib/appIcons/WebSocket.svelte'
+  import IconUI from '$lib/appIcons/UiIcon.svelte'
 
   /* Определение интерфейса для кнопки */
   interface ButtonConfig {
@@ -70,7 +71,7 @@
         key: 'nav.service.ui-constructor',
         label: '',
         page: '/service/ui-constructor',
-        icon: IconWebSocket,
+        icon: IconUI,
         bgColor: currentTheme === 'light' ? 'bg-red-200' : 'bg-red-800',
         textColor: '',
         role: ['MANAGER', 'ADMIN'],

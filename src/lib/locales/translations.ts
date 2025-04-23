@@ -31,6 +31,7 @@ const translations: Translations = {
     'nav.service.users': 'Пользователи',
     'nav.service.info': 'Новости',
     'nav.service.websocket': 'WebSocket',
+    'nav.service.ui-constructor': 'UI коструктор',
 
     /* Общие названия */
     'common.footer': 'Все права защищены ©',
