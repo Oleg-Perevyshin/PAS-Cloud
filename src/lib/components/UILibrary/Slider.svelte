@@ -311,7 +311,6 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 0.5rem;
   }
 
   .values.vertical {
@@ -348,7 +347,6 @@
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 16px;
     height: max-content;
     &:hover {
       transform: scale(1.3);

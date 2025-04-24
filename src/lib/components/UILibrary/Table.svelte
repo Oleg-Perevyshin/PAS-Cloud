@@ -23,7 +23,7 @@
     columns: IColumn<T>[]
   }
 
-  let { id = '', label = 'label', labelAlign = 'center', color = 'blue', rows = [], columns = [] }: Props<any> = $props()
+  let { id = '', label = '', labelAlign = 'center', color = 'blue', rows = [], columns = [] }: Props<any> = $props()
 </script>
 
 <div class="table-wrapper {color}" {id}>

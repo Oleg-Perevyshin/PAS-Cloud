@@ -97,9 +97,9 @@
     <button
       {id}
       class={`button ${disabled ? 'disabled' : ''} ${color}`}
-      style="border-radius: 1rem; min-width: max-content; {buttonCSS} {color == 'white'
+      style="border-radius: 1rem; min-width: max-content; {color == 'white'
         ? 'border: 1px solid var(--border-color);'
-        : 'color: white; border: none;'}"
+        : 'color: white; border: none;'} {buttonCSS}"
       onclick={handleClick}
       {disabled}
     >
@@ -108,9 +108,11 @@
           {@const IconComponent = icon}
           <IconComponent {...iconProps} />
         {/if}
-        <span class="text" style={textCSS}>
-          {text}
-        </span>
+        {#if text}
+          <span class="text" style={textCSS}>
+            {text}
+          </span>
+        {/if}
       </span>
     </button>
   {/if}
@@ -152,6 +154,7 @@
   .button-content {
     display: flex;
     align-items: center;
+    justify-content: center;
   }
 
   .text {

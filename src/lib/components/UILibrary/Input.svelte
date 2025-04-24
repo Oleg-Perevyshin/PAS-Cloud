@@ -10,8 +10,8 @@
     Type?: 'text' | 'password' | 'number' | 'text-area'
     placeholder?: string
     Info?: string
-    Label?: string
-    LabelAlign?: 'start' | 'center' | 'end'
+    label?: string
+    labelAlign?: 'start' | 'center' | 'end'
     styleCSS?: string
     color?: Colors
     disabled?: boolean
@@ -43,6 +43,7 @@
     step?: number
     minNum?: number
     maxNum?: number
+    rows?: number
   }
 
   let {
@@ -51,8 +52,8 @@
     Type = 'text',
     placeholder = '',
     Info = '',
-    Label = '',
-    LabelAlign = 'center',
+    label = '',
+    labelAlign = 'center',
     styleCSS = '',
     color = 'blue',
     disabled = false,
@@ -61,9 +62,10 @@
     autocomplete = null,
     onUpdate = () => {},
     RegExp = /./,
-    step = 0.11,
+    step = 0.1,
     minNum = 1,
     maxNum = 10,
+    rows = 5,
   }: Props = $props()
 
   let showPassword = $state(Type === 'password')
@@ -98,11 +100,39 @@
   function toggleInfoVisibility() {
     showInfo = !showInfo
   }
+
+  function increment() {
+    if (typeof value === 'number') {
+      let newValue = value + step
+      newValue = Math.min(newValue, maxNum)
+
+      const decimalPlaces = countDecimalPlaces(step)
+      value = parseFloat(newValue.toFixed(decimalPlaces))
+    }
+  }
+
+  function decrement() {
+    if (typeof value === 'number') {
+      let newValue = value - step
+      newValue = Math.max(newValue, minNum)
+
+      const decimalPlaces = countDecimalPlaces(step)
+      value = parseFloat(newValue.toFixed(decimalPlaces))
+    }
+  }
+
+  function countDecimalPlaces(num: number): number {
+    const match = ('' + num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/)
+    if (!match) return 0
+    const decimalPart = match[1] ? match[1].length : 0
+    const exponentPart = match[2] ? parseInt(match[2], 10) : 0
+    return Math.max(0, decimalPart - exponentPart)
+  }
 </script>
 
 <div class="input-container" style={styleCSS}>
-  {#if Label}
-    <label for={id} class="label" style="text-align: {LabelAlign};">{Label}</label>
+  {#if label}
+    <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
   {/if}
   <div class="input-wrapper">
     {#if Type === 'text' || Type === 'password' || Type === 'number'}
@@ -119,15 +149,30 @@
         max={maxNum}
         {step}
       />
+      {#if Type === 'number'}
+        <div class="number-controls">
+          <button type="button" class="number-btn up" aria-label="increment" onclick={increment}>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+          <button type="button" class="number-btn down" aria-label="decrement" onclick={decrement}>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+      {/if}
     {:else}
       <textarea
         name="area"
-        class="text-area {color}"
+        class="text-area {color} {disabled ? 'disabled' : ''}"
         {id}
         bind:value
         {readonly}
         {autocomplete}
         {disabled}
+        {rows}
         style="padding: {Info ? '0.25rem 0.5rem 0.25rem 2.6rem' : '0.25rem 1rem'};"
         oninput={updateValue}
       ></textarea>
@@ -164,7 +209,7 @@
     {/if}
   </div>
   {#if showInfo}
-    <div transition:fly={{ y: 15, duration: 300 }} class="info-container">
+    <div transition:fly={{ y: 15, duration: 300 }} class="info-container" style="top: {label ? '4.5rem' : '2.5rem'};">
       {Info}
     </div>
   {/if}
@@ -175,6 +220,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    position: relative;
   }
 
   .label {
@@ -261,7 +307,7 @@
     border-radius: 0.25rem;
     border: 1px solid var(--border-color);
     padding: 0.25rem;
-    background-color: var(--field-color);
+    background-color: var(--info-color);
   }
 
   .number-button {
@@ -306,6 +352,49 @@
   .text-area::-webkit-resizer {
     background: linear-gradient(315deg, #0000 26%, var(--color) 26% 33%, #0000 33% 43%, var(--color) 43% 50%, #0000 50% 100%) no-repeat;
     background-size: 80% 80%;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  .number-controls {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .number-btn {
+    width: 0.6rem;
+    height: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: var(--font-color);
+    transition: all 0.2s;
+  }
+
+  .number-btn:hover {
+    color: var(--primary-color);
+  }
+
+  .number-btn svg {
+    width: 100%;
+    height: 100%;
   }
 
   @media (max-width: 690px) {

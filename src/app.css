@@ -124,10 +124,11 @@ a:hover {
   --back-color: #ffffff; /* Чисто белый фон */
   --font-color: #1e293b; /* Темный сине-серый для текста */
   --border-color: #c6d1df; /* Светлые серо-голубые границы */
-  --conteiner-color: #f8fafc; /* Очень светлый фон контейнеров */
-  --field-color: #f1f5f9;
+  --conteiner-color: #f8fafc; /* Очень светлый фон контейнеров, например аккордеона */
+  --field-color: #f1f5f9; /*цвет маленьких полей, например полей ввода*/
+  --info-color: #fff19f; /* цвет подсказок */
 
-  --primary-color: #aaaaaa;
+  --primary-color: #aaaaaa; /* цвета для ui */
   --white-color: #ffffff;
   --red-color: #f87171;
   --orange-color: #fb923c;
@@ -147,8 +148,9 @@ a:hover {
   --border-color: #334155; /* Границы - темный серо-синий */
   --conteiner-color: #1e293b; /* Основные контейнеры - темный шифер */
   --field-color: #2d3748; /*цвет маленьких полей, например полей ввода*/
+  --info-color: #8a6625; /* цвет подсказок */
 
-  --primary-color: #666666;
+  --primary-color: #666666; /* цвета для ui */
   --white-color: #d0d0d0;
   --red-color: #c0392b;
   --rose-color: #d6336c;
@@ -199,9 +201,9 @@ a:hover {
   --color: var(--rose-color);
 }
 
-.dark-theme .arrow,
+.dark-theme .arrow path,
 .dark-theme .info,
 .dark-theme .icon-eye,
 .dark-theme .icon-eye-slash {
-  filter: invert(0.9);
+  stroke: #ffffff;
 }

@@ -61,7 +61,7 @@
     {#if captionLeft}
       <button class="caption" style="margin-right: 1rem; width: {maxCaptionWidth}; text-align: end;" onclick={() => updateChecked(false)}>{captionLeft}</button>
     {/if}
-    <label class="toggle-container">
+    <label class="toggle-container {disabled ? 'disabled' : ''}">
       <input type="checkbox" class="toggle-input" bind:checked {disabled} onchange={handleToggle} />
       <span class="slider {color}" style="--switch-height: {height};"></span>
     </label>
@@ -74,7 +74,6 @@
 
 <style>
   .wrapper {
-    /* display: inline-block; */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -123,12 +122,13 @@
     height: var(--switch-height);
     display: flex;
     align-items: center;
-    background-color: #d1d5db;
+    background-color: var(--border-color);
     border-radius: 999px;
     transition: all 0.3s ease-in-out;
+    position: relative;
   }
 
-  .toggle-input:hover + .slider {
+  .toggle-input:hover + .slider:not(.disabled) {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
@@ -139,15 +139,30 @@
     margin: 0 calc(var(--switch-height) * 0.13);
     background-color: white;
     border-radius: 999px;
-    transition: transform 0.3s ease-in-out;
+    transition:
+      transform 0.3s ease-in-out,
+      background-color 0.3s ease;
   }
 
-  .toggle-input:checked + .slider {
+  .toggle-input:checked + .slider:not(.disabled) {
     background-color: var(--color);
-    cursor: pointer;
   }
 
   .toggle-input:checked + .slider::after {
     transform: translateX(calc(var(--switch-height) * 0.87));
+  }
+
+  .disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .toggle-input:disabled + .slider {
+    opacity: 0.6;
+    box-shadow: none !important;
+  }
+
+  .toggle-input:disabled + .slider::after {
+    opacity: 0.6;
   }
 </style>

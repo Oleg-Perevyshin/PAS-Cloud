@@ -3,19 +3,19 @@
 
   interface Props {
     id?: string
-    Label?: string
+    label?: string
     styleCSS?: string
-    LabelAlign?: 'start' | 'center' | 'end'
+    labelAlign?: 'start' | 'center' | 'end'
     color?: Colors
     visible?: boolean
   }
 
-  let { id = '', Label = '', styleCSS = '', LabelAlign = 'center', color = 'primary', visible = true }: Props = $props()
+  let { id = '', label = '', styleCSS = '', labelAlign = 'center', color = 'primary', visible = true }: Props = $props()
 </script>
 
 <hr {id} class={color} style="{styleCSS} {visible ? '' : 'border: none;'}" />
-{#if Label}
-  <label for={id} class="label" style="text-align: {LabelAlign};">{Label}</label>
+{#if label}
+  <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
 {/if}
 
 <style>
