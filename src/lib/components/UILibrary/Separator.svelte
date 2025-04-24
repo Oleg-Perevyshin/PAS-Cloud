@@ -13,7 +13,7 @@
   let { id = '', label = '', styleCSS = '', labelAlign = 'center', color = 'primary', visible = true }: Props = $props()
 </script>
 
-<hr {id} class={color} style="{styleCSS} {visible ? '' : 'border: none;'}" />
+<hr {id} class={color} style="{styleCSS} {visible ? '' : 'height: 1rem; border: none;'}" />
 {#if label}
   <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
 {/if}

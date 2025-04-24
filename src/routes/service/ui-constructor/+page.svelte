@@ -11,6 +11,7 @@
   import Switch from '$lib/components/UILibrary/Switch.svelte'
   import Table, { type Colors } from '$lib/components/UILibrary/Table.svelte'
   import Graph from '$lib/components/UILibrary/Graph.svelte'
+    import ColorPicker from '$lib/components/UILibrary/ColorPicker.svelte'
 
   const wifiModeList: IOption[] = [
     { id: 1, name: 'Станция' },
@@ -53,9 +54,9 @@
   }
 
   const rows: Device[] = [
-    { id: '1', name: 'Device A', status: 'online', lastActive: new Date() },
-    { id: '2', name: 'Device B', status: 'offline', lastActive: new Date(Date.now() - 86400000 * 4) },
-    { id: '3', name: 'Device C', status: 'offline', lastActive: new Date(Date.now() - 86400000) },
+    { id: '# 1', name: 'Device A', status: 'online', lastActive: new Date() },
+    { id: '# 2', name: 'Device B', status: 'offline', lastActive: new Date(Date.now() - 86400000 * 4) },
+    { id: '# 3', name: 'Device C', status: 'offline', lastActive: new Date(Date.now() - 86400000) },
   ]
 
   interface IColumn<T extends object> {
@@ -102,7 +103,7 @@
     const data = []
 
     for (let x = 0; x < 100; x++) {
-      y = 2 * Math.sin(x / 10) + Math.random() * 0.5
+      y = 2 * Math.sin(x / 10) + Math.random()
       data.push({ x, y })
     }
 
@@ -114,14 +115,15 @@
 
 <div class="flex h-full w-full flex-col items-stretch overflow-auto">
   <h2>Страница для тестирования UI компонентов</h2>
+  <Separator visible={false} />
 
-  <div>
+  <div class="flex flex-wrap justify-center">
     <Accordion label="Пример использования: Настройки WiFi" styleCSS="width: 100%;" state={false}>
       <Button label="Режимы wifi" color="blue" options={wifiModeList} value={buttonItem} optionWidth="max-width" onChange={(value) => (buttonItem = value)} />
 
       <Accordion type="sub" label="Настройки режима STA" styleCSS="width: 100%;" state={false}>
         <Select
-          label="Точки доступа"
+          label="Точка доступа"
           options={accessPoints}
           value={ap}
           styleCSS="width: 20rem;"
@@ -131,28 +133,77 @@
         />
 
         <Input label="Пароль" styleCSS="width: 30%;" Type="password" bind:value={inputString} placeholder="Enter password" RegExp={/^[0-9a-z]{0,5}$/} />
+
         <Separator visible={false} />
 
+        <Switch label="Режим IP" captionLeft="Статический" captionRight="Динамический" color="blue" />
+        <Separator visible={false} />
         <Input
-          label="STAip"
+          label="IP Address"
           styleCSS="width: 20rem;"
           id="sta-ip"
           autocomplete="on"
           placeholder="XXX.XXX.XXX.XXX"
           RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
         />
-        <Switch label="Режим IP" captionLeft="Статический" captionRight="Динамический" color="blue" />
+
+        <Input
+          label="Mask"
+          styleCSS="width: 20rem;"
+          id="sta-ms"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+
+        <Input
+          label="Gateway"
+          styleCSS="width: 20rem;"
+          id="sta-gw"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
       </Accordion>
 
       <Accordion type="sub" label="Настройки режима AP" styleCSS="width: 100%;" state={false}>
-        <Input label="Имя точки доступа" styleCSS="width: 30%;" Type="text" bind:value={inputString} placeholder="Enter string" RegExp={/^[0-9a-z]{0,5}$/} />
+        <Input id="input-ap-ssid" label="Имя точки доступа" styleCSS="width: 30%;" Type="text" bind:value={inputString} placeholder="Enter string" RegExp={/^[0-9a-z]{0,5}$/} />
         <Input
+          id="input-ap-psk"
           label="Пароль точки доступа"
           styleCSS="width: 30%;"
           Type="password"
           bind:value={inputString}
           placeholder="Enter string"
           RegExp={/^[0-9a-z]{0,5}$/}
+        />
+
+        <Separator visible={false} />
+        <Input
+          label="IP Address"
+          styleCSS="width: 20rem;"
+          id="ap-ip"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+
+        <Input
+          label="Mask"
+          styleCSS="width: 20rem;"
+          id="ap-ms"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+
+        <Input
+          label="Gateway"
+          styleCSS="width: 20rem;"
+          id="ap-gw"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
         />
       </Accordion>
       <Button text="Сохранить" buttonCSS="width: 10rem; margin: 0.5rem;" color="green" onClick={() => counter++} />
@@ -338,8 +389,14 @@
       <Table {rows} {columns} label="Устройства" />
     </Accordion>
 
-    <Accordion label="Graph component (в разработке)" styleCSS="width: 100%;" state={true}>
+    <Accordion label="Graph component (в разработке)" styleCSS="width: 100%;" state={false}>
       <Graph {data} height={300} width={600} label="График" xLabel="Время" yLabel="Значение" />
+      <ColorPicker id="ColorPicker" label="Test Color Picker" styleCSS="width: 25rem;" />
+      <Separator visible={false} />
+      <Button text="Сохранить" buttonCSS="width: 10rem; margin: 0.5rem;" color="green" onClick={() => counter++} />
     </Accordion>
+
+    <Accordion label="Еще что то" styleCSS="width: 40%; margin: 1rem;" state={false}></Accordion>
+    <Accordion label="Еще что то" styleCSS="width: 40%; margin: 1rem;" state={false}></Accordion>
   </div>
 </div>
