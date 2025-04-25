@@ -11,7 +11,7 @@
   import Switch from '$lib/components/UILibrary/Switch.svelte'
   import Table, { type Colors } from '$lib/components/UILibrary/Table.svelte'
   import Graph from '$lib/components/UILibrary/Graph.svelte'
-    import ColorPicker from '$lib/components/UILibrary/ColorPicker.svelte'
+  import ColorPicker from '$lib/components/UILibrary/ColorPicker.svelte'
 
   const wifiModeList: IOption[] = [
     { id: 1, name: 'Станция' },
@@ -103,7 +103,7 @@
     const data = []
 
     for (let x = 0; x < 100; x++) {
-      y = 2 * Math.sin(x / 10) + Math.random()
+      y = 2 * Math.sin(x / 10) + Math.random() * 2
       data.push({ x, y })
     }
 
@@ -117,7 +117,14 @@
   <h2>Страница для тестирования UI компонентов</h2>
   <Separator visible={false} />
 
-  <div class="flex flex-wrap justify-center">
+  <div class="flex flex-wrap items-start justify-center">
+    <Accordion label="Graph component (в разработке)" styleCSS="width: 100%;" state={true}>
+      <Graph {data} width={800} label="График" xLabel="Время" yLabel="Значение" />
+      <ColorPicker id="ColorPicker" label="Test Color Picker" styleCSS="width: 25rem;" />
+      <Separator visible={false} />
+      <Button text="Сохранить" buttonCSS="width: 10rem; margin: 0.5rem;" color="green" onClick={() => counter++} />
+    </Accordion>
+
     <Accordion label="Пример использования: Настройки WiFi" styleCSS="width: 100%;" state={false}>
       <Button label="Режимы wifi" color="blue" options={wifiModeList} value={buttonItem} optionWidth="max-width" onChange={(value) => (buttonItem = value)} />
 
@@ -167,7 +174,15 @@
       </Accordion>
 
       <Accordion type="sub" label="Настройки режима AP" styleCSS="width: 100%;" state={false}>
-        <Input id="input-ap-ssid" label="Имя точки доступа" styleCSS="width: 30%;" Type="text" bind:value={inputString} placeholder="Enter string" RegExp={/^[0-9a-z]{0,5}$/} />
+        <Input
+          id="input-ap-ssid"
+          label="Имя точки доступа"
+          styleCSS="width: 30%;"
+          Type="text"
+          bind:value={inputString}
+          placeholder="Enter string"
+          RegExp={/^[0-9a-z]{0,5}$/}
+        />
         <Input
           id="input-ap-psk"
           label="Пароль точки доступа"
@@ -229,7 +244,6 @@
         <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="sky" onClick={() => counter++} />
         <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="purple" onClick={() => counter++} />
         <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="pink" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="rose" onClick={() => counter++} />
         <p style="flex: 1;">Kнопка нажата <strong>{counter}</strong> раз</p>
       </div>
       <Button label="Режимы wifi" color="rose" options={wifiModeList} value={buttonItem} optionWidth="max-width" onChange={(value) => (buttonItem = value)} />
@@ -387,13 +401,6 @@
 
     <Accordion label="Table component" styleCSS="width: 100%;" state={false}>
       <Table {rows} {columns} label="Устройства" />
-    </Accordion>
-
-    <Accordion label="Graph component (в разработке)" styleCSS="width: 100%;" state={false}>
-      <Graph {data} height={300} width={600} label="График" xLabel="Время" yLabel="Значение" />
-      <ColorPicker id="ColorPicker" label="Test Color Picker" styleCSS="width: 25rem;" />
-      <Separator visible={false} />
-      <Button text="Сохранить" buttonCSS="width: 10rem; margin: 0.5rem;" color="green" onClick={() => counter++} />
     </Accordion>
 
     <Accordion label="Еще что то" styleCSS="width: 40%; margin: 1rem;" state={false}></Accordion>
