@@ -1,15 +1,17 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  interface Props {
+  interface ColorPickerProps {
     id?: string
     label?: string
+    labelAlign?: 'start' | 'center' | 'end'
+
     value?: boolean | string | number | number[] | object | null
     styleCSS?: string
     onUpdate?: (value: number[]) => void
   }
 
-  let { id = '', label = '', value = $bindable([0, 0, 0]), styleCSS = '', onUpdate = () => {} }: Props = $props()
+  let { id = '', label = '', labelAlign = 'center', value = $bindable([0, 0, 0]), styleCSS = '', onUpdate = () => {} }: ColorPickerProps = $props()
 
   let rgb = $state(Array.isArray(value) ? value : [0, 0, 0])
   let colorPalette: string[] = $state([])
@@ -108,7 +110,7 @@
 <div class="picker-conteiner" style={styleCSS}>
   <div class="picker-wrapper">
     {#if label}
-      <label for={id} class="label">{label}</label>
+      <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
     {/if}
     <div
       {id}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
+  import type { Colors } from './Interface'
 
   interface Props {
     color?: Colors

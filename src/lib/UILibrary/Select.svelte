@@ -1,16 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { t } from '../../locales/i18n'
   import { slide, fly } from 'svelte/transition'
+  import type { Colors, IOption } from './Interface'
 
-  export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
-  export interface IOption {
-    id?: number
-    value?: string | number
-    name?: string
-  }
-
-  interface Props {
+  interface SelectProps {
     options?: IOption[]
     value?: IOption | null
     label?: string
@@ -19,7 +12,6 @@
     color?: Colors
     Info?: string
     disabled?: boolean
-    currentLanguage?: string
     placeholder?: string
     onUpdate?: (value: IOption) => void
     showCustomOption?: boolean
@@ -34,11 +26,10 @@
     color = 'white',
     Info = '',
     disabled = false,
-    currentLanguage = 'ru',
-    placeholder = t('select.select_tag', currentLanguage),
+    placeholder = 'Choose option',
     onUpdate,
     showCustomOption = false,
-  }: Props = $props()
+  }: SelectProps = $props()
 
   let isDropdownOpen = $state(false)
   let customOption = $state('')
@@ -158,7 +149,7 @@
           bind:value={customOption}
           oninput={handleCustomInput}
           class={`select-option last-option`}
-          placeholder={t('select.custom', currentLanguage)}
+          placeholder="Enter value"
           style={color != 'white'
             ? 'border-top: 1px solid var(--border); border-left: none; border-right: none; border-bottom: none; background-color: color-mix(in srgb, var(--color) 70%, transparent);'
             : 'border: 1px solid var(--border); border-top: none;'}

@@ -1,17 +1,18 @@
 <!-- src/routes/test/+page.svelte -->
 <script lang="ts">
-  import Accordion from '$lib/components/UILibrary/Accordion.svelte'
-  import Button, { type IOption } from '$lib/components/UILibrary/Button.svelte'
-  import Input from '$lib/components/UILibrary/Input.svelte'
+  import Accordion from '$lib/UILibrary/Accordion.svelte'
+  import Input from '$lib/UILibrary/Input.svelte'
   import UiIcon from '$lib/appIcons/UiIcon.svelte'
-  import Separator from '$lib/components/UILibrary/Separator.svelte'
-  import Slider from '$lib/components/UILibrary/Slider.svelte'
-  import FileInput from '$lib/components/UILibrary/FileInput.svelte'
-  import Select from '$lib/components/UILibrary/Select.svelte'
-  import Switch from '$lib/components/UILibrary/Switch.svelte'
-  import Table, { type Colors } from '$lib/components/UILibrary/Table.svelte'
-  import Graph from '$lib/components/UILibrary/Graph.svelte'
-  import ColorPicker from '$lib/components/UILibrary/ColorPicker.svelte'
+  import Separator from '$lib/UILibrary/Separator.svelte'
+  import Slider from '$lib/UILibrary/Slider.svelte'
+  import FileInput from '$lib/UILibrary/FileInput.svelte'
+  import Select from '$lib/UILibrary/Select.svelte'
+  import Switch from '$lib/UILibrary/Switch.svelte'
+  import type { Colors, IOption } from '$lib/UILibrary/Interface'
+  import Graph from '$lib/UILibrary/Graph.svelte'
+  import ColorPicker from '$lib/UILibrary/ColorPicker.svelte'
+  import Button from '$lib/UILibrary/Button.svelte'
+  import Table from '$lib/UILibrary/Table.svelte'
 
   const wifiModeList: IOption[] = [
     { id: 1, name: 'Станция' },
@@ -30,7 +31,6 @@
   let inputString = $state('')
   let inputNumber = $state(4)
   let counter = $state(0)
-  let switchValue = $state(false)
 
   let sliderValue: number | [number, number] = $state(12)
   let text = $state(
@@ -67,7 +67,7 @@
     button?: {
       text?: string
       color?: Colors
-      buttonCSS?: string
+      styleCSS?: string
       onClick?: (row: T) => void
       disabled?: (row: T) => boolean
     }
@@ -118,17 +118,23 @@
   <Separator visible={false} />
 
   <div class="flex flex-wrap items-start justify-center">
-    <Accordion label="Graph component (в разработке)" styleCSS="width: 100%;" state={true}>
+    <Accordion id="acc1" label="Graph component (в разработке)" styleCSS="width: 100%;" state={true}>
       <Graph {data} width={800} label="График" xLabel="Время" yLabel="Значение" />
       <ColorPicker id="ColorPicker" label="Test Color Picker" styleCSS="width: 25rem;" />
       <Separator visible={false} />
-      <Button text="Сохранить" buttonCSS="width: 10rem; margin: 0.5rem;" color="green" onClick={() => counter++} />
+      <Button id="button1" validation={{ text: 'Сохранить' }} style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'green' }} onClick={() => counter++} />
     </Accordion>
 
-    <Accordion label="Пример использования: Настройки WiFi" styleCSS="width: 100%;" state={false}>
-      <Button label="Режимы wifi" color="blue" options={wifiModeList} value={buttonItem} optionWidth="max-width" onChange={(value) => (buttonItem = value)} />
+    <Accordion id="acc2" label="Пример использования: Настройки WiFi" styleCSS="width: 100%;" state={false}>
+      <Button
+        id="button2"
+        label={{ text: 'Режимы wifi' }}
+        style={{ color: 'blue', optionWidth: 'max-option' }}
+        validation={{ options: wifiModeList, value: buttonItem }}
+        onChange={(value) => (buttonItem = value)}
+      />
 
-      <Accordion type="sub" label="Настройки режима STA" styleCSS="width: 100%;" state={false}>
+      <Accordion id="acc3" type="sub" label="Настройки режима STA" styleCSS="width: 100%;" state={false}>
         <Select
           label="Точка доступа"
           options={accessPoints}
@@ -147,7 +153,7 @@
         <Separator visible={false} />
         <Input
           label="IP Address"
-          styleCSS="width: 20rem;"
+          styleCSS="width: 30%;"
           id="sta-ip"
           autocomplete="on"
           placeholder="XXX.XXX.XXX.XXX"
@@ -156,7 +162,7 @@
 
         <Input
           label="Mask"
-          styleCSS="width: 20rem;"
+          styleCSS="width: 30%;"
           id="sta-ms"
           autocomplete="on"
           placeholder="XXX.XXX.XXX.XXX"
@@ -165,7 +171,7 @@
 
         <Input
           label="Gateway"
-          styleCSS="width: 20rem;"
+          styleCSS="width: 30%;"
           id="sta-gw"
           autocomplete="on"
           placeholder="XXX.XXX.XXX.XXX"
@@ -173,7 +179,7 @@
         />
       </Accordion>
 
-      <Accordion type="sub" label="Настройки режима AP" styleCSS="width: 100%;" state={false}>
+      <Accordion id="acc4" type="sub" label="Настройки режима AP" styleCSS="width: 100%;" state={false}>
         <Input
           id="input-ap-ssid"
           label="Имя точки доступа"
@@ -221,36 +227,85 @@
           RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
         />
       </Accordion>
-      <Button text="Сохранить" buttonCSS="width: 10rem; margin: 0.5rem;" color="green" onClick={() => counter++} />
-      <Button text="Перезагрузить" buttonCSS="width: 10rem; margin: 0.5rem;" color="red" onClick={() => counter++} />
+      <Button id="button2" validation={{ text: 'Сохранить' }} style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'green' }} onClick={() => counter++} />
+      <Button
+        id="button3"
+        validation={{ text: 'Перезагрузить' }}
+        style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'red' }}
+        onClick={() => counter++}
+      />
     </Accordion>
 
-    <Accordion label="Button component" styleCSS="width: 100%;" state={false}>
+    <Accordion id="acc5" label="Button component" styleCSS="width: 100%;" state={false}>
       <div style="display: flex; flex-wrap: wrap; align-items: center;">
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="blue" icon={UiIcon} onClick={() => counter++} />
         <Button
-          buttonCSS="margin: 0.5rem; height: 5rem; width: 5rem; border-radius: 50%;"
-          color="primary"
-          icon={UiIcon}
-          iconProps={{ height: '3rem', width: '3rem' }}
+          id="button4"
+          validation={{ text: 'counter' }}
+          style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'blue', icon: UiIcon }}
           onClick={() => counter++}
         />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="white" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 6rem; margin: 0.5rem; border-radius: 0;" color="amber" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 6rem; margin: 0.5rem; height: 4rem;" textCSS="font-weight: bold;" color="red" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem; box-shadow: 0px 0px 10px red;" color="orange" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" textCSS="color: black; font-style: italic;" color="lime" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem; border-radius: 5px; border: 1px solid grey;" color="green" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="sky" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="purple" onClick={() => counter++} />
-        <Button text="counter" buttonCSS="width: 10rem; margin: 0.5rem;" color="pink" onClick={() => counter++} />
+        <Button
+          id="button5"
+          style={{
+            styleCSS: 'margin: 0.5rem; height: 5rem; width: 5rem; border-radius: 50%;',
+            color: 'primary',
+            icon: UiIcon,
+            iconProps: { height: '3rem', width: '3rem' },
+          }}
+          onClick={() => counter++}
+        />
+        <Button id="button6" validation={{ text: 'counter' }} style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'white' }} onClick={() => counter++} />
+        <Button
+          id="button7"
+          validation={{ text: 'counter' }}
+          style={{ styleCSS: 'width: 6rem; margin: 0.5rem; border-radius: 0;', color: 'amber' }}
+          onClick={() => counter++}
+        />
+        <Button
+          id="button8"
+          validation={{ text: 'counter' }}
+          style={{ styleCSS: 'width: 6rem; margin: 0.5rem; height: 4rem;', color: 'red', textCSS: 'font-weight: bold;' }}
+          onClick={() => counter++}
+        />
+        <Button
+          id="button9"
+          validation={{ text: 'counter' }}
+          style={{ styleCSS: 'width: 10rem; margin: 0.5rem; box-shadow: 0px 0px 10px red;', color: 'orange' }}
+          onClick={() => counter++}
+        />
+        <Button
+          id="button10"
+          validation={{ text: 'counter' }}
+          style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'lime', textCSS: 'color: black; font-style: italic;' }}
+          onClick={() => counter++}
+        />
+        <Button
+          id="button11"
+          validation={{ text: 'counter' }}
+          style={{ styleCSS: 'width: 10rem; margin: 0.5rem; border-radius: 5px; border: 1px solid grey;', color: 'green' }}
+          onClick={() => counter++}
+        />
+        <Button id="button12" validation={{ text: 'counter' }} style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'sky' }} onClick={() => counter++} />
+        <Button
+          id="button13"
+          validation={{ text: 'counter' }}
+          style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'purple' }}
+          onClick={() => counter++}
+        />
+        <Button id="button14" validation={{ text: 'counter' }} style={{ styleCSS: 'width: 10rem; margin: 0.5rem;', color: 'pink' }} onClick={() => counter++} />
         <p style="flex: 1;">Kнопка нажата <strong>{counter}</strong> раз</p>
       </div>
-      <Button label="Режимы wifi" color="rose" options={wifiModeList} value={buttonItem} optionWidth="max-width" onChange={(value) => (buttonItem = value)} />
+      <Button
+        id="button15"
+        label={{ text: 'Режимы wifi' }}
+        style={{ color: 'rose', optionWidth: 'max-option' }}
+        validation={{ options: wifiModeList, value: buttonItem }}
+        onChange={(value) => (buttonItem = value)}
+      />
       <p style="flex: 1;">Bыбранный режим: {buttonItem.name}</p>
     </Accordion>
 
-    <Accordion label="Input component" styleCSS="width: 100%;" state={false}>
+    <Accordion id="acc6" label="Input component" styleCSS="width: 100%;" state={false}>
       <Input
         id="input-string"
         label="Поле ввода строки"
@@ -285,13 +340,13 @@
       />
       <p style="margin-top: 0; width: 40%;">Введенный текст: {text}</p>
 
-      <Accordion type="sub" label="File input" styleCSS="width: 100%;">
+      <Accordion id="acc7" type="sub" label="File input" styleCSS="width: 100%;">
         <FileInput label="Upload document" styleCSS="width: 60%;" accept=".pdf,.doc,.docx" />
         <FileInput type="image" styleCSS="width: 30%;" label="Profile picture" accept="image/*" />
       </Accordion>
     </Accordion>
 
-    <Accordion label="Slider component" styleCSS="width: 100%;" state={false}>
+    <Accordion id="acc8" label="Slider component" styleCSS="width: 100%;" state={false}>
       <!-- vertical -->
       <Slider
         label="label"
@@ -399,11 +454,11 @@
       />
     </Accordion>
 
-    <Accordion label="Table component" styleCSS="width: 100%;" state={false}>
+    <Accordion id="acc9" label="Table component" styleCSS="width: 100%;" state={false}>
       <Table {rows} {columns} label="Устройства" />
     </Accordion>
 
-    <Accordion label="Еще что то" styleCSS="width: 40%; margin: 1rem;" state={false}></Accordion>
-    <Accordion label="Еще что то" styleCSS="width: 40%; margin: 1rem;" state={false}></Accordion>
+    <Accordion id="acc10" label="Еще что то" styleCSS="width: 40%; margin: 1rem;" state={false}></Accordion>
+    <Accordion id="acc11" label="Еще что то" styleCSS="width: 40%; margin: 1rem;" state={false}></Accordion>
   </div>
 </div>

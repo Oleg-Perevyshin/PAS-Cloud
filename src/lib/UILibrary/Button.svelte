@@ -1,54 +1,63 @@
 <script lang="ts">
   import { onMount, type SvelteComponent } from 'svelte'
+  import type { Colors, IOption } from './Interface'
 
-  export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
-  export interface IOption {
-    id?: number
-    value?: string | number
-    name?: string
-  }
+  interface ButtonProps {
+    id: string
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+    }
+    validation?: {
+      disabled?: boolean
+      options?: IOption[] | null
+      value?: IOption | null
+      text?: string
+    }
+    style?: {
+      styleCSS?: string
+      textCSS?: string
+      color?: Colors
+      optionWidth?: 'auto' | 'max-option'
+      icon?: (new (...args: any[]) => SvelteComponent) | null
+      iconProps?: Record<string, unknown>
+    }
 
-  interface Props {
-    id?: string
-    label?: string
-    labelAlign?: 'start' | 'center' | 'end'
-    text?: string
-    buttonCSS?: string
-    textCSS?: string
-    color?: Colors
-    disabled?: boolean
-    options?: IOption[] | null
-    value?: IOption | null
-    optionWidth?: 'auto' | 'max-width'
-    icon?: (new (...args: any[]) => SvelteComponent) | null
-    iconProps?: Record<string, unknown>
     onClick?: (event: MouseEvent) => void
     onChange?: (value: IOption) => void
   }
 
   let {
     id = '',
-    label = '',
-    labelAlign = 'center',
-    text = '',
-    buttonCSS = '',
-    textCSS = '',
-    color = 'white',
-    disabled = false,
-    options = null,
-    value = null,
-    optionWidth = 'auto',
-    icon = null,
-    iconProps = {},
+    label = {
+      text: '',
+      align: 'center',
+    },
+    validation = {
+      text: '',
+      disabled: false,
+      options: null,
+      value: null,
+    },
+    style = {
+      styleCSS: '',
+      textCSS: '',
+      color: 'white',
+
+      optionWidth: 'auto',
+      icon: null,
+      iconProps: {},
+    },
+
     onClick = () => {},
     onChange = () => {},
-  }: Props = $props()
+  }: ButtonProps = $props()
 
   let isActive = $state(false)
   let maxWidth = $state('auto')
 
   function handleClick(event: MouseEvent) {
-    if (!disabled) {
+    if (!validation.disabled) {
       isActive = !isActive
       onClick(event)
     }
@@ -61,8 +70,8 @@
   }
 
   onMount(() => {
-    if (options && optionWidth === 'max-width') {
-      const maxLength = options.reduce((max, option) => {
+    if (validation.options && style.optionWidth === 'max-option') {
+      const maxLength = validation.options.reduce((max, option) => {
         return Math.max(max, option.name!.length)
       }, 0)
 
@@ -73,21 +82,23 @@
 
 <div class="button-conteiner">
   {#if label}
-    <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
+    <label for={id} class="label" style="text-align: {label.align};">{label.text}</label>
   {/if}
-  {#if options}
-    <div class="group">
-      {#each options as item, index}
+  {#if validation.options}
+    <div class="group {validation.disabled ? 'disabled' : ''}" {id}>
+      {#each validation.options as item, index}
         <button
           value={item.value}
-          class={`button button-option ${color}
+          class={`button button-option ${style.color}
           ${index === 0 ? 'first' : ''}
-          ${index === options.length - 1 ? 'last' : ''}
-          ${item.name === value?.name ? 'active' : 'not-active'}
+          ${index === validation.options.length - 1 ? 'last' : ''}
+          ${item.name === validation.value?.name ? 'active' : 'not-active'}
         `}
           onclick={() => updateValue(item)}
-          style="width: {maxWidth}; {color == 'white' ? 'border: 1px solid var(--border-color);' : 'color: white; border: none; margin: 0 1px;'}"
-          {disabled}
+          style="width: {maxWidth}; {style.color == 'white'
+            ? 'border: 1px solid var(--border-color);'
+            : 'color: white; border: none; margin: 0 1px;'} {validation.disabled ? 'cursor: not-allowed;' : ''}"
+          disabled={validation.disabled}
         >
           {item.name}
         </button>
@@ -96,21 +107,21 @@
   {:else}
     <button
       {id}
-      class={`button ${disabled ? 'disabled' : ''} ${color}`}
-      style="border-radius: 1rem; min-width: max-content; {color == 'white'
+      class={`button ${validation.disabled ? 'disabled' : ''} ${style.color}`}
+      style="border-radius: 1rem; min-width: max-content; {style.color == 'white'
         ? 'border: 1px solid var(--border-color);'
-        : 'color: white; border: none;'} {buttonCSS}"
+        : 'color: white; border: none;'} {style.styleCSS}"
       onclick={handleClick}
-      {disabled}
+      disabled={validation.disabled}
     >
       <span class="button-content">
-        {#if icon}
-          {@const IconComponent = icon}
-          <IconComponent {...iconProps} />
+        {#if style.icon}
+          {@const IconComponent = style.icon}
+          <IconComponent {...style.iconProps} />
         {/if}
-        {#if text}
-          <span class="text" style={textCSS}>
-            {text}
+        {#if validation.text}
+          <span class="text" style={style.textCSS}>
+            {validation.text}
           </span>
         {/if}
       </span>

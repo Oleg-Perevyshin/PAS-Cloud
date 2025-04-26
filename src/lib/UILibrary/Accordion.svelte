@@ -3,6 +3,7 @@
   import type { Snippet } from 'svelte'
 
   interface Props {
+    id: string
     type?: 'default' | 'sub'
     label?: string
     state?: boolean

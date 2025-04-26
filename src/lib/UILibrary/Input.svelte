@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
+  import type { Colors } from './Interface'
 
-  export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
-
-  interface Props {
+  interface InputProps {
     value?: boolean | string | number | number[] | object | null
     id?: string
     Type?: 'text' | 'password' | 'number' | 'text-area'
@@ -66,7 +65,7 @@
     minNum = 1,
     maxNum = 10,
     rows = 5,
-  }: Props = $props()
+  }: InputProps = $props()
 
   let showPassword = $state(Type === 'password')
   let isValid = $state(true)
@@ -130,7 +129,7 @@
   }
 </script>
 
-<div class="input-container" style={styleCSS}>
+<div class="input-container {color}" style={styleCSS}>
   {#if label}
     <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
   {/if}
@@ -166,7 +165,7 @@
     {:else}
       <textarea
         name="area"
-        class="text-area {color} {disabled ? 'disabled' : ''}"
+        class="text-area {disabled ? 'disabled' : ''}"
         {id}
         bind:value
         {readonly}
@@ -250,7 +249,7 @@
   }
 
   .input:focus {
-    border: 1px solid #008cff;
+    border: 1px solid var(--color);
   }
 
   .input:hover {

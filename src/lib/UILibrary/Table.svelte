@@ -1,5 +1,5 @@
 <script lang="ts">
-  export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
+  import type { Colors } from './Interface'
 
   interface IColumn<T extends object> {
     label: string
@@ -9,7 +9,7 @@
     button?: {
       text?: string
       color?: Colors
-      buttonCSS?: string
+      styleCSS?: string
       onClick?: (row: T) => void
     }
   }
@@ -47,7 +47,7 @@
                 <button
                   class="action {column.button.color || 'blue'}"
                   style="border-radius: 1rem; {column.button.color == 'white' ? 'border: 1px solid var(--border-color);' : 'color: white; border: none;'}{column
-                    .button.buttonCSS}"
+                    .button.styleCSS}"
                   onclick={() => column.button?.onClick?.(row)}>{column.button.text}</button
                 >
               {:else if column.formatter}

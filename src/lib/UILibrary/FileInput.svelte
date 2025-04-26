@@ -1,7 +1,7 @@
 <script lang="ts">
   export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
 
-  interface Props {
+  interface FileInputProps {
     id?: string
     label?: string
     labelAlign?: 'start' | 'center' | 'end'
@@ -25,7 +25,7 @@
     multiple = false,
     type = 'default',
     onFileChange = () => {},
-  }: Props = $props()
+  }: FileInputProps = $props()
 
   let selectedFile = $state<File | null>(null)
   let previewUrl = $state<string | null>(null)
