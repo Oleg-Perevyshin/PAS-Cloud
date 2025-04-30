@@ -2,16 +2,30 @@
   import { onMount } from 'svelte'
 
   interface ColorPickerProps {
-    id?: string
-    label?: string
-    labelAlign?: 'start' | 'center' | 'end'
-
+    id: string
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+    }
     value?: boolean | string | number | number[] | object | null
-    styleCSS?: string
-    onUpdate?: (value: number[]) => void
+    style?: {
+      styleCSS?: string
+    }
+    onChange?: (value: number[]) => void
   }
 
-  let { id = '', label = '', labelAlign = 'center', value = $bindable([0, 0, 0]), styleCSS = '', onUpdate = () => {} }: ColorPickerProps = $props()
+  let {
+    id = '',
+    label = {
+      text: '',
+      align: 'center',
+    },
+    value = $bindable([0, 0, 0]),
+    style = {
+      styleCSS: '',
+    },
+    onChange = () => {},
+  }: ColorPickerProps = $props()
 
   let rgb = $state(Array.isArray(value) ? value : [0, 0, 0])
   let colorPalette: string[] = $state([])
@@ -69,7 +83,7 @@
 
     const color = hslToRgb(colorIndex / 360, 1, brightnessFactor)
     rgb = [Math.min(255, Math.max(0, color.r)), Math.min(255, Math.max(0, color.g)), Math.min(255, Math.max(0, color.b))]
-    onUpdate(rgb)
+    onChange(rgb)
     pointerPosition = {
       x: Math.max(0, Math.min((x / rect.width) * 100, 100)),
       y: Math.max(0, Math.min((y / rect.height) * 100, 100)),
@@ -107,10 +121,10 @@
 </script>
 
 <!-- Разметка компонента -->
-<div class="picker-conteiner" style={styleCSS}>
+<div class="picker-conteiner" style={style.styleCSS}>
   <div class="picker-wrapper">
     {#if label}
-      <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
+      <label for={id} class="label" style="text-align: {label.align};">{label.text}</label>
     {/if}
     <div
       {id}
@@ -168,7 +182,7 @@
   .field {
     position: relative;
     height: 10rem;
-    width: 16rem;
+    width: 100%;
     cursor: pointer;
     border-radius: 1rem;
     border-color: rgb(156, 163, 175);

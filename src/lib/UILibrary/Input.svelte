@@ -5,7 +5,7 @@
 
   interface InputProps {
     value?: boolean | string | number | number[] | object | null
-    id?: string
+    id: string
     Type?: 'text' | 'password' | 'number' | 'text-area'
     placeholder?: string
     Info?: string
@@ -357,10 +357,6 @@
   input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
-  }
-
-  input[type='number'] {
-    -moz-appearance: textfield;
   }
 
   .number-controls {

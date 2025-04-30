@@ -1,31 +1,48 @@
 <script lang="ts">
-  export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
+  import type { Colors } from './Interface'
 
   interface FileInputProps {
-    id?: string
-    label?: string
-    labelAlign?: 'start' | 'center' | 'end'
-    styleCSS?: string
-    disabled?: boolean
-    color?: Colors
-    accept?: string
-    multiple?: boolean
-    type?: 'default' | 'image'
+    id: string
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+    }
+    validation?: {
+      disabled?: boolean
+      accept?: string
+      type?: 'default' | 'image'
+    }
+    style?: {
+      styleCSS?: string
+      color?: Colors
+    }
     onFileChange?: (files: FileList | null) => void
   }
 
   let {
     id = `file-input-${Math.random().toString(36).substring(2, 9)}`,
-    label = 'Choose file',
-    labelAlign = 'center',
-    styleCSS = '',
-    disabled = false,
-    color = 'blue',
-    accept = '*/*',
-    multiple = false,
-    type = 'default',
+    label = {
+      text: '',
+      align: 'center',
+    },
+    validation = {
+      disabled: false,
+      accept: '*/*',
+      type: 'default',
+    },
+    style = {
+      styleCSS: '',
+      color: 'blue',
+    },
+
     onFileChange = () => {},
   }: FileInputProps = $props()
+
+  style = {
+    styleCSS: '',
+    color: 'blue',
+    ...style,
+  }
 
   let selectedFile = $state<File | null>(null)
   let previewUrl = $state<string | null>(null)
@@ -52,25 +69,25 @@
   }
 </script>
 
-<div class="file-input-container {color}" style={styleCSS}>
+<div class="file-input-container {style.color}" style={style.styleCSS}>
   {#if label}
-    <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
+    <label for={id} class="label" style="text-align: {label.align};">{label.text}</label>
   {/if}
 
-  {#if type === 'image'}
+  {#if validation.type === 'image'}
     <div class="image-uploader">
-      <button class="image-upload-button" onclick={triggerFileInput} {disabled}>
+      <button class="image-upload-button" onclick={triggerFileInput} disabled={validation.disabled}>
         {#if previewUrl}
           <img src={previewUrl} alt="Preview" class="image-preview" />
         {:else}
           <span class="placeholder-text">Click to upload image</span>
         {/if}
       </button>
-      <input {id} type="file" class="hidden" {accept} {multiple} {disabled} onchange={handleFileChange} />
+      <input {id} type="file" class="hidden" accept={validation.accept} disabled={validation.disabled} onchange={handleFileChange} />
     </div>
   {:else}
     <label class="input-file">
-      <input {id} type="file" class="input" {accept} {multiple} {disabled} onchange={handleFileChange} />
+      <input {id} type="file" class="input" accept={validation.accept} disabled={validation.disabled} onchange={handleFileChange} />
     </label>
   {/if}
 </div>
@@ -94,6 +111,7 @@
     position: relative;
     display: inline-block;
     width: 100%;
+    font-weight: normal;
   }
 
   .input-file input[type='file'] {

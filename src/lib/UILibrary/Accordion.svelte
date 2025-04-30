@@ -1,34 +1,55 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition'
   import type { Snippet } from 'svelte'
+  import { slide } from 'svelte/transition'
+  import type { Colors } from './Interface'
 
   interface Props {
     id: string
-    type?: 'default' | 'sub'
-    label?: string
-    state?: boolean
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+      bgColor?: Colors | null
+    }
+    validation?: {
+      state?: boolean
+      type?: 'main' | 'sub'
+    }
+    style?: {
+      styleCSS?: string
+    }
     children?: Snippet
-    styleCSS?: string
   }
 
-  let { type = 'default', label = '', state = false, children, styleCSS = '' }: Props = $props()
+  const props: Props = $props()
+
+  let reactiveValidation = $state({
+    type: 'main',
+    state: false,
+    ...props.validation,
+  })
 
   function toggle() {
-    state = !state
+    reactiveValidation.state = !reactiveValidation.state
   }
 </script>
 
-<div class="accordion-container {type == 'default' ? 'main' : 'sub'}" transition:slide={{ duration: 300 }} style={styleCSS}>
+<div
+  id={props.id}
+  class="accordion-container {reactiveValidation.type === 'main' ? 'main' : 'sub'} {props.label?.bgColor}"
+  transition:slide={{ duration: 300 }}
+  style={props.style?.styleCSS}
+>
   <button class="header-button" onclick={toggle}>
-    <span class="toggle">{label}</span>
+    <span class="toggle" style="text-align: {props.label?.align};">{props.label?.text}</span>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="arrow"
       width="1.1rem"
       height="1.1rem"
       viewBox="0 0 24 24"
-      style="transform: rotate({state ? 180 : 0}deg); transition: transform 0.3s;"
-      ><path
+      style="transform: rotate({reactiveValidation.state ? 180 : 0}deg); transition: transform 0.3s;"
+    >
+      <path
         fill="none"
         stroke="currentColor"
         stroke-linecap="round"
@@ -36,14 +57,14 @@
         stroke-width="1.5"
         d="M18 12.5s-4.419 6-6 6s-6-6-6-6m12-7s-4.419 6-6 6s-6-6-6-6"
         color="currentColor"
-      /></svg
-    >
+      />
+    </svg>
   </button>
 
-  {#if state}
+  {#if reactiveValidation.state}
     <div class="wrapper" transition:slide={{ duration: 300 }}>
       <div class="content">
-        {@render children?.()}
+        {@render props.children?.()}
       </div>
     </div>
   {/if}

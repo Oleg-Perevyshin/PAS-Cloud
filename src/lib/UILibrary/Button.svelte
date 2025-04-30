@@ -7,6 +7,7 @@
     label?: {
       text?: string
       align?: 'start' | 'center' | 'end'
+      itemColor?: Colors | null
     }
     validation?: {
       disabled?: boolean
@@ -15,9 +16,9 @@
       text?: string
     }
     style?: {
-      styleCSS?: string
-      textCSS?: string
-      color?: Colors
+      level_1?: string
+      level_2?: string
+      bgColor?: Colors
       optionWidth?: 'auto' | 'max-option'
       icon?: (new (...args: any[]) => SvelteComponent) | null
       iconProps?: Record<string, unknown>
@@ -32,6 +33,7 @@
     label = {
       text: '',
       align: 'center',
+      itemColor: null,
     },
     validation = {
       text: '',
@@ -40,10 +42,9 @@
       value: null,
     },
     style = {
-      styleCSS: '',
-      textCSS: '',
-      color: 'white',
-
+      level_1: '',
+      level_2: '',
+      bgColor: 'white',
       optionWidth: 'auto',
       icon: null,
       iconProps: {},
@@ -80,22 +81,22 @@
   })
 </script>
 
-<div class="button-conteiner">
+<div class="button-conteiner" style={style.level_1}>
   {#if label}
-    <label for={id} class="label" style="text-align: {label.align};">{label.text}</label>
+    <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.itemColor ? label.itemColor : 'font'}-color);">{label.text}</label>
   {/if}
   {#if validation.options}
     <div class="group {validation.disabled ? 'disabled' : ''}" {id}>
       {#each validation.options as item, index}
         <button
           value={item.value}
-          class={`button button-option ${style.color}
+          class={`button button-option ${style.bgColor}
           ${index === 0 ? 'first' : ''}
           ${index === validation.options.length - 1 ? 'last' : ''}
           ${item.name === validation.value?.name ? 'active' : 'not-active'}
         `}
           onclick={() => updateValue(item)}
-          style="width: {maxWidth}; {style.color == 'white'
+          style="width: {maxWidth}; {style.bgColor == 'white'
             ? 'border: 1px solid var(--border-color);'
             : 'color: white; border: none; margin: 0 1px;'} {validation.disabled ? 'cursor: not-allowed;' : ''}"
           disabled={validation.disabled}
@@ -107,10 +108,10 @@
   {:else}
     <button
       {id}
-      class={`button ${validation.disabled ? 'disabled' : ''} ${style.color}`}
-      style="border-radius: 1rem; min-width: max-content; {style.color == 'white'
+      class={`button ${validation.disabled ? 'disabled' : ''} ${style.bgColor}`}
+      style="border-radius: 1rem; min-width: max-content; {style.bgColor == 'white'
         ? 'border: 1px solid var(--border-color);'
-        : 'color: white; border: none;'} {style.styleCSS}"
+        : 'color: white; border: none;'} {style.level_2}"
       onclick={handleClick}
       disabled={validation.disabled}
     >
@@ -120,7 +121,7 @@
           <IconComponent {...style.iconProps} />
         {/if}
         {#if validation.text}
-          <span class="text" style={style.textCSS}>
+          <span class="text">
             {validation.text}
           </span>
         {/if}

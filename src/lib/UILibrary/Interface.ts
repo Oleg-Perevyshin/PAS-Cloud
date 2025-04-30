@@ -7,37 +7,77 @@ export interface Point {
 }
 
 export interface IUIComponent<T extends object> {
-  // Общие свойства
   id: string // Уникальный идентификатор компонента
+
+  //название компонента
   label?: {
-    text?: string
-    align?: 'start' | 'center' | 'end'
-  } // Название компонента
-
-  style?: {
-    styleCSS?: string
-    textCSS?: string
-    color?: Colors
-    optionWidth?: 'auto' | 'max-option'
-    icon?: (new (...args: any[]) => SvelteComponent) | null
-    iconProps?: Record<string, unknown>
-  } // Кастомные стили
-
-  validation?: {
-    disabled?: boolean
-    options?: IOption[] | null
-    value?: IOption | null
-    text?: string
-    type?: 'default' | 'sub'
-    state?: boolean
+    text?: string //текст названия
+    align?: 'start' | 'center' | 'end' //выравнивание
+    bgColor?: Colors | null //цвет фона - должен быть в аккордеоне
+    itemColor?: Colors | null // цвет текста
   }
 
-  children?: Snippet
-  onClick?: (event: MouseEvent) => void
-  onChange?: (value: IOption) => void
+  //внешний вид компонента
+  style?: {
+    level_1?: string //стили для обертки компонента
+    level_2?: string // стили для внутреннего содержимого
+    icon?: SvelteComponent | null //иконка в кнопке
+    iconProps?: Record<string, unknown> //ее стили
+    bgColor?: Colors // цвет фона компонента
+    itemColor?: Colors //цвет текста или активного элемента компоненты
+    rows?: number // количество строк в textarea
+    placeholder?: string // для инпута
+    info?: string // вспомогательная информация в селекте или инпуте
+    optionWidth?: 'auto' | 'max-option' // ширина кнопок в группе кнопок - автоматическая по ширине содержимого или все равняются по максимальной ширине
+  }
 
-  rows: T[] // Строки таблицы
-  columns: IColumn<T>[] // Колонки таблицы
+  //валидация данных
+  validation?: {
+    disabled?: boolean //кликабельно или нет
+    type?: 'default' | 'main' | 'sub' | 'image' | 'text' | 'password' | 'number' | 'text-area' // тип в различных компонентах
+    state?: boolean // состояние аккордеона
+    accept?: string // типы файлов для file input
+    required?: boolean //обязательный или нет
+    readonly?: boolean // изменяемый или нет
+    autocomplete?: // автозаполнение для инпута
+    | 'on'
+      | 'off'
+      | 'given-name'
+      | 'family-name'
+      | 'name'
+      | 'email'
+      | 'username'
+      | 'new-password'
+      | 'current-password'
+      | 'tel'
+      | 'country-name'
+      | 'address-level1'
+      | 'address-level2'
+      | 'street-address'
+      | 'postal-code'
+      | 'cc-name'
+      | 'cc-number'
+      | 'cc-exp'
+      | 'cc-csc'
+      | null
+    RegExp?: RegExp // валидация содержимого с помощью регулярного выражения
+    step?: number // шаг для числовых диапазонов
+    minNum?: number // минимальное числовое значение
+    maxNum?: number // максимальное числовое значение
+  }
+
+  data?: {
+    text?: string //текст кнопки
+    options?: IOption[] | null // список опций
+    value?: IOption | boolean | string | number | number[] | object | null //текущее значение/опция
+    rows: T[] // Строки таблицы
+    columns: IColumn<T>[] // Колонки таблицы
+  }
+
+  children?: Snippet //содержамое аккордеона
+  onClick?: (event: MouseEvent) => void
+  onChange?: (value: IOption | number[]) => void
+  onFileChange?: (files: FileList | null) => void
 }
 
 export interface IColumn<T extends object> {
@@ -62,8 +102,8 @@ export interface IUIComponentHandler {
 }
 
 export interface IOption {
-  id?: number
-  value?: string | number
+  id: number
+  value?: string | number //| object
   name?: string
 }
 
