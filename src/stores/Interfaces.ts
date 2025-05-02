@@ -126,6 +126,7 @@ export interface ICatalogDevice {
   Firmware: File | null,                  // Прошивки
   Manual: File | null,                    // Руководство пользователя
   API: File | IDeviceModule | string | null,  // API
+  APILang: string,                        // Язык интерфейса
 }
 
 

@@ -25,24 +25,66 @@ export const DELETE: RequestHandler = async (event) => {
     }
 
     if (VerFW) {
-      await prisma.catalogVersion.deleteMany({ where: { DeviceID: DevID, VerFW } })
+      await prisma.catalogApiFile.deleteMany({
+        where: {
+          VersionDeviceID: DevID,
+          VersionVerFW: VerFW,
+        },
+      })
+      console.info(`Удалены API-файлы версии ${VerFW}`)
+
+      // Затем удаляем саму версию
+      await prisma.catalogVersion.deleteMany({
+        where: {
+          DeviceID: DevID,
+          VerFW,
+        },
+      })
       console.info(`Удалена версия ${VerFW} устройства`)
     } else {
       /* Устройство удаляется полностью */
-      /* Удаляем все версии */
-      await prisma.catalogVersion.deleteMany({ where: { DeviceID: DevID } })
+      // Сначала удаляем все API-файлы всех версий
+      await prisma.catalogApiFile.deleteMany({
+        where: {
+          VersionDeviceID: DevID,
+        },
+      })
+      console.info('Удалены все API-файлы устройства')
+
+      // Удаляем все версии устройства
+      await prisma.catalogVersion.deleteMany({
+        where: {
+          DeviceID: DevID,
+        },
+      })
       console.info('Удалены все версии устройства')
 
-      /* Удаляем устройство у всех пользователей */
-      await prisma.userDevice.deleteMany({ where: { Device: { DevID } } })
+      // Удаляем устройство у всех пользователей
+      await prisma.userDevice.deleteMany({
+        where: {
+          Device: {
+            DevID,
+          },
+        },
+      })
       console.info('Устройство удалено у всех пользователей')
 
-      /* Находим устройства по DevID, чтобы получить DevSN */
-      const devices = await prisma.device.findMany({ where: { DevID } })
+      // Находим устройства по DevID, чтобы получить DevSN
+      const devices = await prisma.device.findMany({
+        where: {
+          DevID,
+        },
+      })
       const deviceSNs = devices.map((device) => device.DevSN)
 
-      /* Удаляем устройство из таблицы Devices */
-      await prisma.device.deleteMany({ where: { DevSN: { in: deviceSNs } } })
+      // Удаляем устройство из таблицы Devices
+      await prisma.device.deleteMany({
+        where: {
+          DevSN: {
+            in: deviceSNs,
+          },
+        },
+      })
       console.info('Устройство удалено из таблицы Devices')
     }
 
@@ -52,10 +94,18 @@ export const DELETE: RequestHandler = async (event) => {
 
     return new Response(JSON.stringify(ResponseManager('OK_DELETE_DEVICE_FROM_CATALOG', lang)), { status: 200 })
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
-      return new Response(JSON.stringify(ResponseManager('ER_FOREIGN_KEY_CONSTRAINT', lang)), { status: 400 })
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2003') {
+        console.error('Ошибка удаления (нарушение внешнего ключа):', {
+          model: error.meta?.model_name,
+          field: error.meta?.field_name,
+          details: error.message,
+        })
+        return new Response(JSON.stringify(ResponseManager('ER_CATALOG_DELETE_DEVICE', lang)), { status: 400 })
+      }
+      console.error('Ошибка Prisma при удалении:', error.code, error.message)
     }
-    console.log('catalog_delete Ошибка удаления устройства', error)
+    console.error('Ошибка удаления устройства:', error)
     return new Response(JSON.stringify(ResponseManager('ER_DELETE_DEVICE_FROM_CATALOG', lang)), { status: 500 })
   }
 }

@@ -13,10 +13,10 @@
   onMount(() => {
     const savedLanguage = localStorage.getItem('AppLanguage')
     if (savedLanguage) {
-      const lang = LOCALES.find((lang) => lang.code === savedLanguage)
+      const lang = LOCALES.find((lang) => lang.id === savedLanguage)
       if (lang) {
         currentLanguage = lang
-        Language.set(lang.code)
+        Language.set(lang.id)
       }
     }
 
@@ -32,12 +32,12 @@
   })
 
   /* Переключение языка */
-  function switchLanguage(code: string) {
-    const lang = LOCALES.find((lang) => lang.code === code)
+  function switchLanguage(id: string) {
+    const lang = LOCALES.find((lang) => lang.id === id)
     if (lang) {
-      Language.set(lang.code)
+      Language.set(lang.id)
       currentLanguage = lang
-      localStorage.setItem('AppLanguage', lang.code)
+      localStorage.setItem('AppLanguage', lang.id)
       showLanguageModal = false
     }
   }
@@ -69,9 +69,9 @@
       transition:fade={{ duration: 300 }}
     >
       <ul class="list-none p-2">
-        {#each LOCALES as lang (lang.code)}
+        {#each LOCALES as lang (lang.id)}
           <li class="cursor-pointer rounded-lg p-2 transition duration-300 hover:shadow-lg">
-            <button class="flex items-center" onclick={() => switchLanguage(lang.code)} aria-label={`Switch to ${lang.name}`} role="menuitem">
+            <button class="flex items-center" onclick={() => switchLanguage(lang.id)} aria-label={`Switch to ${lang.name}`} role="menuitem">
               <lang.component class="h-6 w-6" />
               <span class="pl-4">{lang.name}</span>
             </button>

@@ -17,6 +17,7 @@ interface CandidateDevice {
   Firmware: FormDataEntryValue | null
   Manual: FormDataEntryValue | null
   API: FormDataEntryValue | null
+  APILanguage: string
 }
 
 export const POST: RequestHandler = async (event) => {
@@ -44,45 +45,51 @@ export const POST: RequestHandler = async (event) => {
       Firmware: formData.get('Firmware'),
       Manual: formData.get('Manual'),
       API: formData.get('API'),
+      APILanguage: formData.get('APILanguage') as string,
     }
 
-    /* Проверяем наличия всех данных об устройстве */
-    const requiredFields: (keyof CandidateDevice)[] = ['CatalogID', 'CatalogName', 'Brief', 'Description', 'Icon', 'VerFW', 'Firmware', 'Manual', 'API']
+    // Проверка обязательных полей
+    const requiredFields: (keyof CandidateDevice)[] = ['CatalogID', 'CatalogName', 'Brief', 'Description', 'Icon', 'VerFW', 'Firmware', 'Manual', 'APILanguage']
+
     if (!requiredFields.every((field) => candidate_device[field])) {
       return new Response(JSON.stringify(ResponseManager('ER_INSUFFICIENT_DATA_TO_CREATE_DEVICE', lang)), { status: 400 })
     }
 
-    /* Проверка формата CatalogID */
+    // Проверка формата CatalogID
     const catalogIdRegex = /^[0-9A-F]{4}$/
     if (!catalogIdRegex.test(candidate_device.CatalogID)) {
       return new Response(JSON.stringify(ResponseManager('ER_INVALID_CATALOG_ID', lang)), { status: 400 })
     }
 
-    /* Проверка типов для Firmware, Manual и API */
-    const files = [candidate_device.Firmware, candidate_device.Manual, candidate_device.API]
-    if (!files.every((file) => file instanceof File)) {
-      return new Response(JSON.stringify(ResponseManager('ER_INVALID_FILE_TYPE', lang)), { status: 400 })
-    }
-
-    /* Преобразуем файлы в Buffer */
+    // Проверка типов файлов
     const fileToBuffer = async (file: File): Promise<Buffer> => Buffer.from(await file.arrayBuffer())
-    const [firmwareBytes, manualBytes, apiBytes] = await Promise.all(files.map(fileToBuffer))
 
-    /* Извлекаем текущее устройство из базы данных */
-    let device = await prisma.catalogDevice.findUnique({
-      where: { CatalogID: candidate_device.CatalogID },
-      include: { Versions: true },
-    })
+    const firmwareBytes = await fileToBuffer(candidate_device.Firmware as File)
+    const manualBytes = await fileToBuffer(candidate_device.Manual as File)
+    const apiBytes = candidate_device.API ? await fileToBuffer(candidate_device.API as File) : null
 
-    /* Создаем объект MetaData */
+    // Создаем метаданные
     const metaData = {
       CatalogID: candidate_device.CatalogID,
       VerFW: candidate_device.VerFW,
       CRC32: crc32(firmwareBytes),
     }
 
+    // Поиск существующего устройства
+    let device = await prisma.catalogDevice.findUnique({
+      where: { CatalogID: candidate_device.CatalogID },
+      include: {
+        Versions: {
+          include: {
+            ApiFiles: true,
+          },
+        },
+      },
+    })
+
     let versionDevice = null
     if (device) {
+      // Обновляем существующую версию
       versionDevice = await prisma.catalogVersion.upsert({
         where: { DeviceID_VerFW: { DeviceID: device.CatalogID, VerFW: candidate_device.VerFW } },
         create: {
@@ -90,60 +97,90 @@ export const POST: RequestHandler = async (event) => {
           Description: candidate_device.Description,
           Firmware: firmwareBytes,
           Manual: manualBytes,
-          API: apiBytes,
-          MetaData: { ...metaData },
+          MetaData: metaData,
           CatalogDevice: { connect: { CatalogID: device.CatalogID } },
+          ApiFiles: apiBytes
+            ? {
+                create: {
+                  Language: candidate_device.APILanguage,
+                  Content: apiBytes,
+                },
+              }
+            : undefined,
         },
         update: {
           Description: candidate_device.Description,
           Firmware: firmwareBytes,
           Manual: manualBytes,
-          API: apiBytes,
-          MetaData: { ...metaData },
+          MetaData: metaData,
+          ApiFiles: apiBytes
+            ? {
+                upsert: {
+                  where: {
+                    VersionDeviceID_VersionVerFW_Language: {
+                      VersionDeviceID: device.CatalogID,
+                      VersionVerFW: candidate_device.VerFW,
+                      Language: candidate_device.APILanguage,
+                    },
+                  },
+                  create: {
+                    Language: candidate_device.APILanguage,
+                    Content: apiBytes,
+                  },
+                  update: {
+                    Content: apiBytes,
+                  },
+                },
+              }
+            : undefined,
         },
       })
     } else {
-      /* Создаем новое устройство с новой версией */
-      const newDevice = await prisma.catalogDevice.create({
+      // Создаем новое устройство с версией
+      device = await prisma.catalogDevice.create({
         data: {
           CatalogID: candidate_device.CatalogID,
           CatalogName: candidate_device.CatalogName,
           Brief: candidate_device.Brief,
           Icon: candidate_device.Icon,
           VerFW: candidate_device.VerFW,
+          Versions: {
+            create: {
+              VerFW: candidate_device.VerFW,
+              Description: candidate_device.Description,
+              Firmware: firmwareBytes,
+              Manual: manualBytes,
+              MetaData: metaData,
+              ApiFiles: apiBytes
+                ? {
+                    create: {
+                      Language: candidate_device.APILanguage,
+                      Content: apiBytes,
+                    },
+                  }
+                : undefined,
+            },
+          },
+        },
+        include: {
+          Versions: {
+            include: {
+              ApiFiles: true,
+            },
+          },
         },
       })
-      if (!newDevice) {
-        return new Response(JSON.stringify(ResponseManager('ER_EDIT_DEVICE', lang)), { status: 500 })
-      }
-
-      versionDevice = await prisma.catalogVersion.create({
-        data: {
-          VerFW: candidate_device.VerFW,
-          Description: candidate_device.Description,
-          Firmware: firmwareBytes,
-          Manual: manualBytes,
-          API: apiBytes,
-          MetaData: { ...metaData, Versions: [candidate_device.VerFW] },
-          CatalogDevice: { connect: { CatalogID: candidate_device.CatalogID } },
-        },
-      })
+      versionDevice = device?.Versions[0]
     }
+
     if (!versionDevice) {
       return new Response(JSON.stringify(ResponseManager('ER_EDIT_DEVICE', lang)), { status: 500 })
     }
 
-    /* Получаем данные об устройстве после изменений */
-    device = await prisma.catalogDevice.findUnique({
-      where: { CatalogID: candidate_device.CatalogID },
-      include: { Versions: true },
-    })
-
-    /* Получаем все версии для обновления последней версии в CatalogDevice */
-    const allVersions = device && device.Versions ? device.Versions.map((ver) => ver.VerFW) : []
+    // Обновляем последнюю версию в CatalogDevice
+    const allVersions = device?.Versions ? device.Versions.map((ver) => ver.VerFW) : []
     const latestVerFW = allVersions.length > 0 ? allVersions.sort((a, b) => b.localeCompare(a))[0] : '0.0'
 
-    /* Обновляем данные об устройстве в базе данных */
     device = await prisma.catalogDevice.update({
       where: { CatalogID: candidate_device.CatalogID },
       data: {
@@ -152,13 +189,16 @@ export const POST: RequestHandler = async (event) => {
         Icon: candidate_device.Icon,
         VerFW: latestVerFW,
       },
-      include: { Versions: true },
+      include: {
+        Versions: {
+          include: {
+            ApiFiles: true,
+          },
+        },
+      },
     })
-    if (!device) {
-      return new Response(JSON.stringify(ResponseManager('ER_EDIT_DEVICE', lang)), { status: 500 })
-    }
 
-    /* Создаем объект ответа без Firmware, Manual и API */
+    // Формируем ответ
     const responseData = {
       catalog: {
         CatalogID: device.CatalogID,
@@ -170,6 +210,7 @@ export const POST: RequestHandler = async (event) => {
         Versions: device.Versions.map((ver) => ({
           VerFW: ver.VerFW,
           Description: ver.Description,
+          APILanguages: ver.ApiFiles.map((api) => api.Language),
           Created: FormatDate(ver.Created.toISOString()),
           Updated: FormatDate(ver.Updated.toISOString()),
         })),

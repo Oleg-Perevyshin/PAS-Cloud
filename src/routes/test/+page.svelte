@@ -1,13 +1,124 @@
 <!-- src/routes/test/+page.svelte -->
 <script lang="ts">
   import type { IWebSocketPacket, IOptionUI } from '../../stores/Interfaces'
-  import Slider from '$lib/components/UI/Slider.svelte'
   import ButtonGroup from '$lib/components/UI/ButtonGroup.svelte'
   import Input from '$lib/components/UI/Input.svelte'
   import Button from '$lib/components/UI/Button.svelte'
   import ProgressBar from '$lib/components/UI/ProgressBar.svelte'
   import ColorPicker from '$lib/components/UI/ColorPicker.svelte'
   import Switch from '$lib/components/UI/Switch.svelte'
+
+  import Accordion from '$lib/UILibrary/Accordion.svelte'
+  import UIInput from '$lib/UILibrary/Input.svelte'
+  import UiIcon from '$lib/appIcons/UiIcon.svelte'
+  import Separator from '$lib/UILibrary/Separator.svelte'
+  import UISlider from '$lib/UILibrary/Slider.svelte'
+  import FileInput from '$lib/UILibrary/FileInput.svelte'
+  import Select from '$lib/UILibrary/Select.svelte'
+  import UISwitch from '$lib/UILibrary/Switch.svelte'
+  import type { Colors, IOption } from '$lib/UILibrary/Interface'
+  import Graph from '$lib/UILibrary/Graph.svelte'
+  import UIColorPicker from '$lib/UILibrary/ColorPicker.svelte'
+  import UIButton from '$lib/UILibrary/Button.svelte'
+  import Table from '$lib/UILibrary/Table.svelte'
+
+  const wifiModeList: IOption[] = [
+    { id: 1, name: 'Станция' },
+    { id: 2, name: 'Точка доступа' },
+    { id: 3, name: 'Гибрид' },
+  ]
+
+  const accessPoints: IOption[] = [
+    { id: 1, name: 'point1' },
+    { id: 2, name: 'point2' },
+  ]
+  let ap: IOption = $state(accessPoints[0])
+
+  let selectValue: IOption = $state(wifiModeList[0])
+  let buttonItem: IOption = $state(wifiModeList[2])
+  let inputString = $state('')
+  let inputNumber = $state(4)
+  let counter = $state(0)
+
+  let sliderValue: number | [number, number] = $state(12)
+  let text = $state(
+    'Проблема в том, что груз задачи мешает работать. Мы ведь понимаем, что это надолго. А большую задачу делать не хочется... ' +
+      'Поэтому мы ее откладываем, беремся за задачи поменьше. В итоге да, день прошел, а мы не успели закончить. ' +
+      'А если не тратить время на размышления «сколько времени это у меня займет», а сосредоточиться на конкретной задаче (в данном случае — ' +
+      'первом письме из стопки, потом втором...), то не успеете оглянуться, как уже всё разгребли!',
+  )
+
+  function clickItem(id: string) {
+    console.log(id)
+  }
+
+  // данные для таблицы - массив колонок и строк
+  interface Device {
+    id: string
+    name: string
+    status: 'online' | 'offline'
+    lastActive: Date
+    action?: string
+  }
+
+  const rows: Device[] = [
+    { id: '# 1', name: 'Device A', status: 'online', lastActive: new Date() },
+    { id: '# 2', name: 'Device B', status: 'offline', lastActive: new Date(Date.now() - 86400000 * 4) },
+    { id: '# 3', name: 'Device C', status: 'offline', lastActive: new Date(Date.now() - 86400000) },
+  ]
+
+  interface IColumn<T extends object> {
+    label: string
+    key: keyof T
+    width?: string
+    formatter?: (value: any, row: T) => string | number
+    button?: {
+      text?: string
+      color?: Colors
+      style?: string
+      onClick?: (row: T) => void
+      disabled?: (row: T) => boolean
+    }
+  }
+
+  const columns: IColumn<Device>[] = [
+    { label: 'ID', key: 'id', width: '10%' },
+    { label: 'Name', key: 'name' },
+    {
+      label: 'Status',
+      key: 'status',
+      formatter: (value: string) => (value === 'online' ? '🟢 Online' : '🔴 Offline'),
+    },
+    {
+      label: 'Last Active',
+      key: 'lastActive',
+      formatter: (value: { toLocaleDateString: () => any }) => value.toLocaleDateString(),
+    },
+    {
+      label: 'Actions',
+      key: 'action',
+      button: {
+        text: 'Click',
+        color: 'red',
+        onClick: (row) => clickItem(row.id),
+      },
+    },
+  ]
+
+  // генерация данных для графика
+  const generateSmoothData = () => {
+    let y = 0
+    const data = []
+
+    for (let x = 0; x < 100; x++) {
+      y = 2 * Math.sin(x / 10) + Math.random() * 2
+      data.push({ x, y })
+    }
+
+    return data
+  }
+
+  const data = generateSmoothData()
 
   import { EncryptWebSocketPacket, DecryptWebSocketPacket } from '$lib/utils/Common'
   import { DEFAULT_TAGS } from '../../enums'
@@ -37,12 +148,6 @@
   const handleRadioButton = (value: IOptionUI) => {
     console.log('ButtonGroup Value:', value)
     radioButtonValue = value
-  }
-
-  let sliderValue: number | null = $state(23)
-  const handleSlider = (value: number) => {
-    console.log('Slider Value:', value)
-    sliderValue = value
   }
 
   let packHeader: string = $state('GET')
@@ -98,7 +203,7 @@
   }
 </script>
 
-<div class="flex h-full flex-col items-center overflow-hidden">
+<div class="flex h-full flex-col items-center overflow-hidden overflow-y-visible">
   <h2>Страница для тестирования UI компонентов</h2>
   <div class="flex w-full flex-row">
     <hr class="w-full border-t border-gray-400" />
@@ -126,17 +231,6 @@
 
   <br />
 
-  <Slider
-    id="TestSlider"
-    label="Component - Slider"
-    props={{ min: 0, max: 100, step: 1, disabled: false }}
-    className="m-4"
-    value={sliderValue ?? 0}
-    onUpdate={handleSlider}
-  />
-
-  <br />
-
   <div class="flex flex-row">
     <Input id="TestInputHeader" bind:value={packHeader} props={{ autocomplete: 'on', maxLength: 8 }} className="m-1" />
     <Input id="TestInputArgument" bind:value={packArgument} props={{ autocomplete: 'on', maxLength: 16 }} className="m-1" />
@@ -160,4 +254,389 @@
   <br />
 
   <Switch id="Switch" label="Test Switch" value={switchValue} className="" onUpdate={toggleSwitch} />
+
+  <Separator visible={false} />
+
+  <div class="flex flex-wrap items-start justify-center">
+    <Accordion id="acc1" label={{ text: 'Graph component (в разработке)' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+      <Graph {data} width={800} label="График" xLabel="Время" yLabel="Значение" />
+      <UIColorPicker id="ColorPicker" label={{ text: 'Test Color Picker' }} style={{ styleCSS: 'width: 25rem;' }} />
+      <Separator visible={false} />
+      <UIButton
+        id="button1"
+        validation={{ text: 'Сохранить' }}
+        style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'green' }}
+        onClick={() => counter++}
+      />
+    </Accordion>
+
+    <Accordion id="acc2" label={{ text: 'Пример использования: Настройки WiFi' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+      <UIButton
+        id="button2"
+        label={{ text: 'Режимы wifi' }}
+        style={{ bgColor: 'blue', optionWidth: 'max-option' }}
+        validation={{ options: wifiModeList, value: buttonItem }}
+        onChange={(value) => (buttonItem = value)}
+      />
+
+      <Accordion id="acc3" label={{ text: 'Настройки режима STA' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false, type: 'sub' }}>
+        <Select
+          label="Точка доступа"
+          options={accessPoints}
+          value={ap}
+          styleCSS="width: 20rem;"
+          onUpdate={(value) => (selectValue = value)}
+          showCustomOption
+          color="white"
+        />
+
+        <UIInput
+          id="sta-psk"
+          label="Пароль"
+          styleCSS="width: 30%;"
+          Type="password"
+          bind:value={inputString}
+          placeholder="Enter password"
+          RegExp={/^[0-9a-z]{0,5}$/}
+        />
+
+        <Separator visible={false} />
+
+        <UISwitch label="Режим IP" captionLeft="Статический" captionRight="Динамический" color="blue" />
+        <Separator visible={false} />
+        <UIInput
+          label="IP Address"
+          styleCSS="width: 30%;"
+          id="sta-ip"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+
+        <UIInput
+          label="Mask"
+          styleCSS="width: 30%;"
+          id="sta-ms"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+
+        <UIInput
+          label="Gateway"
+          styleCSS="width: 30%;"
+          id="sta-gw"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+      </Accordion>
+
+      <Accordion id="acc4" label={{ text: 'Настройки режима AP' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false, type: 'sub' }}>
+        <UIInput
+          id="input-ap-ssid"
+          label="Имя точки доступа"
+          styleCSS="width: 30%;"
+          Type="text"
+          bind:value={inputString}
+          placeholder="Enter string"
+          RegExp={/^[0-9a-z]{0,5}$/}
+        />
+        <UIInput
+          id="input-ap-psk"
+          label="Пароль точки доступа"
+          styleCSS="width: 30%;"
+          Type="password"
+          bind:value={inputString}
+          placeholder="Enter string"
+          RegExp={/^[0-9a-z]{0,5}$/}
+        />
+
+        <Separator visible={false} />
+        <UIInput
+          label="IP Address"
+          styleCSS="width: 20rem;"
+          id="ap-ip"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+
+        <UIInput
+          label="Mask"
+          styleCSS="width: 20rem;"
+          id="ap-ms"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+
+        <UIInput
+          label="Gateway"
+          styleCSS="width: 20rem;"
+          id="ap-gw"
+          autocomplete="on"
+          placeholder="XXX.XXX.XXX.XXX"
+          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+        />
+      </Accordion>
+      <UIButton
+        id="button2"
+        validation={{ text: 'Сохранить' }}
+        style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'green' }}
+        onClick={() => counter++}
+      />
+      <UIButton
+        id="button3"
+        validation={{ text: 'Перезагрузить' }}
+        style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'red' }}
+        onClick={() => counter++}
+      />
+    </Accordion>
+
+    <Accordion id="acc5" label={{ text: 'Button component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: true }}>
+      <div style="display: flex; flex-wrap: wrap; align-items: center;">
+        <UIButton
+          id="button4"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'blue', icon: UiIcon }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button5"
+          style={{
+            level_2: 'margin: 0.5rem; height: 5rem; width: 5rem; border-radius: 50%;',
+            bgColor: 'primary',
+            icon: UiIcon,
+            iconProps: { height: '3rem', width: '3rem' },
+          }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button6"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'white' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button7"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 6rem; margin: 0.5rem; border-radius: 0;', bgColor: 'amber' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button8"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 6rem; margin: 0.5rem; height: 4rem;', bgColor: 'red' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button9"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem; box-shadow: 0px 0px 10px red;', bgColor: 'orange' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button10"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'lime' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button11"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem; border-radius: 5px; border: 1px solid grey;', bgColor: 'green' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button12"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'sky' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button13"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'purple' }}
+          onClick={() => counter++}
+        />
+        <UIButton
+          id="button14"
+          validation={{ text: 'counter' }}
+          style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'pink' }}
+          onClick={() => counter++}
+        />
+        <p style="flex: 1;">Kнопка нажата <strong>{counter}</strong> раз</p>
+      </div>
+      <UIButton
+        id="button15"
+        label={{ text: 'Режимы wifi' }}
+        style={{ bgColor: 'rose', optionWidth: 'max-option' }}
+        validation={{ options: wifiModeList, value: buttonItem }}
+        onChange={(value) => (buttonItem = value)}
+      />
+      <p style="flex: 1;">Bыбранный режим: {buttonItem.name}</p>
+    </Accordion>
+
+    <Accordion id="acc6" label={{ text: 'Input component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+      <UIInput
+        id="input-string"
+        label="Поле ввода строки"
+        styleCSS="width: 60%;"
+        Type="password"
+        bind:value={inputString}
+        placeholder="Enter string"
+        RegExp={/^[0-9a-z]{0,5}$/}
+      />
+      <p style="margin-top: 0; width: 40%;">Введенная строка: {inputString}</p>
+      <UIInput
+        id="input-number"
+        label="Поле ввода числа"
+        styleCSS="width: 20%;"
+        Type="number"
+        bind:value={inputNumber}
+        Info=" Проблема в том, что груз задачи мешает работать. Мы ведь понимаем, что это надолго."
+        placeholder="Enter number"
+      />
+      <p style="margin-top: 0; width: 20%;">Введенное число: {inputNumber}</p>
+      <Separator visible={false} />
+
+      <UIInput
+        id="input-text"
+        label="Поле ввода текста"
+        styleCSS="width: 50%;"
+        Info="info about this input"
+        Type="text-area"
+        bind:value={text}
+        disabled
+        placeholder="Enter text"
+      />
+      <p style="margin-top: 0; width: 40%;">Введенный текст: {text}</p>
+
+      <Accordion id="acc7" validation={{ type: 'sub' }} label={{ text: 'File input' }} style={{ styleCSS: 'width: 100%;' }}>
+        <FileInput id="default-file-input" label={{ text: 'Upload document' }} style={{ styleCSS: 'width: 60%;' }} validation={{ accept: '.pdf,.doc,.docx' }} />
+        <FileInput
+          id="image-file-input"
+          validation={{ type: 'image', accept: 'image/*' }}
+          style={{ styleCSS: 'width: 30%;' }}
+          label={{ text: 'Profile picture' }}
+        />
+      </Accordion>
+    </Accordion>
+
+    <Accordion id="acc8" label={{ text: 'Slider component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+      <!-- vertical -->
+      <UISlider
+        label="label"
+        value={[100, 500]}
+        min={50}
+        max={1200}
+        step={10}
+        orientation="vertical"
+        styleCSS="height: 20rem;"
+        thumbColor="purple"
+        sliderColor="sky"
+        onUpdate={(value) => (sliderValue = value)}
+        showStepButtons
+      />
+
+      <UISlider
+        label="label"
+        value={800}
+        min={50}
+        max={1200}
+        step={10}
+        styleCSS="height: 20rem;"
+        orientation="vertical"
+        onUpdate={(value) => (sliderValue = value)}
+        showStepButtons
+      />
+
+      <UISlider
+        label="label"
+        value={[100, 500]}
+        min={50}
+        max={1200}
+        step={10}
+        orientation="vertical"
+        styleCSS="height: 10rem;"
+        onUpdate={(value) => (sliderValue = value)}
+      />
+
+      <UISlider
+        label="label"
+        value={800}
+        min={50}
+        max={1200}
+        step={10}
+        styleCSS="height: 15rem;"
+        orientation="vertical"
+        thumbColor="orange"
+        sliderColor="amber"
+        onUpdate={(value) => (sliderValue = value)}
+      />
+
+      <Separator visible={false} />
+
+      <!-- horizontal -->
+      <UISlider
+        label="label"
+        value={[500, 600]}
+        min={50}
+        max={1200}
+        step={10}
+        orientation="horizontal"
+        styleCSS="width: 20rem;"
+        onUpdate={(value) => (sliderValue = value)}
+        showStepButtons
+      />
+
+      <UISlider
+        label="label"
+        value={150}
+        min={50}
+        max={1200}
+        step={10}
+        styleCSS="width: 20rem;"
+        orientation="horizontal"
+        thumbColor="green"
+        sliderColor="lime"
+        onUpdate={(value) => (sliderValue = value)}
+      />
+
+      <Separator visible={false} />
+
+      <UISlider
+        label="label"
+        value={[500, 1000]}
+        min={50}
+        max={1200}
+        step={10}
+        orientation="horizontal"
+        styleCSS="width: 30rem;"
+        sliderColor="sky"
+        onUpdate={(value) => (sliderValue = value)}
+      />
+
+      <UISlider
+        label="label"
+        value={800}
+        min={50}
+        max={1200}
+        step={10}
+        styleCSS="width: 12rem;"
+        orientation="horizontal"
+        thumbColor="rose"
+        sliderColor="red"
+        onUpdate={(value) => (sliderValue = value)}
+      />
+    </Accordion>
+
+    <Accordion id="acc9" label={{ text: 'Table component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+      <Table {rows} {columns} label="Устройства" />
+    </Accordion>
+
+    <Accordion id="acc10" label={{ text: 'Еще что то' }} style={{ styleCSS: 'width: 40%; margin: 1rem;' }} validation={{ state: false }}></Accordion>
+    <Accordion id="acc11" label={{ text: 'Еще что то' }} style={{ styleCSS: 'width: 40%; margin: 1rem;' }} validation={{ state: false }}></Accordion>
+  </div>
 </div>

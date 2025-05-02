@@ -82,16 +82,33 @@ model CatalogVersion {
   Description       String                                        // Подробное описание устройства
   Firmware          Bytes                                         // Бинарные данные прошивки
   Manual            Bytes                                         // Бинарные данные руководства пользователя
-  API               Bytes                                         // Бинарные данные API (YAML файл с описание интерфейса)
+  // API               Bytes                                         // Бинарные данные API (YAML файл с описание интерфейса)
   MetaData          Json                                          // Мета данные прошивки (ID устройство, версия прошивки, CRC32 прошивки)
   Created           DateTime          @default(now())             // Дата создания прошивки
   Updated           DateTime          @updatedAt                  // Дата обновления прошивки
 
   DeviceID          String                                        // Идентификатор устройства
   CatalogDevice     CatalogDevice     @relation("DeviceVersions", fields: [DeviceID], references: [CatalogID])
+  ApiFiles          CatalogApiFile[]  @relation("VersionApiFiles")
 
   @@id([DeviceID, VerFW])                                         // Уникальный составной ключ (версия + идентификатор устройства)
   @@map("CatalogVersions")                                        // Имя таблицы в базе данных
+}
+
+// Таблица API-файлов для версий
+model CatalogApiFile {
+  id                String            @id @default(uuid())
+  Language          String            // Язык API (например 'ru', 'en')
+  Content           Bytes             // Содержимое YAML файла
+  Created           DateTime          @default(now())
+  Updated           DateTime          @updatedAt
+
+  VersionDeviceID   String
+  VersionVerFW      String
+  CatalogVersion    CatalogVersion    @relation("VersionApiFiles", fields: [VersionDeviceID, VersionVerFW], references: [DeviceID, VerFW])
+
+  @@unique([VersionDeviceID, VersionVerFW, Language])
+  @@map("CatalogApiFiles")
 }
 
 // Таблица реальных (физических) устройств

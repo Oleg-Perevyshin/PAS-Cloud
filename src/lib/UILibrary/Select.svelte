@@ -162,7 +162,6 @@
 <style>
   .select-container {
     position: relative;
-    margin: 0.25rem;
     width: 50%;
   }
 

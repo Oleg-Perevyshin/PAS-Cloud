@@ -1,7 +1,7 @@
 <!-- $lib/components/Catalog/CatalogAddEdit.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { t } from '$lib/locales/i18n'
+  import { t, LOCALES } from '$lib/locales/i18n'
   import { OPTION_DEVID, OPTION_DEV_CATEGORY } from '../../../enums'
   import { LoaderStore, CatalogStore, CatalogUpsertDevice, RemoveDeviceFromStore } from '../../../stores'
   import type { ICatalogDevice, IOptionUI } from '../../../stores/Interfaces'
@@ -11,6 +11,8 @@
   import Input from '../UI/Input.svelte'
   import TextArea from '../UI/TextArea.svelte'
   import Button from '../UI/Button.svelte'
+  import UISelect from '$lib/UILibrary/Select.svelte'
+  import type { IOption } from '$lib/UILibrary/Interface'
 
   onMount(() => {
     const subscriptions = {
@@ -32,6 +34,7 @@
     onSave: (device: ICatalogDevice) => void
   }
   let { currentDevice, currentLang, currentTheme, isEditing, onCancel, onSave }: Props = $props()
+  let currentAPILanguage: IOption = $state({ id: 'ru', value: 'ru', name: 'ru' })
 
   /* Реактивные переменные для полей */
   let SelectedVerFWs: IOptionUI | null = $state(null)
@@ -60,6 +63,7 @@
       { key: 'Firmware', id: 'Firmware' },
       { key: 'Manual', id: 'Manual' },
       { key: 'API', id: 'API' },
+      { key: 'APILang', id: 'APILang' },
     ]
 
     if (isEditing) {
@@ -104,7 +108,7 @@
     }
     LoaderStore.set(true)
     try {
-      const responseData = await API_CatalogDevice(currentDevice.CatalogID, VerFW)
+      const responseData = await API_CatalogDevice(currentDevice.CatalogID, VerFW, currentLang)
       if (!responseData?.catalog) {
         throw new Error('Invalid Response Data')
       }
@@ -370,10 +374,11 @@
         />
 
         <!-- Прикрепление файла прошивки и руководства пользователя -->
-        <div class="m-4 grid grid-cols-2 gap-2">
+        <div class="m-4 grid grid-cols-3 gap-2">
           <div class="flex items-center">
             <label for="Firmware" class="font-semibold">{t('service.catalog.append_core', currentLang)}</label>
           </div>
+          <div></div>
           <div class="flex items-center">
             <input
               id="Firmware"
@@ -387,6 +392,7 @@
           <div class="flex items-center">
             <label for="Manual" class="font-semibold">{t('service.catalog.append_manual', currentLang)}</label>
           </div>
+          <div></div>
           <div class="flex items-center">
             <input
               id="Manual"
@@ -399,6 +405,23 @@
 
           <div class="flex items-center">
             <label for="API" class="font-semibold">{t('service.catalog.append_api', currentLang)}</label>
+          </div>
+          <div>
+            <UISelect
+              id="APILang"
+              label={t('service.constructor.api_lang', currentLang)}
+              options={LOCALES.map((locale, index) => ({
+                id: index + 1,
+                value: locale.id,
+                name: locale.id,
+              }))}
+              value={currentAPILanguage}
+              styleCSS="width: 6rem;"
+              onUpdate={(value) => {
+                currentAPILanguage = value
+                $CatalogStore.APILang = value.value as string
+              }}
+            />
           </div>
           <div class="flex items-center">
             <input

@@ -16,7 +16,7 @@
       styleCSS?: string
       color?: Colors
     }
-    onFileChange?: (files: FileList | null) => void
+    onFileChange?: (event: Event) => void
   }
 
   let {
@@ -58,7 +58,7 @@
       previewUrl = URL.createObjectURL(file)
     }
 
-    onFileChange(input.files)
+    onFileChange(event)
   }
 
   function triggerFileInput() {
@@ -115,7 +115,7 @@
   }
 
   .input-file input[type='file'] {
-    height: 2rem;
+    height: 2.15rem;
     width: 100%;
     border: 1px solid var(--color);
     border-radius: 1rem;

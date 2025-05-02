@@ -201,7 +201,7 @@
       /* Параллельный запрос для получения данных по каждому модулю */
       const moduleRequests = moduleList.map(async (module) => {
         const DevID = module.DevSN.substring(0, 4)
-        const responseData = await API_CatalogDevice(DevID, module.DevFW)
+        const responseData = await API_CatalogDevice(DevID, module.DevFW, currentLang)
 
         /* Создаем объект модуля со значениями по умолчанию и ошибкой */
         const moduleData: IDeviceModule = {

@@ -163,6 +163,13 @@ const translations: Translations = {
     'service.catalog.title': 'Обслуживание каталога',
     'service.catalog.title_search': 'Поиск по каталогу',
     'service.catalog.create': 'Создать новое устройство',
+    /* UI Конструктор */
+    'service.constructor.title': 'UI Конструктор',
+    'service.constructor.yaml_input': 'Загрузить yaml файл',
+    'service.constructor.load': 'Загрузить',
+    'service.constructor.save': 'Сохранить',
+    'service.constructor.api_name': 'ID устройства',
+    'service.constructor.api_lang': 'Язык API',
     /* Модальное окно и страница устройства */
     'service.catalog.title_create': 'Создать устройство',
     'service.catalog.title_edit': 'Редактировать устройство',
@@ -276,6 +283,7 @@ const translations: Translations = {
     'err.dev_delete': 'ERR: Удаление устройства не выполнено',
     'err.dev_data': 'ERR: Недостаточног данных для создания устройства',
     'err.catalog_id': 'ERR: ID устройства не соответствует требованиям',
+    'err.catalog_delete_device': 'ERR: Ошибка при удалении устройства',
     'err.file_type': 'ERR: Неверный тип файлов при создании устройства',
     'err.core_file_save': 'ERR: Ошибка при сохранении файла',
     'err.core_file_empty': 'ERR: Файл прошивки пуст',

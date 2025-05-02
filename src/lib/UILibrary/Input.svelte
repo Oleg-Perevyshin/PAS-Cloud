@@ -257,7 +257,7 @@
   }
 
   .input.invalid {
-    border: 2px solid var(--red-color);
+    border: 1px solid var(--red-color);
   }
 
   .disabled {

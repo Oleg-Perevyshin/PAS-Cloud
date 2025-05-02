@@ -476,9 +476,9 @@ export const API_CatalogUpdateDevice = async (DeviceData: FormData) => {
  * Создание/Редактирование устройства в каталоге
  * @param DeviceData - полный пакет данных об устройстве
  */
-export const API_CatalogDevice = async (CatalogID: string, VerFW: string) => {
+export const API_CatalogDevice = async (CatalogID: string, VerFW: string, APILanguage: string) => {
   try {
-    const responseData = await SmartRequest(`${API_ROUTES.CATALOG_GET_DEVICE}?CatalogID=${CatalogID}&VerFW=${VerFW}`, {
+    const responseData = await SmartRequest(`${API_ROUTES.CATALOG_GET_DEVICE}?CatalogID=${CatalogID}&VerFW=${VerFW}&APILanguage=${APILanguage}`, {
       method: 'GET',
       headers: {
         'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',

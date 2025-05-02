@@ -98,7 +98,7 @@
           onclick={() => updateValue(item)}
           style="width: {maxWidth}; {style.bgColor == 'white'
             ? 'border: 1px solid var(--border-color);'
-            : 'color: white; border: none; margin: 0 1px;'} {validation.disabled ? 'cursor: not-allowed;' : ''}"
+            : 'color: white; border: 1px solid var(--color); margin: 0 1px;'} {validation.disabled ? 'cursor: not-allowed;' : ''}"
           disabled={validation.disabled}
         >
           {item.name}
@@ -111,7 +111,7 @@
       class={`button ${validation.disabled ? 'disabled' : ''} ${style.bgColor}`}
       style="border-radius: 1rem; min-width: max-content; {style.bgColor == 'white'
         ? 'border: 1px solid var(--border-color);'
-        : 'color: white; border: none;'} {style.level_2}"
+        : 'color: white; border: 1px solid var(--color);'} {style.level_2}"
       onclick={handleClick}
       disabled={validation.disabled}
     >
@@ -151,7 +151,7 @@
     color: black;
     transition: box-shadow 0.3s;
     background-color: var(--color);
-    height: 2rem;
+    height: auto;
   }
 
   .button:hover {

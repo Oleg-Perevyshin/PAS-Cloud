@@ -13,6 +13,7 @@ const DefaultCatalog: ICatalogDevice = {
   Firmware: null,
   Manual: null,
   API: null,
+  APILang: 'ru',
   Created: '',
   Updated: '',
 }

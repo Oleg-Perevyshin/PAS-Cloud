@@ -36,9 +36,9 @@ export function setLanguage(newLang: string) {
  * Поддерживаемые языки (код, название языка, флаг)
  */
 export const LOCALES = [
-  { code: 'ru', name: 'Русский', component: CircleFlagsRu },
-  { code: 'en', name: 'English', component: CircleFlagsEn },
-  { code: 'zh', name: '中国人', component: CircleFlagsZh },
+  { id: 'ru', name: 'Русский', component: CircleFlagsRu },
+  { id: 'en', name: 'English', component: CircleFlagsEn },
+  { id: 'zh', name: '中国人', component: CircleFlagsZh },
 ]
 
 /**

@@ -11,7 +11,7 @@
 
   const CatalogID = $page.params.id
 
-  let currentLang: string | undefined = $state()
+  let currentLang: string = $state('ru')
   let currentTheme: string | undefined = $state()
   let UserData: IUser | undefined = $state()
   let SelectedVerFWs: IOptionUI | null = $state(null)
@@ -39,7 +39,7 @@
   const getCatalogDevice = async (VerFW: string) => {
     LoaderStore.set(true)
     try {
-      const responseData = await API_CatalogDevice(CatalogID, VerFW)
+      const responseData = await API_CatalogDevice(CatalogID, VerFW, currentLang)
       if (!responseData?.catalog) {
         throw new Error('Invalid Response Data')
       }
@@ -71,7 +71,7 @@
    */
   const downloadFile = async (type: 'Firmware' | 'Manual' | 'API') => {
     try {
-      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&DataType=${type}&VerFW=${SelectedVerFWs?.name}`)
+      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&DataType=${type}&VerFW=${SelectedVerFWs?.name}&APILanguage=${currentLang}`)
       if (!response.ok) {
         throw new Error('Ошибка получения файла: ' + response.statusText)
       }
@@ -84,7 +84,7 @@
       } else if (type === 'Manual') {
         a.download = `${product?.CatalogID}-Manual-v${SelectedVerFWs?.name}.pdf`
       } else if (type === 'API') {
-        a.download = `${product?.CatalogID}-API-v${SelectedVerFWs?.name}.yaml`
+        a.download = `${product?.CatalogID}-${currentLang}-API-v${SelectedVerFWs?.name}.yaml`
       } else {
         console.error('Неизвестный тип данных для скачивания')
       }

@@ -25,6 +25,7 @@ export const GET: RequestHandler = async (event) => {
     const DevSNParam = event.url.searchParams.get('DevSN')
     const DataTypeParam = event.url.searchParams.get('DataType')
     const VerFWParam = event.url.searchParams.get('VerFW')
+    const APILang = event.url.searchParams.get('APILang') || 'ru'
     if (!DataTypeParam || !VerFWParam || (!DevSNParam && !CatalogID)) {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
@@ -42,58 +43,60 @@ export const GET: RequestHandler = async (event) => {
     }
 
     /* Если CatalogID или DevSNParam нет в запросе возвращаем ошибку */
-    let DevID
-    if (CatalogID) {
-      DevID = CatalogID
-    } else if (DevSNParam) {
-      DevID = DevSNParam?.substring(0, 4)
-    } else {
+    const DevID = CatalogID || DevSNParam?.substring(0, 4)
+    if (!DevID) {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
     /* Читаем данные о конкретном устройстве из базы данных */
     const device = await prisma.catalogDevice.findUnique({
       where: { CatalogID: DevID },
-      include: { Versions: true },
+      include: {
+        Versions: {
+          where: VerFWParam ? { VerFW: VerFWParam } : undefined,
+          include: {
+            ApiFiles: DataTypeParam === 'API' ? true : undefined,
+          },
+        },
+      },
     })
+
     if (!device) {
       return new Response(JSON.stringify(ResponseManager('ER_DEVICE_NOT_FOUND_IN_CATALOG', lang)), { status: 404 })
     }
 
-    let selectedVersion = null
-    if (VerFWParam) {
-      selectedVersion = await prisma.catalogVersion.findUnique({
-        where: { DeviceID_VerFW: { DeviceID: device.CatalogID, VerFW: VerFWParam } },
-      })
-    }
-
-    /* Если версия не указана или не найдена, находим последнюю доступную версию */
-    if (!selectedVersion) {
+    // Находим нужную версию
+    let selectedVersion = device.Versions[0]
+    if (!selectedVersion && !VerFWParam) {
+      // Если версия не указана, ищем последнюю
       const versions = await prisma.catalogVersion.findMany({
         where: { DeviceID: device.CatalogID },
+        include: {
+          ApiFiles: DataTypeParam === 'API' ? true : undefined,
+        },
+        orderBy: { VerFW: 'desc' },
+        take: 1,
       })
-      if (versions.length > 0) {
-        selectedVersion = versions.reduce((latest, current) => {
-          const currentVersion = parseFloat(current.VerFW)
-          const latestVersion = parseFloat(latest.VerFW || '0.0')
-          return currentVersion > latestVersion ? current : latest
-        })
-      }
+      selectedVersion = versions[0]
     }
+
     if (!selectedVersion) {
       return new Response(JSON.stringify(ResponseManager('ER_VERSION_NOT_FOUND', lang)), { status: 404 })
     }
 
-    /* Создаем список прошивок из 15 последних в порядке убывания */
-    const allVersions = device.Versions.map((ver) => ver.VerFW)
-      .sort((a, b) => parseFloat(b) - parseFloat(a))
-      .slice(0, 15)
-    /* Собираем ответ с метаданными */
+    // Подготовка метаданных
+    const allVersions = await prisma.catalogVersion.findMany({
+      where: { DeviceID: device.CatalogID },
+      orderBy: { VerFW: 'desc' },
+      take: 15,
+      select: { VerFW: true },
+    })
+
     const responseData = {
       CatalogID: device.CatalogID,
-      CRC32: crc32(Buffer.from(selectedVersion.Firmware)),
+      CRC32: selectedVersion.Firmware ? crc32(Buffer.from(selectedVersion.Firmware)) : null,
       VerFW: selectedVersion.VerFW,
-      Versions: allVersions,
+      Versions: allVersions.map((v) => v.VerFW),
     }
 
     let fileBuffer: Buffer | string | null = null
@@ -101,43 +104,53 @@ export const GET: RequestHandler = async (event) => {
     let contentType: string | null = null
 
     /* Обработка типа данных */
-    if (DataTypeParam === 'Firmware') {
-      if (!selectedVersion.Firmware) {
-        return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
+    switch (DataTypeParam) {
+      case 'Firmware':
+        if (!selectedVersion.Firmware) {
+          return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
+        }
+        fileBuffer = Buffer.from(selectedVersion.Firmware)
+        fileName = `${device.CatalogID}-Firmware-v${selectedVersion.VerFW}.bin`
+        contentType = 'application/octet-stream'
+        break
+
+      case 'Manual':
+        if (!selectedVersion.Manual) {
+          return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
+        }
+        fileBuffer = Buffer.from(selectedVersion.Manual)
+        fileName = `${device.CatalogID}-Manual-v${selectedVersion.VerFW}.pdf`
+        contentType = 'application/pdf'
+        break
+
+      case 'MetaData':
+        fileBuffer = Buffer.from(JSON.stringify(responseData))
+        fileName = `${device.CatalogID}-MetaData.json`
+        contentType = 'application/json'
+        break
+
+      case 'API': {
+        const apiFile = selectedVersion.ApiFiles?.find((f) => f.Language === APILang)
+        if (!apiFile) {
+          return new Response(JSON.stringify(ResponseManager('ER_API_LANGUAGE_NOT_FOUND', lang)), { status: 404 })
+        }
+        fileBuffer = Buffer.from(apiFile.Content)
+        fileName = `${device.CatalogID}-API-${APILang}-v${selectedVersion.VerFW}.yaml`
+        contentType = 'application/x-yaml'
+        break
       }
-      fileBuffer = Buffer.from(selectedVersion.Firmware)
-      fileName = `${device.CatalogID}-Firmware-v${VerFWParam}.bin`
-      contentType = 'application/octet-stream'
-    } else if (DataTypeParam === 'Manual') {
-      if (!selectedVersion.Manual) {
-        return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
-      }
-      fileBuffer = Buffer.from(selectedVersion.Manual)
-      fileName = `${device.CatalogID}-Manual-v${VerFWParam}.pdf`
-      contentType = 'application/pdf'
-    } else if (DataTypeParam === 'MetaData') {
-      if (!selectedVersion.MetaData) {
-        return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
-      }
-      fileBuffer = Buffer.from(JSON.stringify(responseData))
-      fileName = `${device.CatalogID}-MetaData.json`
-      contentType = 'application/json'
-    } else if (DataTypeParam === 'API') {
-      if (!selectedVersion.API) {
-        return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
-      }
-      fileBuffer = Buffer.from(selectedVersion.API)
-      fileName = `${device.CatalogID}-API-v${VerFWParam}.yaml`
-      contentType = 'application/x-yaml'
-    } else if (DataTypeParam === 'Icon') {
-      if (!device.Icon) {
-        return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
-      }
-      fileBuffer = Buffer.from(device.Icon)
-      fileName = `${device.CatalogID}-Icon.svg`
-      contentType = 'image/svg+xml'
-    } else {
-      return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
+
+      case 'Icon':
+        if (!device.Icon) {
+          return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
+        }
+        fileBuffer = Buffer.from(device.Icon)
+        fileName = `${device.CatalogID}-Icon.svg`
+        contentType = 'image/svg+xml'
+        break
+
+      default:
+        return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
     /* Возвращаем файл */
