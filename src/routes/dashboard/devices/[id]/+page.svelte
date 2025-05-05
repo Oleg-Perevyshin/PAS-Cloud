@@ -133,6 +133,7 @@
           if (UserData?.UserID && DevGroupID && !moduleListFetched) {
             moduleListFetched = true /* Запрос на получение списка модулей в изделии выполнен */
             const { ModuleList } = state.lastResponse.VALUE as IReqModuleList
+            console.log(ModuleList)
 
             /* Запрашиваем данные по всем модулям из каталога */
             let isGotDevicesAPI = await getDevicesAPI(ModuleList)

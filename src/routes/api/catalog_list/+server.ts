@@ -6,21 +6,13 @@ import { ResponseManager } from '$lib/utils/ResponseManager'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
 import { FormatDate } from '$lib/utils/Common'
 
-/* Определяем интерфейс для устройства с массивом версий */
-interface CatalogDeviceWithVersions {
+/* Определяем интерфейс для устройства */
+interface CatalogDeviceShort {
+  Icon: string
   CatalogID: string
   CatalogName: string
+  LatestFW: string
   Brief: string
-  Icon: string
-  VerFW: string
-  Created: Date
-  Updated: Date
-  Versions?: {
-    VerFW: string
-    Description: string
-    Created: Date
-    Updated: Date
-  }[]
 }
 
 export const GET: RequestHandler = async (event) => {
@@ -79,7 +71,7 @@ export const GET: RequestHandler = async (event) => {
     const devices = (await prisma.catalogDevice.findMany({
       ...queryOptions,
       include: { Versions: true },
-    })) as CatalogDeviceWithVersions[]
+    })) as CatalogDeviceShort[]
     if (!devices) {
       return new Response(JSON.stringify(ResponseManager('ER_GET_CATALOG', lang)), { status: 500 })
     }

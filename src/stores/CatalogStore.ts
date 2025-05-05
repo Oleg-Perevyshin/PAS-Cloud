@@ -1,19 +1,20 @@
 // src/stores/CatalogStore.ts
 import { writable } from 'svelte/store'
-import type { ICatalogDevice } from './Interfaces'
+import type { ICatalogDevice, ICatalogAddEditDevice } from './Interfaces'
 
-const DefaultCatalog: ICatalogDevice = {
+const DefaultCatalog: ICatalogAddEditDevice = {
+  Icon: '',
   CatalogID: '0000',
   CatalogName: 'PAS-Device',
-  Brief: '',
-  Description: '',
-  Icon: '',
-  VerFW: '0.1',
-  MetaData: '',
+  DataLanguage: 'ru',
+  VerFW: '',
+  Brief: 'Введите краткое описание',
+  Description: 'Введите полное описание',
+
   Firmware: null,
   Manual: null,
   API: null,
-  APILang: 'ru',
+
   Created: '',
   Updated: '',
 }
@@ -23,7 +24,7 @@ const DefaultCatalogList: ICatalogDevice[] = []
 /**
  * Создание writable store
  */
-export const CatalogStore = writable<ICatalogDevice>(DefaultCatalog)
+export const CatalogStore = writable<ICatalogAddEditDevice>(DefaultCatalog)
 export const CatalogListStore = writable<ICatalogDevice[]>(DefaultCatalogList)
 
 /**
@@ -48,7 +49,7 @@ export const RemoveDeviceFromStore = (CatalogID: string) => {
 }
 
 /* Функция для добавления или обновления устройства в CatalogStore */
-export const CatalogUpsertDevice = (device: Partial<ICatalogDevice>) => {
+export const CatalogUpsertDevice = (device: Partial<ICatalogAddEditDevice>) => {
   CatalogListStore.update((currentDeviceList) => {
     const uniqueDeviceList = currentDeviceList.filter((d, index, self) => index === self.findIndex((t) => t.CatalogID === d.CatalogID))
     const existingIndex = uniqueDeviceList.findIndex((d) => d.CatalogID === device.CatalogID)
@@ -59,7 +60,7 @@ export const CatalogUpsertDevice = (device: Partial<ICatalogDevice>) => {
       return updatedDeviceList
     } else {
       /* Устройства нет - добавляем как новое */
-      const newDevice: ICatalogDevice = {
+      const newDevice: ICatalogAddEditDevice = {
         ...DefaultCatalog,
         ...device,
       }

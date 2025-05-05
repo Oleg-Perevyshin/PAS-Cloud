@@ -62,53 +62,46 @@ model News {
 
 // Таблица устройств в каталоге
 model CatalogDevice {
+  Icon              String                                        // Иконка
   CatalogID         String            @id @unique                 // Уникальный идентификатор устройства по каталогу
   CatalogName       String            @default("PAS-Module")      // Имя устройство по умолчанию
-  Brief             String                                        // Краткое описание устройтсва
-  Icon              String                                        // Иконка
-  VerFW             String                                        // Последняя версия прошивки
+  LatestFW          String                                        // Последняя версия прошивки на сервере
+
   Created           DateTime          @default(now())             // Дата создания устройства
   Updated           DateTime          @updatedAt                  // Дата обновления устройства
 
   Versions          CatalogVersion[]  @relation("DeviceVersions") // Связь с версиями прошивок
   Devices           Device[]
 
-  @@map("CatalogDevices")                                         // Имя таблицы в базе данных
+  @@map("CatalogItems")                                            // Имя таблицы в базе данных
 }
 
 // Таблица конкретной версии устройства из каталога (с описанием, прошивкой, руководством, API и мета данными)
 model CatalogVersion {
+  DeviceID          String            @id                         // Идентификатор устройства
   VerFW             String                                        // Версия прошивок
-  Description       String                                        // Подробное описание устройства
-  Firmware          Bytes                                         // Бинарные данные прошивки
-  Manual            Bytes                                         // Бинарные данные руководства пользователя
-  // API               Bytes                                         // Бинарные данные API (YAML файл с описание интерфейса)
-  MetaData          Json                                          // Мета данные прошивки (ID устройство, версия прошивки, CRC32 прошивки)
-  Created           DateTime          @default(now())             // Дата создания прошивки
-  Updated           DateTime          @updatedAt                  // Дата обновления прошивки
 
-  DeviceID          String                                        // Идентификатор устройства
-  CatalogDevice     CatalogDevice     @relation("DeviceVersions", fields: [DeviceID], references: [CatalogID])
-  ApiFiles          CatalogApiFile[]  @relation("VersionApiFiles")
-
-  @@id([DeviceID, VerFW])                                         // Уникальный составной ключ (версия + идентификатор устройства)
+  Localizations     VersionLocalization[]
+  CatalogDevice     CatalogDevice       @relation("DeviceVersions", fields: [DeviceID], references: [CatalogID])
+ 
+  @@unique([DeviceID, VerFW])                                     // Уникальный составной ключ (версия + идентификатор устройства)
   @@map("CatalogVersions")                                        // Имя таблицы в базе данных
 }
 
-// Таблица API-файлов для версий
-model CatalogApiFile {
-  id                String            @id @default(uuid())
-  Language          String            // Язык API (например 'ru', 'en')
-  Content           Bytes             // Содержимое YAML файла
-  Created           DateTime          @default(now())
-  Updated           DateTime          @updatedAt
+model VersionLocalization {
+  Language          String            @id                         // en, ru, etc
+  Brief             String                                        // Краткое описание устройства
+  Description       String                                        // Full description
+  Firmware          Bytes                                         // Бинарные данные прошивки
+  Manual            Bytes                                         // PDF manual
+  API               Bytes                                         // API specification
+  MetaData          Json                                          // Мета данные прошивки (ID устройство, версия прошивки, CRC32 прошивки)
 
-  VersionDeviceID   String
-  VersionVerFW      String
-  CatalogVersion    CatalogVersion    @relation("VersionApiFiles", fields: [VersionDeviceID, VersionVerFW], references: [DeviceID, VerFW])
+  VersionID         String
+  Version           CatalogVersion @relation(fields: [VersionID], references: [DeviceID])
 
-  @@unique([VersionDeviceID, VersionVerFW, Language])
-  @@map("CatalogApiFiles")
+  @@unique([VersionID, Language])
+  @@map("VersionLocalizations")
 }
 
 // Таблица реальных (физических) устройств

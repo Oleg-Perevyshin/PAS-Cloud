@@ -4,15 +4,13 @@
   import { t, LOCALES } from '$lib/locales/i18n'
   import { OPTION_DEVID, OPTION_DEV_CATEGORY } from '../../../enums'
   import { LoaderStore, CatalogStore, CatalogUpsertDevice, RemoveDeviceFromStore } from '../../../stores'
-  import type { ICatalogDevice, IOptionUI } from '../../../stores/Interfaces'
+  import type { ICatalogAddEditDevice, IOptionUI } from '../../../stores/Interfaces'
   import { API_CatalogDevice, API_CatalogDeleteDevice } from '$lib/utils/API'
   import ConfirmDelete from '../UI/ConfirmDelete.svelte'
   import Select from '../UI/Select.svelte'
   import Input from '../UI/Input.svelte'
   import TextArea from '../UI/TextArea.svelte'
   import Button from '../UI/Button.svelte'
-  import UISelect from '$lib/UILibrary/Select.svelte'
-  import type { IOption } from '$lib/UILibrary/Interface'
 
   onMount(() => {
     const subscriptions = {
@@ -25,16 +23,16 @@
   })
 
   interface Props {
-    currentDevice?: ICatalogDevice | null
+    currentDevice?: ICatalogAddEditDevice | null
     currentLang: string
     currentTheme: string
     isEditing: boolean
 
     onCancel: () => void
-    onSave: (device: ICatalogDevice) => void
+    onSave: (device: ICatalogAddEditDevice) => void
   }
   let { currentDevice, currentLang, currentTheme, isEditing, onCancel, onSave }: Props = $props()
-  let currentAPILanguage: IOption = $state({ id: 'ru', value: 'ru', name: 'ru' })
+  let currentAPILanguage: IOptionUI | null = $state({ id: 'ru', value: 'ru', name: 'Русский' })
 
   /* Реактивные переменные для полей */
   let SelectedVerFWs: IOptionUI | null = $state(null)
@@ -55,30 +53,21 @@
   const handleAddDevice = () => {
     $CatalogStore.CatalogID = `${DevCategory.id}${DevType.id}${DevModel.id}${DevRevision.id}`
 
-    const fieldsToCheck: { key: keyof ICatalogDevice; id: string }[] = [
+    const fieldsToCheck: { key: keyof ICatalogAddEditDevice; id: string }[] = [
+      { key: 'Icon', id: 'newIcon' },
       { key: 'CatalogName', id: 'CatalogName' },
+      { key: 'DataLanguage', id: 'DataLanguage' },
+      { key: 'VerFW', id: 'VerFW' },
       { key: 'Brief', id: 'Brief' },
       { key: 'Description', id: 'Description' },
-      { key: 'Icon', id: 'newIcon' },
       { key: 'Firmware', id: 'Firmware' },
       { key: 'Manual', id: 'Manual' },
       { key: 'API', id: 'API' },
-      { key: 'APILang', id: 'APILang' },
     ]
-
-    if (isEditing) {
-      const selectedVersion = SelectedVerFWs?.name
-      if (selectedVersion !== '+') {
-        fieldsToCheck.push({ key: 'Versions', id: 'Versions' })
-      } else {
-        fieldsToCheck.push({ key: 'VerFW', id: 'VerFW' }) // Добавляем новое поле для новой версии
-      }
-    } else {
-      fieldsToCheck.push({ key: 'VerFW', id: 'VerFW' }) // Если новое устройство, добавляем новое поле версии
-    }
 
     const isValid = fieldsToCheck.every(({ key, id }) => {
       const value = $CatalogStore[key]
+      console.log(key, value)
       const element = document.getElementById(id)
 
       if (!element) {
@@ -288,7 +277,7 @@
 
           <!-- CatalogName, VerFW -->
           <div class="grid grid-cols-4 items-start gap-2">
-            <div class="col-span-3 flex flex-col">
+            <div class="col-span-2 flex">
               <Input
                 id="CatalogName"
                 props={{ autocomplete: 'on', maxLength: 16 }}
@@ -300,21 +289,43 @@
             </div>
             <div class="col-span-1 flex flex-col items-center">
               <Select
-                id="Versions"
-                label={t('service.catalog.verfw', currentLang)}
+                id="DataLanguage"
+                label={t('service.constructor.api_lang', currentLang)}
                 props={currentTheme === 'light' ? { bgColor: '!bg-blue-200', currentLang: currentLang } : { bgColor: '!bg-blue-800', currentLang: currentLang }}
-                options={[
-                  ...($CatalogStore.Versions?.map((version) => ({
-                    id: version.VerFW || '',
-                    name: version.VerFW || '',
-                    color: '',
-                  })) || []),
-                  { id: 'CreatingNewVersion', name: '+', color: '' },
-                ]}
-                value={SelectedVerFWs}
-                onUpdate={(value) => handleVerFWChange(value)}
+                options={LOCALES.map((locale) => ({
+                  id: locale.id,
+                  value: locale.id,
+                  name: locale.name,
+                }))}
+                value={currentAPILanguage}
+                onUpdate={(value) => {
+                  currentAPILanguage = value
+                  $CatalogStore.DataLanguage = value?.value as string
+                }}
                 className="w-full"
               />
+            </div>
+            <div class="col-span-1 flex flex-col items-center">
+              {#if !showNewVersionInput}
+                <Select
+                  id="VerFW"
+                  label={t('service.catalog.verfw', currentLang)}
+                  props={currentTheme === 'light'
+                    ? { bgColor: '!bg-blue-200', currentLang: currentLang }
+                    : { bgColor: '!bg-blue-800', currentLang: currentLang }}
+                  options={[
+                    ...($CatalogStore.Versions?.map((version) => ({
+                      id: version.VerFW || '',
+                      name: version.VerFW || '',
+                      color: '',
+                    })) || []),
+                    { id: 'CreatingNewVersion', name: '+', color: '' },
+                  ]}
+                  value={SelectedVerFWs}
+                  onUpdate={(value) => handleVerFWChange(value)}
+                  className="w-full"
+                />
+              {/if}
 
               {#if showNewVersionInput}
                 <Input
@@ -374,11 +385,10 @@
         />
 
         <!-- Прикрепление файла прошивки и руководства пользователя -->
-        <div class="m-4 grid grid-cols-3 gap-2">
+        <div class="m-4 grid grid-cols-2 gap-2">
           <div class="flex items-center">
             <label for="Firmware" class="font-semibold">{t('service.catalog.append_core', currentLang)}</label>
           </div>
-          <div></div>
           <div class="flex items-center">
             <input
               id="Firmware"
@@ -392,7 +402,6 @@
           <div class="flex items-center">
             <label for="Manual" class="font-semibold">{t('service.catalog.append_manual', currentLang)}</label>
           </div>
-          <div></div>
           <div class="flex items-center">
             <input
               id="Manual"
@@ -405,23 +414,6 @@
 
           <div class="flex items-center">
             <label for="API" class="font-semibold">{t('service.catalog.append_api', currentLang)}</label>
-          </div>
-          <div>
-            <UISelect
-              id="APILang"
-              label={t('service.constructor.api_lang', currentLang)}
-              options={LOCALES.map((locale, index) => ({
-                id: index + 1,
-                value: locale.id,
-                name: locale.id,
-              }))}
-              value={currentAPILanguage}
-              styleCSS="width: 6rem;"
-              onUpdate={(value) => {
-                currentAPILanguage = value
-                $CatalogStore.APILang = value.value as string
-              }}
-            />
           </div>
           <div class="flex items-center">
             <input
