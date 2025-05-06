@@ -70,7 +70,7 @@
         throw new Error('Неверные входные данные')
       }
       const dynamicKeys: string[] = []
-      const responseData = await API_CatalogDevice(deviceID.toUpperCase(), currentAPIVersion, currentAPILanguage.id as string)
+      const responseData = await API_CatalogDevice(deviceID.toUpperCase(), currentAPIVersion)
       if (!responseData?.catalog) {
         return null
       }

@@ -39,7 +39,7 @@
   const getCatalogDevice = async (VerFW: string) => {
     LoaderStore.set(true)
     try {
-      const responseData = await API_CatalogDevice(CatalogID, VerFW, currentLang)
+      const responseData = await API_CatalogDevice(CatalogID, VerFW)
       if (!responseData?.catalog) {
         throw new Error('Invalid Response Data')
       }

@@ -11,8 +11,8 @@ interface CandidateDevice {
   Icon: string
   CatalogID: string
   CatalogName: string
-  DataLanguage: string
-  VerFW: string
+  Language: string
+  CurrentFW: string
   Brief: string
   Description: string
   Firmware: FormDataEntryValue | null
@@ -39,8 +39,8 @@ export const POST: RequestHandler = async (event) => {
       Icon: formData.get('Icon') as string,
       CatalogID: formData.get('CatalogID') as string,
       CatalogName: formData.get('CatalogName') as string,
-      DataLanguage: formData.get('DataLanguage') as string,
-      VerFW: formData.get('VerFW') as string,
+      Language: formData.get('Language') as string,
+      CurrentFW: formData.get('CurrentFW') as string,
       Brief: formData.get('Brief') as string,
       Description: formData.get('Description') as string,
       Firmware: formData.get('Firmware'),
@@ -53,8 +53,8 @@ export const POST: RequestHandler = async (event) => {
       'Icon',
       'CatalogID',
       'CatalogName',
-      'DataLanguage',
-      'VerFW',
+      'Language',
+      'CurrentFW',
       'Brief',
       'Description',
       'Firmware',
@@ -80,122 +80,110 @@ export const POST: RequestHandler = async (event) => {
     /* Создаем метаданные */
     const metaData = {
       CatalogID: candidate_device.CatalogID,
-      VerFW: candidate_device.VerFW,
+      CurrentFW: candidate_device.CurrentFW,
       CRC32: crc32(firmwareBytes),
     }
 
-    /* Убедимся, что устройство существует */
-    const device = await prisma.catalogDevice.upsert({
-      where: { CatalogID: candidate_device.CatalogID },
-      create: {
-        CatalogID: candidate_device.CatalogID,
-        CatalogName: candidate_device.CatalogName,
-        Icon: candidate_device.Icon,
-        LatestFW: candidate_device.VerFW,
-      },
-      update: {
-        CatalogName: candidate_device.CatalogName,
-        Icon: candidate_device.Icon,
-      },
-    })
+    const result = await prisma.$transaction(async (prisma) => {
+      /* Создаем/обновляем устройство */
+      const device = await prisma.catalogDevice.upsert({
+        where: { CatalogID: candidate_device.CatalogID },
+        create: {
+          CatalogID: candidate_device.CatalogID,
+          CatalogName: candidate_device.CatalogName,
+          Icon: candidate_device.Icon,
+          LatestFW: candidate_device.CurrentFW,
+        },
+        update: {
+          CatalogName: candidate_device.CatalogName,
+          Icon: candidate_device.Icon,
+        },
+      })
 
-    /* Найдем или создадим версию */
-    const version = await prisma.catalogVersion.upsert({
-      where: {
-        DeviceID_VerFW: {
+      /* Создаем/обновляем версию */
+      const version = await prisma.catalogVersion.upsert({
+        where: {
+          DeviceID_VerFW: {
+            DeviceID: device.CatalogID,
+            VerFW: candidate_device.CurrentFW,
+          },
+        },
+        create: {
           DeviceID: device.CatalogID,
-          VerFW: candidate_device.VerFW,
+          VerFW: candidate_device.CurrentFW,
         },
-      },
-      create: {
-        DeviceID: device.CatalogID,
-        VerFW: candidate_device.VerFW,
-      },
-      update: {},
-    })
+        update: {},
+      })
 
-    /* Обновим или создадим локализацию */
-    const versionDevice = await prisma.catalogVersion.update({
-      where: {
-        DeviceID_VerFW: {
-          DeviceID: device.CatalogID,
-          VerFW: candidate_device.VerFW,
-        },
-      },
-      data: {
-        Localizations: {
-          upsert: {
-            where: {
-              VersionID_Language: {
-                VersionID: version.DeviceID,
-                Language: candidate_device.DataLanguage,
-              },
-            },
-            create: {
-              Language: candidate_device.DataLanguage,
-              Brief: candidate_device.Brief,
-              Description: candidate_device.Description,
-              Firmware: firmwareBytes,
-              Manual: manualBytes,
-              API: apiBytes,
-              MetaData: metaData,
-            },
-            update: {
-              Brief: candidate_device.Brief,
-              Description: candidate_device.Description,
-              Firmware: firmwareBytes,
-              Manual: manualBytes,
-              API: apiBytes,
-              MetaData: metaData,
-            },
+      /* Обновляем/создаем локализацию */
+      await prisma.versionLocalization.upsert({
+        where: {
+          VersionLanguageUnique: {
+            VersionID: version.id,
+            Language: candidate_device.Language,
           },
         },
-      },
-      include: {
-        Localizations: {
-          where: {
-            Language: candidate_device.DataLanguage,
-          },
+        create: {
+          VersionID: version.id,
+          Language: candidate_device.Language,
+          Brief: candidate_device.Brief,
+          Description: candidate_device.Description,
+          Firmware: firmwareBytes,
+          Manual: manualBytes,
+          API: apiBytes,
+          MetaData: metaData,
         },
-      },
-    })
+        update: {
+          Brief: candidate_device.Brief,
+          Description: candidate_device.Description,
+          Firmware: firmwareBytes,
+          Manual: manualBytes,
+          API: apiBytes,
+          MetaData: metaData,
+        },
+      })
 
-    /* Обновим LatestFW если версия новее */
-    const finalDevice = await prisma.catalogDevice.update({
-      where: { CatalogID: device.CatalogID },
-      data: {
-        LatestFW: candidate_device.VerFW > device.LatestFW ? candidate_device.VerFW : device.LatestFW,
-      },
-      include: {
-        Versions: {
-          include: {
-            Localizations: true,
+      /* Обновляем LatestFW если версия новее */
+      if (candidate_device.CurrentFW > device.LatestFW) {
+        await prisma.catalogDevice.update({
+          where: { CatalogID: device.CatalogID },
+          data: { LatestFW: candidate_device.CurrentFW },
+        })
+      }
+
+      /* Получаем обновленные данные для ответа */
+      return await prisma.catalogDevice.findUnique({
+        where: { CatalogID: device.CatalogID },
+        include: {
+          Versions: {
+            include: {
+              Localizations: true,
+            },
+            orderBy: {
+              VerFW: 'desc',
+            },
           },
         },
-      },
+      })
     })
 
     /* Формируем ответ */
-    const currentVersion = finalDevice.Versions.find((v) => v.VerFW === finalDevice.LatestFW)
-    const currentLocalization = currentVersion?.Localizations.find((l) => l.Language === candidate_device.DataLanguage)
+    const currentVersion = result?.Versions[0]
+    const currentLocalization = currentVersion?.Localizations.find((l) => l.Language === candidate_device.Language)
     const responseData = {
       catalog: {
-        Icon: finalDevice.Icon,
-        CatalogID: finalDevice.CatalogID,
-        CatalogName: finalDevice.CatalogName,
-        VerFW: finalDevice.LatestFW,
-
+        Icon: result?.Icon,
+        CatalogID: result?.CatalogID,
+        CatalogName: result?.CatalogName,
+        CurrentFW: result?.LatestFW,
         Language: currentLocalization?.Language,
         Brief: currentLocalization?.Brief,
         Description: currentLocalization?.Description,
-
-        Versions: finalDevice.Versions.map((v) => v.VerFW).sort((a, b) => parseFloat(b) - parseFloat(a)),
-
-        Created: FormatDate(finalDevice.Created.toISOString()),
-        Updated: FormatDate(finalDevice.Updated.toISOString()),
+        Versions: result?.Versions.map((v) => v.VerFW),
+        Created: FormatDate(result?.Created.toISOString()),
+        Updated: FormatDate(result?.Updated.toISOString()),
       },
     }
-
     return new Response(JSON.stringify(ResponseManager('OK_EDIT_DEVICE', lang, responseData)), { status: 201 })
   } catch (error) {
     console.error('Ошибка catalog_edit', error)

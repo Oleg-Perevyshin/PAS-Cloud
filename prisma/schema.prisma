@@ -1,7 +1,7 @@
 // prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/@prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -64,14 +64,14 @@ model News {
 // Таблица устройств в каталоге
 model CatalogDevice {
   Icon              String                                        // Иконка
-  CatalogID         String            @id @unique                 // Уникальный идентификатор устройства по каталогу
-  CatalogName       String            @default("PAS-Module")      // Имя устройство по умолчанию
+  CatalogID         String            @id @unique @db.VarChar(4)  // Уникальный идентификатор устройства по каталогу
+  CatalogName       String            @default("PAS-Module") @db.VarChar(16)  // Имя устройство по умолчанию
   LatestFW          String                                        // Последняя версия прошивки на сервере
 
   Created           DateTime          @default(now())             // Дата создания устройства
   Updated           DateTime          @updatedAt                  // Дата обновления устройства
 
-  Versions          CatalogVersion[]  @relation("DeviceVersions") // Связь с версиями прошивок
+  Versions          CatalogVersion[]                              // Связь с версиями прошивок
   Devices           Device[]
 
   @@map("CatalogItems")                                            // Имя таблицы в базе данных
@@ -79,18 +79,20 @@ model CatalogDevice {
 
 // Таблица конкретной версии устройства из каталога (с описанием, прошивкой, руководством, API и мета данными)
 model CatalogVersion {
-  DeviceID          String            @id                         // Идентификатор устройства
+  id                String            @id @default(cuid())
+  DeviceID          String            @db.VarChar(4)              // Связь с устройством из каталога
   VerFW             String                                        // Версия прошивок
 
   Localizations     VersionLocalization[]
-  CatalogDevice     CatalogDevice       @relation("DeviceVersions", fields: [DeviceID], references: [CatalogID])
+  Device            CatalogDevice     @relation(fields: [DeviceID], references: [CatalogID])
  
   @@unique([DeviceID, VerFW])                                     // Уникальный составной ключ (версия + идентификатор устройства)
   @@map("CatalogVersions")                                        // Имя таблицы в базе данных
 }
 
 model VersionLocalization {
-  Language          String            @id                         // en, ru, etc
+  id                String            @id @default(cuid())
+  Language          String                                        // en, ru, etc
   Brief             String                                        // Краткое описание устройства
   Description       String                                        // Full description
   Firmware          Bytes                                         // Бинарные данные прошивки
@@ -99,9 +101,9 @@ model VersionLocalization {
   MetaData          Json                                          // Мета данные прошивки (ID устройство, версия прошивки, CRC32 прошивки)
 
   VersionID         String
-  Version           CatalogVersion @relation(fields: [VersionID], references: [DeviceID])
+  Version           CatalogVersion    @relation(fields: [VersionID], references: [id])
 
-  @@unique([VersionID, Language])
+  @@unique([VersionID, Language], name: "VersionLanguageUnique")
   @@map("VersionLocalizations")
 }
 

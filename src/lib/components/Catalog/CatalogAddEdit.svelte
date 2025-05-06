@@ -4,13 +4,14 @@
   import { t, LOCALES } from '$lib/locales/i18n'
   import { OPTION_DEVID, OPTION_DEV_CATEGORY } from '../../../enums'
   import { LoaderStore, CatalogStore, CatalogUpsertDevice, RemoveDeviceFromStore } from '../../../stores'
-  import type { ICatalogAddEditDevice, IOptionUI } from '../../../stores/Interfaces'
+  import type { ICatalogDevice, IOptionUI } from '../../../stores/Interfaces'
   import { API_CatalogDevice, API_CatalogDeleteDevice } from '$lib/utils/API'
   import ConfirmDelete from '../UI/ConfirmDelete.svelte'
   import Select from '../UI/Select.svelte'
   import Input from '../UI/Input.svelte'
   import TextArea from '../UI/TextArea.svelte'
   import Button from '../UI/Button.svelte'
+  import { get } from 'svelte/store'
 
   onMount(() => {
     const subscriptions = {
@@ -23,13 +24,13 @@
   })
 
   interface Props {
-    currentDevice?: ICatalogAddEditDevice | null
+    currentDevice?: ICatalogDevice | null
     currentLang: string
     currentTheme: string
     isEditing: boolean
 
     onCancel: () => void
-    onSave: (device: ICatalogAddEditDevice) => void
+    onSave: (device: ICatalogDevice) => void
   }
   let { currentDevice, currentLang, currentTheme, isEditing, onCancel, onSave }: Props = $props()
   let currentAPILanguage: IOptionUI | null = $state({ id: 'ru', value: 'ru', name: 'Русский' })
@@ -45,7 +46,7 @@
 
   /* Установка версии прошивки на основе currentDevice.VerFW */
   if (currentDevice?.Versions && currentDevice.Versions.length > 0) {
-    const matchedVersion = currentDevice.Versions.find((version) => version.VerFW === currentDevice?.VerFW)
+    const matchedVersion = currentDevice.Versions.find((version) => version.VerFW === currentDevice?.LatestFW)
     SelectedVerFWs = matchedVersion ? { id: matchedVersion.VerFW || '', name: matchedVersion.VerFW || 'Unknown Version', color: '' } : null
   }
 
@@ -53,11 +54,11 @@
   const handleAddDevice = () => {
     $CatalogStore.CatalogID = `${DevCategory.id}${DevType.id}${DevModel.id}${DevRevision.id}`
 
-    const fieldsToCheck: { key: keyof ICatalogAddEditDevice; id: string }[] = [
+    const fieldsToCheck: { key: keyof ICatalogDevice; id: string }[] = [
       { key: 'Icon', id: 'newIcon' },
       { key: 'CatalogName', id: 'CatalogName' },
-      { key: 'DataLanguage', id: 'DataLanguage' },
-      { key: 'VerFW', id: 'VerFW' },
+      { key: 'Language', id: 'Language' },
+      { key: 'CurrentFW', id: 'CurrentFW' },
       { key: 'Brief', id: 'Brief' },
       { key: 'Description', id: 'Description' },
       { key: 'Firmware', id: 'Firmware' },
@@ -67,7 +68,6 @@
 
     const isValid = fieldsToCheck.every(({ key, id }) => {
       const value = $CatalogStore[key]
-      console.log(key, value)
       const element = document.getElementById(id)
 
       if (!element) {
@@ -97,7 +97,7 @@
     }
     LoaderStore.set(true)
     try {
-      const responseData = await API_CatalogDevice(currentDevice.CatalogID, VerFW, currentLang)
+      const responseData = await API_CatalogDevice(currentDevice.CatalogID, VerFW)
       if (!responseData?.catalog) {
         throw new Error('Invalid Response Data')
       }
@@ -134,15 +134,15 @@
   const handleManualFileChange = (e: Event) => handleFileChange(e, 'Manual')
   const handleAPIFileChange = (e: Event) => handleFileChange(e, 'API')
 
-  /* Метод для валидации значения VerFW */
+  /* Метод для валидации значения CurrentFW */
   function validateVerFW(value: string) {
     let cleanedValue = value.replace(/[^0-9.]/g, '')
     const parts = cleanedValue.split('.')
     if (parts.length > 2) {
       cleanedValue = parts[0] + '.' + parts.slice(1).join('')
     }
-    if (cleanedValue !== $CatalogStore.VerFW) {
-      $CatalogStore.VerFW = cleanedValue
+    if (cleanedValue !== $CatalogStore.CurrentFW) {
+      $CatalogStore.CurrentFW = cleanedValue
     }
   }
 
@@ -160,14 +160,20 @@
   const handleDeleteVersion = () => {
     showModalDelete = true
   }
-  const confirmDeleteDevice = async () => {
-    if (currentDevice?.CatalogID === undefined) return console.error('Ошибка confirmDeleteDevice - currentDevice.CatalogID не существует')
+  const confirmDeleteVersion = async () => {
+    if (currentDevice?.CatalogID === undefined) return console.error('Ошибка confirmDeleteVersion - currentDevice.CatalogID не существует')
     try {
       const responseData = await API_CatalogDeleteDevice(currentDevice.CatalogID, SelectedVerFWs?.name || '')
+      console.log('Ответ сервера:', responseData)
       if (responseData?.status.code == 200) {
-        RemoveDeviceFromStore(currentDevice.CatalogID)
+        RemoveDeviceFromStore(responseData.catalog.CatalogID)
+
+        if (responseData.catalog.Versions?.length !== 0) {
+          CatalogUpsertDevice(responseData.catalog)
+        }
       }
       showModalDelete = false
+      onCancel()
     } catch (error) {
       console.error('Ошибка при удалении устройства:', error)
     }
@@ -289,7 +295,7 @@
             </div>
             <div class="col-span-1 flex flex-col items-center">
               <Select
-                id="DataLanguage"
+                id="Language"
                 label={t('service.constructor.api_lang', currentLang)}
                 props={currentTheme === 'light' ? { bgColor: '!bg-blue-200', currentLang: currentLang } : { bgColor: '!bg-blue-800', currentLang: currentLang }}
                 options={LOCALES.map((locale) => ({
@@ -300,15 +306,15 @@
                 value={currentAPILanguage}
                 onUpdate={(value) => {
                   currentAPILanguage = value
-                  $CatalogStore.DataLanguage = value?.value as string
+                  $CatalogStore.Language = value?.value as string
                 }}
                 className="w-full"
               />
             </div>
             <div class="col-span-1 flex flex-col items-center">
-              {#if !showNewVersionInput}
+              {#if !showNewVersionInput && isEditing}
                 <Select
-                  id="VerFW"
+                  id="CurrentFW"
                   label={t('service.catalog.verfw', currentLang)}
                   props={currentTheme === 'light'
                     ? { bgColor: '!bg-blue-200', currentLang: currentLang }
@@ -327,14 +333,14 @@
                 />
               {/if}
 
-              {#if showNewVersionInput}
+              {#if showNewVersionInput || !isEditing}
                 <Input
-                  id="VerFW"
+                  id="CurrentFW"
                   props={{ autocomplete: 'off', maxLength: 7 }}
                   allowOnly={/[^0-9.]/g}
                   label={t('service.catalog.verfw', currentLang)}
                   className="w-full"
-                  bind:value={$CatalogStore.VerFW}
+                  bind:value={$CatalogStore.CurrentFW}
                   onUpdate={validateVerFW}
                 />
               {/if}
@@ -452,7 +458,7 @@
     show={showModalDelete}
     item={currentDevice?.CatalogID}
     {currentLang}
-    onConfirm={confirmDeleteDevice}
+    onConfirm={confirmDeleteVersion}
     onCancel={() => (showModalDelete = false)}
   />
 {/if}

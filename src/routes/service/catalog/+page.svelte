@@ -5,9 +5,9 @@
   import { t, Language } from '$lib/locales/i18n'
   import { SmartRequest } from '$lib/utils/SmartRequest'
   import { ThemeStore, addMessage } from '../../../stores'
-  import { API_CatalogUpdateDevice, API_CatalogDeleteDevice } from '$lib/utils/API'
+  import { API_CatalogUpdateDevice, API_CatalogDeleteDevice, API_CatalogDevice } from '$lib/utils/API'
 
-  import type { ICatalogDevice, IUser } from '../../../stores/Interfaces'
+  import type { ICatalogDevice, IOptionUI, IUser } from '../../../stores/Interfaces'
   import {
     CatalogStore,
     CatalogListStore,
@@ -23,6 +23,7 @@
   import Button from '$lib/components/UI/Button.svelte'
   import Input from '$lib/components/UI/Input.svelte'
   import CatalogAddEdit from '$lib/components/Catalog/CatalogAddEdit.svelte'
+  import Select from '$lib/components/UI/Select.svelte'
 
   let showEditorModal = $state(false)
   let isEditing = $state(false)
@@ -66,16 +67,21 @@
   const createDevice = () => {
     CatalogDeviceDefault()
     currentDevice = {
+      Icon: '',
       CatalogID: '0000',
       CatalogName: 'PAS-Device',
+      LatestFW: '0.1',
+      CurrentFW: '',
+      Versions: [],
+      Language: 'ru',
       Brief: '',
       Description: '',
-      Icon: '',
-      VerFW: '0.1',
-      MetaData: '',
+
       Firmware: null,
       Manual: null,
       API: null,
+      MetaData: '',
+
       Created: '',
       Updated: '',
     }
@@ -84,6 +90,8 @@
   }
   const cancelDevice = () => {
     CatalogDeviceDefault()
+    cursor = null
+    getDeviceList()
     isEditing = false
     showEditorModal = false
   }
@@ -355,7 +363,7 @@
               {device.CatalogName}
             </div>
             <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
-              <p>{device.VerFW}</p>
+              <p>{device.LatestFW}</p>
             </div>
             <div class="flex h-full flex-shrink-0 flex-col items-center justify-center border-r border-gray-400 p-2">
               <Button

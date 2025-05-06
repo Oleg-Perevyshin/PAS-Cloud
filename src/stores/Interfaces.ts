@@ -107,48 +107,25 @@ export interface IUserDevice {
 
 
 /* КАТАЛОГ: Интерфейс устройства из каталога */
-export interface ICatalogAddEditDevice {
-  Icon: string                            // Иконка
-  CatalogID: string                       // Уникальный идентификатор изделия / модуля
-  CatalogName: string                     // Имя изделия / модуля (имя по умолчанию из каталога)
-  DataLanguage: string                    // Язык интерфейса
-  VerFW: string                        
-  Brief: string
-  Description: string
-  Firmware: File | null                   // Прошивки
-  Manual: File | null                     // Руководство пользователя
-  API: File | null                        // API
-  Created?: string                        // Дата создания устройство
-  Updated?: string                        // Дата изменения устройство
-}
-
 export interface ICatalogDevice {
   Icon: string                            // Иконка
   CatalogID: string                       // Уникальный идентификатор изделия / модуля
   CatalogName: string                     // Имя изделия / модуля (имя по умолчанию из каталога)
-  DataLanguage: string                    // Язык интерфейса
-  LatestFW: string                        // Последняя версия прошивки на сервере
-
+  LatestFW?: string                       // Последняя версия прошивки на сервере
+  CurrentFW?: string                      // Выбранная версия
   Versions?: {                            // Все существующие версии прошивок на сервере
-    DeviceID?: string                     // Идентификатор устройства 
-    VerFW?: string                        // Версия прошивки
-    Localizations?: VersionLocalization[]
+    VerFW: string                         // Версия прошивки
   }[]
-  
+  Language?: string                       // Код языка ('ru', 'en' и т.д.)
+  Brief?: string
+  Description?: string
+  Firmware?: File | null                  // Прошивки
+  Manual?: File | null                    // Руководство пользователя
+  API?: File | null  
+  MetaData?: string                       // Мета данные о прошивке
   Created?: string                        // Дата создания устройство
   Updated?: string                        // Дата изменения устройство
 }
-
-export interface VersionLocalization {
-  Language: string                        // Код языка ('ru', 'en' и т.д.)
-  Brief: string                           // Краткое описание
-  Description: string                     // Подробное описание текущего устройства (с учетом версии прошивки)
-  Firmware: File | null                   // Прошивки
-  Manual: File | null                     // Руководство пользователя
-  API: File | null                        // API
-  MetaData?: string                       // Мета данные о прошивке
-}
-
 
 /* НОВОСТИ: Интерфейс новости */
 export interface INews {

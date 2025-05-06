@@ -1,19 +1,10 @@
 // src/routes/api/catalog_list/+server.ts
 import type { RequestHandler } from '@sveltejs/kit'
 import { prisma } from '../../../../prisma/Prisma'
-import type { Prisma } from '../../../../prisma/client'
+import type { Prisma } from '@prisma/client'
 import { ResponseManager } from '$lib/utils/ResponseManager'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
 import { FormatDate } from '$lib/utils/Common'
-
-/* Определяем интерфейс для устройства */
-interface CatalogDeviceShort {
-  Icon: string
-  CatalogID: string
-  CatalogName: string
-  LatestFW: string
-  Brief: string
-}
 
 export const GET: RequestHandler = async (event) => {
   /* Получаем язык, проверяем токены запросившего пользователя и активацию аккаунте */
@@ -29,25 +20,35 @@ export const GET: RequestHandler = async (event) => {
       return new Response(JSON.stringify(ResponseManager('ER_USER_FORBIDDEN', lang)), { status: 403 })
     }
 
-    /* Формируем пакеты с устройствами с учетом пагинации */
+    /* Формируем параметры запроса */
     const quantity = Math.max(Number(event.url.searchParams.get('quantity')) || 10, 1)
     const startCursor = event.url.searchParams.get('startCursor')
     const endCursor = event.url.searchParams.get('endCursor')
     const cursorDevID = event.url.searchParams.get('cursor')
     const actualCursorID = cursorDevID === 'null' ? null : cursorDevID
+    const language = lang || 'ru'
 
-    /* Определяем тип для queryOptions */
+    /* Формируем условия запроса */
     const whereConditions: Prisma.CatalogDeviceWhereInput = {}
     const queryOptions: Prisma.CatalogDeviceFindManyArgs = {
       take: quantity,
       where: whereConditions,
       orderBy: { CatalogID: 'asc' },
-      include: { Versions: true },
+      include: {
+        Versions: {
+          orderBy: { VerFW: 'desc' }, // Сортируем версии по убыванию
+          include: {
+            Localizations: {
+              where: { Language: language },
+              take: 1,
+            },
+          },
+        },
+      },
     }
 
-    /* Если передан диапазон, добавляем условия для фильтрации */
+    /* Фильтрация по диапазону CatalogID */
     const devIDFilter: Prisma.StringFilter = {}
-
     if (startCursor) {
       devIDFilter.gte = startCursor
     }
@@ -57,61 +58,61 @@ export const GET: RequestHandler = async (event) => {
     if (Object.keys(devIDFilter).length > 0) {
       whereConditions.CatalogID = devIDFilter
     }
-    if (Object.keys(whereConditions).length > 0) {
-      queryOptions.where = whereConditions
-    }
 
-    /* Если курсор установлен, пропускаем текущее устройство */
+    /* Курсор для пагинации */
     if (actualCursorID) {
       queryOptions.cursor = { CatalogID: actualCursorID }
       queryOptions.skip = 1
     }
 
-    /* Читаем данные из базы данных согласно опций queryOptions */
-    const devices = (await prisma.catalogDevice.findMany({
-      ...queryOptions,
-      include: { Versions: true },
-    })) as CatalogDeviceShort[]
-    if (!devices) {
-      return new Response(JSON.stringify(ResponseManager('ER_GET_CATALOG', lang)), { status: 500 })
-    }
+    /* Получаем устройства из базы данных */
+    const devices = await prisma.catalogDevice.findMany(queryOptions)
 
-    /* Обрабатываем каждое устройство и находим последнюю версию прошивки */
-    const formattedDevices = await Promise.all(
-      devices.map(async (device) => {
-        /* Получаем все версии для данного устройства */
-        const versions = device.Versions || []
-
-        /* Находим последнюю версию */
-        const latestVersion = versions.reduce((latest, current) => {
-          const num1 = parseFloat(current.VerFW)
-          const num2 = parseFloat(latest)
-          return num1 > num2 ? current.VerFW : latest
-        }, '0.0')
+    /* Форматируем данные */
+    const formattedDevices = devices.map((device) => {
+      // Для каждой версии находим подходящую локализацию
+      const versionsWithLocalizations = device.Versions.map((version) => {
+        const localization = version.Localizations[0] || {
+          Brief: '',
+          Description: '',
+          Language: '',
+        }
 
         return {
-          CatalogID: device.CatalogID,
-          CatalogName: device.CatalogName,
-          Brief: device.Brief,
-          Description: versions.find((version) => version.VerFW === latestVersion)?.Description || '',
-          Icon: device.Icon,
-          VerFW: latestVersion,
-          Versions:
-            versions.map((version) => ({
-              VerFW: version.VerFW,
-              Description: version.Description,
-              Created: FormatDate(version.Created.toISOString()),
-              Updated: FormatDate(version.Updated.toISOString()),
-            })) || [],
-          Created: FormatDate(device.Created.toISOString()),
-          Updated: FormatDate(device.Updated.toISOString()),
+          VerFW: version.VerFW,
+          Brief: localization.Brief,
+          Description: localization.Description,
+          Language: localization.Language,
         }
-      }),
-    )
+      })
 
-    /* Определяем курсор и формируем ответ */
+      // Находим локализацию для последней версии (первой в отсортированном списке)
+      const latestVersionLocalization = device.Versions[0]?.Localizations[0] || {
+        Brief: '',
+        Description: '',
+        Language: '',
+      }
+
+      return {
+        Icon: device.Icon,
+        CatalogID: device.CatalogID,
+        CatalogName: device.CatalogName,
+        LatestFW: device.LatestFW,
+        Brief: latestVersionLocalization.Brief,
+        Description: latestVersionLocalization.Description,
+        Versions: versionsWithLocalizations, // Все версии с локализациями
+        Created: FormatDate(device.Created.toISOString()),
+        Updated: FormatDate(device.Updated.toISOString()),
+      }
+    })
+
+    /* Формируем ответ */
     const newCursor = formattedDevices.length > 0 ? formattedDevices[formattedDevices.length - 1].CatalogID : null
-    const responseData = { catalog_list: formattedDevices, cursor: newCursor }
+    const responseData = {
+      catalog_list: formattedDevices,
+      cursor: newCursor,
+    }
+
     return new Response(JSON.stringify(ResponseManager('OK_GET_CATALOG', lang, responseData)), { status: 200 })
   } catch (error) {
     console.error('Ошибка catalog_list', error)

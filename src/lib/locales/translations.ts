@@ -253,6 +253,7 @@ const translations: Translations = {
 
     /* ОТВЕТЫ ОТ СЕРВЕРА */
     'ok.dev_delete': 'INFO: Устройство успешно удалено из каталога',
+    'ok.dev_delete_version': 'INFO: Версия устройства успешно удалена из каталога',
     'ok.edit_device': 'INFO: Устройство успешно сохранено в каталоге',
     'ok.catalog_list': 'INFO: Данные из каталога успешно получены',
     'ok.catalog_search': 'INFO: Поиск по каталогу успешо выполнен',

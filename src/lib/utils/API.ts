@@ -476,9 +476,9 @@ export const API_CatalogUpdateDevice = async (DeviceData: FormData) => {
  * Создание/Редактирование устройства в каталоге
  * @param DeviceData - полный пакет данных об устройстве
  */
-export const API_CatalogDevice = async (CatalogID: string, VerFW: string, APILanguage: string) => {
+export const API_CatalogDevice = async (CatalogID: string, VerFW: string) => {
   try {
-    const responseData = await SmartRequest(`${API_ROUTES.CATALOG_GET_DEVICE}?CatalogID=${CatalogID}&VerFW=${VerFW}&APILanguage=${APILanguage}`, {
+    const responseData = await SmartRequest(`${API_ROUTES.CATALOG_GET_DEVICE}?CatalogID=${CatalogID}&VerFW=${VerFW}`, {
       method: 'GET',
       headers: {
         'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
@@ -501,7 +501,7 @@ export const API_CatalogDevice = async (CatalogID: string, VerFW: string, APILan
  * Удаление устройства из каталога
  * @param DevID - идентификатор устройства
  */
-export const API_CatalogDeleteDevice = async (DevID: string, VerFW: string | null) => {
+export const API_CatalogDeleteDevice = async (CatalogID: string, VerFW: string | null) => {
   try {
     const responseData = await SmartRequest(`${API_ROUTES.CATALOG_DELETE_DEVICE}`, {
       method: 'DELETE',
@@ -509,7 +509,7 @@ export const API_CatalogDeleteDevice = async (DevID: string, VerFW: string | nul
         'Content-Type': 'application/json',
         'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
       },
-      body: JSON.stringify({ DevID, VerFW }),
+      body: JSON.stringify({ CatalogID, VerFW }),
       credentials: 'include',
     })
 

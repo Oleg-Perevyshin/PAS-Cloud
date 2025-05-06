@@ -12,6 +12,7 @@ const statusResponse: Record<string, StatusResponse> = {
   ER_USER_UNAUTHORIZED: { code: 401, messageKey: 'err.unauthorized' },
 
   OK_DELETE_DEVICE_FROM_CATALOG: { code: 200, messageKey: 'ok.dev_delete' },
+  OK_DELETE_DEVICE_VERSION: { code: 200, messageKey: 'ok.dev_delete_version' },
   OK_EDIT_DEVICE: { code: 200, messageKey: 'ok.edit_device' },
   OK_GET_CATALOG: { code: 200, messageKey: 'ok.catalog_list' },
   OK_CATALOG_SEARCH: { code: 200, messageKey: 'ok.catalog_search' },
