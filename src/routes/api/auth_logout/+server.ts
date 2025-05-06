@@ -1,5 +1,5 @@
 // src/routes/api/auth_logout/+server.ts
-import { prisma } from '$lib/Prisma'
+import { prisma } from '../../../../prisma/Prisma'
 import { ResponseManager } from '$lib/utils/ResponseManager'
 import { NODE_ENV } from '$env/static/private'
 import { ValidateUser } from '$lib/utils/ValidateRequest.js'

@@ -1,7 +1,7 @@
 // src/ws.server.ts
 import { WebSocketServer, WebSocket } from 'ws'
 import type { Server } from 'http'
-import { prisma } from './lib/Prisma'
+import { prisma } from '../prisma/Prisma'
 import { EncryptWebSocketPacket, DecryptWebSocketPacket, ValidateDevSN } from './lib/utils/Common'
 import { parse } from 'url'
 import { JoinGroup, GetGroupList, CreateGroup, DeleteGroup, SetMessage, GetMessages, DeleteMessage } from './lib/utils/WebSocket'
@@ -325,7 +325,7 @@ const handlerSYS = async (ws: WebSocket, argument: string, value: string) => {
         break
       }
       try {
-        let groupResponse = null
+        let groupResponse: Uint8Array<ArrayBufferLike> | null = null
         if (ClientID) {
           groupResponse = await SetMessage(ClientID, null, GroupID, argument, Data)
         }
@@ -355,7 +355,7 @@ const handlerGET = async (ws: WebSocket, argument: string, value: string) => {
         break
       }
       try {
-        let groupResponse = null
+        let groupResponse: Uint8Array<ArrayBufferLike> | null = null
         if (ClientID) {
           groupResponse = await SetMessage(ClientID, null, GroupID, 'ModuleList', '')
         } else if (DevSN) {
@@ -383,7 +383,7 @@ const handlerGET = async (ws: WebSocket, argument: string, value: string) => {
       }
 
       try {
-        let groupResponse = null
+        let groupResponse: Uint8Array<ArrayBufferLike> | null = null
         if (ClientID) {
           groupResponse = await SetMessage(ClientID, null, GroupID, 'ModuleConfig', ModuleSN)
         } else if (DevSN) {
@@ -437,7 +437,7 @@ const handlerSET = async (ws: WebSocket, argument: string, value: string) => {
         break
       }
       try {
-        let groupResponse = null
+        let groupResponse: Uint8Array<ArrayBufferLike> | null = null
         if (ClientID) {
           groupResponse = await SetMessage(ClientID, null, GroupID, 'GroupMessage', Message)
         }
@@ -478,7 +478,7 @@ const handlerSET = async (ws: WebSocket, argument: string, value: string) => {
         break
       }
       try {
-        let groupResponse = null
+        let groupResponse: Uint8Array<ArrayBufferLike> | null = null
         if (ClientID) {
           groupResponse = await SetMessage(ClientID, null, GroupID, argument, Data)
         }
@@ -508,7 +508,7 @@ const handlerOK = async (ws: WebSocket, argument: string, value: string) => {
         break
       }
       try {
-        let groupResponse = null
+        let groupResponse: Uint8Array<ArrayBufferLike> | null = null
         if (DevSN) {
           groupResponse = await SetMessage(null, DevSN, GroupID, 'ModuleList', ModuleList)
         }
@@ -547,7 +547,7 @@ const handlerOK = async (ws: WebSocket, argument: string, value: string) => {
       }
 
       try {
-        let groupResponse = null
+        let groupResponse: Uint8Array<ArrayBufferLike> | null = null
         if (DevSN) {
           groupResponse = await SetMessage(null, DevSN, GroupID, 'ModuleConfig', ModuleConfig)
         }

@@ -1,6 +1,6 @@
 // $lib/utils/ServerUtils.ts
-import { prisma } from '../Prisma'
-import { Prisma } from '@prisma/client'
+import { prisma } from '../../../prisma/Prisma'
+import type { Prisma } from '../../../prisma/client'
 
 /**
  * Метод генерации уникального идентификатора

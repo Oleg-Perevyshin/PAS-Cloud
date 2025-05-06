@@ -1,7 +1,7 @@
 // $lib/utils/TokenManager.ts
 import { JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRE, JWT_REFRESH_SECRET, JWT_REFRESH_EXPIRE } from '$env/static/private'
 import jwt from 'jsonwebtoken'
-import { prisma } from '$lib/Prisma'
+import { prisma } from '../../../prisma/Prisma'
 
 /* Проверка токенов на уникальность или его отсутствие */
 const isTokenUnique = async (token: string, isRefreshToken: boolean = false): Promise<boolean> => {

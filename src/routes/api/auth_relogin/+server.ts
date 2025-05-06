@@ -1,7 +1,7 @@
 // src/routes/api/auth_relogin/+server.ts
 
 import type { RequestHandler } from '@sveltejs/kit'
-import { prisma } from '$lib/Prisma'
+import { prisma } from '../../../../prisma/Prisma'
 import { ResponseManager } from '$lib/utils/ResponseManager'
 import { FormatDate } from '$lib/utils/Common'
 import { ValidateUser } from '$lib/utils/ValidateRequest'

@@ -1,4 +1,4 @@
-// $lib/Prisma.ts
+// prisma/prisma.ts
 // Вынесено отдельно, чтоб не создавать много подключений к БД
 import { PrismaClient } from '@prisma/client'
 

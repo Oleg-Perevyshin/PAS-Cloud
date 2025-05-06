@@ -1,7 +1,7 @@
 // src/routes/api/auth_login/+server.ts
 
 import type { RequestHandler } from '@sveltejs/kit'
-import { prisma } from '$lib/Prisma'
+import { prisma } from '../../../../prisma/Prisma'
 import argon2 from 'argon2'
 import { generateTokens } from '$lib/utils/TokenManager'
 import { ResponseManager } from '$lib/utils/ResponseManager'

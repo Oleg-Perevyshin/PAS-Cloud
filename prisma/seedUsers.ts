@@ -1,6 +1,6 @@
 // prisma/seed.ts
 import { PrismaClient } from '@prisma/client'
-import { Prisma } from '@prisma/client'
+import { GenerateUniqueID } from '../src/lib/utils/ServerUtils'
 
 const prisma = new PrismaClient()
 export const DEFAULT_TAGS = [
@@ -11,35 +11,6 @@ export const DEFAULT_TAGS = [
   { id: 'tag-5', name: 'Tag 5', value: 'tag-5', color: 'bg-sky-400 border-2 !border-sky-400' },
   { id: 'tag-6', name: 'Tag 6', value: 'tag-6', color: 'bg-fuchsia-400 border-2 !border-fuchsia-400' },
 ]
-
-async function GenerateUniqueID(model: 'news' | 'user', blocks: number, charsPerBlock: number): Promise<string> {
-  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  let attempts = 0
-  let newID: string
-
-  while (attempts < 100) {
-    newID = Array.from({ length: blocks }, () =>
-      Array.from({ length: charsPerBlock }, () => characters[Math.floor(Math.random() * characters.length)]).join(''),
-    ).join('-')
-
-    /* Создаем объект where с правильным типом */
-    let where: Prisma.NewsWhereUniqueInput | Prisma.UserWhereUniqueInput | Prisma.DeviceWhereUniqueInput
-    if (model === 'news') {
-      where = { NewsID: newID }
-      const exists = await prisma.news.findUnique({ where })
-      if (!exists) return newID
-    } else if (model === 'user') {
-      where = { UserID: newID }
-      const exists = await prisma.user.findUnique({ where })
-      if (!exists) return newID
-    } else {
-      throw new Error(`Неверная модель`)
-    }
-
-    attempts++
-  }
-  throw new Error(`Не удалось сгенерировать уникальный ID для модели ${model} после 100 попыток`)
-}
 
 /* Функция создания фиктивных пользователей */
 const seed = async () => {

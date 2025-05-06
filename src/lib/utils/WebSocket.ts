@@ -1,5 +1,5 @@
 // $lib/utils/WebSocket.ts
-import { prisma } from '../Prisma'
+import { prisma } from '../../../prisma/Prisma'
 import { EncryptWebSocketPacket, FormatDate, ValidateDevSN } from './Common'
 import { GenerateUniqueID } from './ServerUtils'
 import type { IJoinGroup, ICreateGroup, IGroupList, IDeleteGroup, IGroupMessage, IDeleteMessage, IGroupMessageList } from '../../stores/Interfaces'

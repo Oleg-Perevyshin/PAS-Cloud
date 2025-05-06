@@ -1,7 +1,7 @@
 // src/routes/api/catalog_list/+server.ts
 import type { RequestHandler } from '@sveltejs/kit'
-import { prisma } from '$lib/Prisma'
-import type { Prisma } from '@prisma/client'
+import { prisma } from '../../../../prisma/Prisma'
+import type { Prisma } from '../../../../prisma/client'
 import { ResponseManager } from '$lib/utils/ResponseManager'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
 import { FormatDate } from '$lib/utils/Common'

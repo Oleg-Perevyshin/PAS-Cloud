@@ -2,7 +2,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, JWT_ACCESS_MAX_AGE, NODE_ENV } from '$env/static/private'
-import { prisma } from '$lib/Prisma'
+import { prisma } from '../../../prisma/Prisma'
 import { generateTokens } from './TokenManager'
 
 export const ValidateUser = async (event: RequestEvent) => {

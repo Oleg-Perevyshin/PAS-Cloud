@@ -1,6 +1,6 @@
 // src/routes/api/user_delete/+server.ts
 import type { RequestHandler } from '@sveltejs/kit'
-import { prisma } from '$lib/Prisma'
+import { prisma } from '../../../../prisma/Prisma'
 import { ResponseManager } from '$lib/utils/ResponseManager'
 import { NODE_ENV } from '$env/static/private'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
