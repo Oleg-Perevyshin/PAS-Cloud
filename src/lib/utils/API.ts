@@ -28,6 +28,7 @@ export const API_ROUTES = {
   NEWS_LIST: '/api/news_list',
   NEWS_DELETE: '/api/news_delete',
   CATALOG_EDIT_DEVICE: '/api/catalog_edit',
+  CATALOG_ADD_DEVICE: '/api/catalog_add',
   CATALOG_GET_DEVICE: '/api/catalog_id',
   CATALOG_DELETE_DEVICE: '/api/catalog_delete',
 }
@@ -447,7 +448,7 @@ export const API_UserDeleteNews = async (UserID: string, NewsID: string) => {
 }
 
 /**
- * Создание/Редактирование устройства в каталоге
+ * Редактирование устройства в каталоге
  * @param DeviceData - полный пакет данных об устройстве
  */
 export const API_CatalogUpdateDevice = async (DeviceData: FormData) => {
@@ -469,6 +470,32 @@ export const API_CatalogUpdateDevice = async (DeviceData: FormData) => {
     console.error('Ошибка API_CatalogUpdateDevice', error)
     addMessage('ERR: API_CatalogUpdateDevice')
     throw new Error('Failed API_CatalogUpdateDevice')
+  }
+}
+
+/**
+ * Создание устройства в каталоге
+ * @param DeviceData - полный пакет данных об устройстве
+ */
+export const API_CatalogAddDevice = async (DeviceData: FormData) => {
+  try {
+    const responseData = await SmartRequest(`${API_ROUTES.CATALOG_ADD_DEVICE}`, {
+      method: 'POST',
+      headers: {
+        'Accept-Language': typeof window !== 'undefined' ? localStorage.getItem('AppLanguage') || 'ru' : 'ru',
+      },
+      body: DeviceData,
+      credentials: 'include',
+    })
+
+    if (responseData?.status.message) {
+      addMessage(responseData.status.message)
+    }
+    return responseData
+  } catch (error) {
+    console.error('Ошибка API_CatalogAddDevice', error)
+    addMessage('ERR: API_CatalogAddDevice')
+    throw new Error('Failed API_CatalogAddDevice')
   }
 }
 

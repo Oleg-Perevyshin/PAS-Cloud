@@ -65,6 +65,13 @@ export const POST: RequestHandler = async (event) => {
       return new Response(JSON.stringify(ResponseManager('ER_INSUFFICIENT_DATA_TO_CREATE_DEVICE', lang)), { status: 400 })
     }
 
+    const existingDevice = await prisma.catalogDevice.findUnique({
+      where: { CatalogID: candidate_device.CatalogID },
+    })
+    if (existingDevice) {
+      return new Response(JSON.stringify(ResponseManager('ER_DEVICE_ALREADY_ADDED', lang)), { status: 400 })
+    }
+
     /* Проверка формата CatalogID */
     const catalogIdRegex = /^[0-9A-F]{4}$/
     if (!catalogIdRegex.test(candidate_device.CatalogID)) {
@@ -85,39 +92,27 @@ export const POST: RequestHandler = async (event) => {
     }
 
     const result = await prisma.$transaction(async (prisma) => {
-      /* Создаем/обновляем устройство */
-      const device = await prisma.catalogDevice.update({
-        where: { CatalogID: candidate_device.CatalogID },
+      /* Создаем устройство */
+      const device = await prisma.catalogDevice.create({
         data: {
+          CatalogID: candidate_device.CatalogID,
           CatalogName: candidate_device.CatalogName,
           Icon: candidate_device.Icon,
+          LatestFW: candidate_device.CurrentFW,
         },
       })
 
-      /* Создаем/обновляем версию */
-      const version = await prisma.catalogVersion.upsert({
-        where: {
-          IDX_DeviceVersion: {
-            DeviceID: device.CatalogID,
-            VerFW: candidate_device.CurrentFW,
-          },
-        },
-        create: {
+      /* Создаем версию */
+      const version = await prisma.catalogVersion.create({
+        data: {
           DeviceID: device.CatalogID,
           VerFW: candidate_device.CurrentFW,
         },
-        update: {},
       })
 
-      /* Обновляем/создаем локализацию */
-      await prisma.catalogLocalization.upsert({
-        where: {
-          IDX_VersionLanguage: {
-            VersionID: version.id,
-            Language: candidate_device.Language,
-          },
-        },
-        create: {
+      /* Создаем локализацию */
+      await prisma.catalogLocalization.create({
+        data: {
           VersionID: version.id,
           Language: candidate_device.Language,
           Brief: candidate_device.Brief,
@@ -127,35 +122,15 @@ export const POST: RequestHandler = async (event) => {
           API: apiBytes,
           MetaData: metaData,
         },
-        update: {
-          Brief: candidate_device.Brief,
-          Description: candidate_device.Description,
-          Firmware: firmwareBytes,
-          Manual: manualBytes,
-          API: apiBytes,
-          MetaData: metaData,
-        },
       })
-
-      /* Обновляем LatestFW если версия новее */
-      if (candidate_device.CurrentFW > device.LatestFW) {
-        await prisma.catalogDevice.update({
-          where: { CatalogID: device.CatalogID },
-          data: { LatestFW: candidate_device.CurrentFW },
-        })
-      }
 
       /* Получаем обновленные данные для ответа */
       return await prisma.catalogDevice.findUnique({
         where: { CatalogID: device.CatalogID },
         include: {
           Versions: {
-            include: {
-              Localizations: true,
-            },
-            orderBy: {
-              VerFW: 'desc',
-            },
+            include: { Localizations: true },
+            orderBy: { VerFW: 'desc' },
           },
         },
       })

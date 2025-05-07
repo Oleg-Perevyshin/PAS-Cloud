@@ -6,15 +6,15 @@ import { LOG_LEVEL } from '$env/static/private'
 
 const logger = pino({
   level: LOG_LEVEL || 'info',
-  // transport: {
-  //   target: 'pino-loki',
-  //   options: {
-  //     translateTime: 'dd-mm-yyyy HH:MM:ss.l o',
-  //     colorize: true,
-  //     ignore: 'pid,hostname',
-  //     host: 'localhost:3100',
-  //   },
-  // },
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      translateTime: 'dd-mm-yyyy HH:MM:ss.l o',
+      colorize: true,
+      ignore: 'pid,hostname',
+      host: 'localhost:3100',
+    },
+  },
 })
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -22,49 +22,49 @@ export const handle: Handle = async ({ event, resolve }) => {
   const contentLength = +(event.request.headers.get('content-length') ?? '0')
 
   /* TRACE: Логируем детали запроса (если уровень >= trace) */
-  // logger.trace(
-  //   {
-  //     headers: Object.fromEntries(event.request.headers.entries()),
-  //     ip: event.getClientAddress(),
-  //   },
-  //   'Получен запрос (детали)',
-  // )
+  logger.trace(
+    {
+      headers: Object.fromEntries(event.request.headers.entries()),
+      ip: event.getClientAddress(),
+    },
+    'Получен запрос (детали)',
+  )
 
   /* DEBUG: Размер тела запроса */
-  // logger.debug(`Content-Length: ${contentLength} Bytes`)
+  logger.debug(`Content-Length: ${contentLength} Bytes`)
 
   /* Размера тела должен быть до 64 MB (FATAL для критически больших запросов) */
   if (contentLength > 67_108_864) {
-    // logger.fatal({ contentLength, maxAllowed: 67_108_864 }, 'Превышен максимальный размер тела запроса')
+    logger.fatal({ contentLength, maxAllowed: 67_108_864 }, 'Превышен максимальный размер тела запроса')
     return new Response(JSON.stringify(ResponseManager('ER_BODY_SIZE_LIMIT', lang)), { status: 413 })
   }
 
   /* INFO: Основная информация о запросе */
-  // logger.info({ method: event.request.method, path: event.url.pathname }, 'Начало обработки запроса')
+  logger.info({ method: event.request.method, path: event.url.pathname }, 'Начало обработки запроса')
 
   try {
     const response = await resolve(event)
 
     /* INFO: Успешный ответ */
-    // logger.info({ status: response.status }, 'Запрос успешно обработан')
+    logger.info({ status: response.status }, 'Запрос успешно обработан')
 
     /* DEBUG: Детали ответа */
-    // logger.debug({ headers: Object.fromEntries(response.headers.entries()) }, 'Заголовки ответа')
+    logger.debug({ headers: Object.fromEntries(response.headers.entries()) }, 'Заголовки ответа')
 
     return response
   } catch (error) {
     /* ERROR: Ошибка обработки запроса */
-    // logger.error(
-    //   {
-    //     error: error instanceof Error ? error.message : String(error),
-    //     stack: error instanceof Error ? error.stack : undefined,
-    //   },
-    //   'Ошибка при обработке запроса',
-    // )
+    logger.error(
+      {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      },
+      'Ошибка при обработке запроса',
+    )
 
     /* WARN: Дополнительное предупреждение для специфичных ошибок */
     if (error instanceof Error && error.message.includes('Validation')) {
-      // logger.warn('Ошибка валидации данных')
+      logger.warn('Ошибка валидации данных')
     }
 
     throw error // или возвращаем кастомный Response

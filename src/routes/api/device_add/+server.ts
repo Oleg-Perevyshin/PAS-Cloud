@@ -51,7 +51,7 @@ export const PATCH: RequestHandler = async (event) => {
           DevSN: SerialNumber,
           DevID,
           DevName: catalogDevice.CatalogName,
-          DevFW: catalogDevice.VerFW,
+          DevFW: catalogDevice.LatestFW,
         },
       })
     }
@@ -99,7 +99,7 @@ export const PATCH: RequestHandler = async (event) => {
       TagID: userDevice.TagID,
       IsOnline: userDevice.Device.IsOnline,
       CatIcon: userDevice.Device.Catalog.Icon,
-      CatVerFW: userDevice.Device.Catalog.VerFW,
+      CatVerFW: userDevice.Device.Catalog.LatestFW,
     }
     const responseData = { user_device: response }
 

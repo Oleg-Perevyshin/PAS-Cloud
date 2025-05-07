@@ -66,13 +66,13 @@ model CatalogDevice {
   Icon              String                                        // Иконка
   CatalogID         String            @id @unique @db.VarChar(4)  // Уникальный идентификатор устройства по каталогу
   CatalogName       String            @default("PAS-Module") @db.VarChar(16)  // Имя устройство по умолчанию
-  LatestFW          String                                        // Последняя версия прошивки на сервере
+  LatestFW          String            @db.VarChar(5)              // Последняя версия прошивки на сервере
 
   Created           DateTime          @default(now())             // Дата создания устройства
   Updated           DateTime          @updatedAt                  // Дата обновления устройства
 
-  Versions          CatalogVersion[]                              // Связь с версиями прошивок
-  Devices           Device[]
+  Versions          CatalogVersion[]  @relation("CatalogVersions") // Связь с версиями прошивок
+  Devices           Device[]          @relation("DeviceCatalog")
 
   @@map("CatalogItems")                                            // Имя таблицы в базе данных
 }
@@ -83,43 +83,46 @@ model CatalogVersion {
   DeviceID          String            @db.VarChar(4)              // Связь с устройством из каталога
   VerFW             String                                        // Версия прошивок
 
-  Localizations     VersionLocalization[]
-  Device            CatalogDevice     @relation(fields: [DeviceID], references: [CatalogID])
- 
-  @@unique([DeviceID, VerFW])                                     // Уникальный составной ключ (версия + идентификатор устройства)
+  Device            CatalogDevice     @relation("CatalogVersions", fields: [DeviceID], references: [CatalogID], onDelete: Cascade)
+  Localizations     CatalogLocalization[] @relation("CatalogLocalization")
+
+  @@unique([DeviceID, VerFW], name: "IDX_DeviceVersion")          // Уникальный составной ключ (идентификатор устройства + версия)
+  @@index([DeviceID], name: "IDX_DeviceID")                                 
   @@map("CatalogVersions")                                        // Имя таблицы в базе данных
 }
 
-model VersionLocalization {
+model CatalogLocalization {
   id                String            @id @default(cuid())
-  Language          String                                        // en, ru, etc
-  Brief             String                                        // Краткое описание устройства
-  Description       String                                        // Full description
+  VersionID         String
+  Language          String            @db.VarChar(2)              // en, ru, etc
+  Brief             String            @db.VarChar(255)            // Краткое описание устройства
+  Description       String            @db.Text                    // Full description
   Firmware          Bytes                                         // Бинарные данные прошивки
   Manual            Bytes                                         // PDF manual
   API               Bytes                                         // API specification
   MetaData          Json                                          // Мета данные прошивки (ID устройство, версия прошивки, CRC32 прошивки)
 
-  VersionID         String
-  Version           CatalogVersion    @relation(fields: [VersionID], references: [id])
+  Version           CatalogVersion    @relation("CatalogLocalization", fields: [VersionID], references: [id], onDelete: Cascade)
 
-  @@unique([VersionID, Language], name: "VersionLanguageUnique")
-  @@map("VersionLocalizations")
+  @@unique([VersionID, Language], name: "IDX_VersionLanguage")
+  @@index([VersionID], name: "IDX_VersionID")
+  @@map("CatalogLocalizations")
 }
 
 // Таблица реальных (физических) устройств
 model Device {
-  DevSN             String            @id @unique                 // Серийный номер устройства
-  DevID             String                                        // Идентификатор устройства по каталогу
-  DevName           String                                        // Имя устройства
-  DevFW             String                                        // Версия прошивки
+  DevSN             String            @id @unique @db.VarChar(32) // Серийный номер устройства
+  DevID             String            @db.VarChar(4)              // Идентификатор устройства по каталогу
+  DevName           String            @db.VarChar(16)             // Имя устройства
+  DevFW             String            @db.VarChar(5)              // Версия прошивки
   IsOnline          Boolean           @default(false)             // Признак нахождения устройство в сети
   Modules           Json?                                         // Список модулей в виде JSON
   
   Users             UserDevice[]                                  // Обратная связь с UserDevice
   Messages          GroupMessage[]                                // Обратная связь с GroupMessage
-  Catalog           CatalogDevice         @relation(fields: [DevID], references: [CatalogID])
+  Catalog           CatalogDevice     @relation("DeviceCatalog", fields: [DevID], references: [CatalogID])
   
+  @@index([DevID], name: "IDX_DeviceCatalogID")
   @@map("Devices")                                                // Имя таблицы в базе данных
 }
 

@@ -1,11 +1,11 @@
 // src/routes/api/catalog_file/+server.ts
 /**
  * Компонент, который возвращает файлы в зависимости от запроса
- * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=Manual&VerFW=0.1 - запрос от пользователя на получение руководства 0000-Manual-v0.3.pdf
- * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=Firmware&VerFW=0.3 - запрос от пользователя на получение прошивки 0000-Firmware-v0.3.bin
- * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=API&VerFW=0.3 - запрос от устройства на получение API
- * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&DataType=MetaData&VerFW=0.3 - запрос от устройства на получение мета данных
- * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&DataType=Firmware&VerFW=0.3 - запрос от устройства на получение прошивки
+ * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=Manual&VerFW=0.1&Language=ru - запрос от пользователя на получение руководства 0000-Manual-v0.3.pdf
+ * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=Firmware&VerFW=0.3&Language=ru - запрос от пользователя на получение прошивки 0000-Firmware-v0.3.bin
+ * Путь запроса: /api/catalog_file?CatalogID=0000&DataType=API&VerFW=0.3&Language=ru - запрос от устройства на получение API
+ * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&DataType=MetaData&VerFW=0.3&Language=ru - запрос от устройства на получение мета данных
+ * Путь запроса: /api/catalog_file?DevSN=0000-0000C43300004B0C0000DADC|DF&DataType=Firmware&VerFW=0.3&Language=ru - запрос от устройства на получение прошивки
  */
 
 import type { RequestHandler } from '@sveltejs/kit'
@@ -25,8 +25,8 @@ export const GET: RequestHandler = async (event) => {
     const DevSNParam = event.url.searchParams.get('DevSN')
     const DataTypeParam = event.url.searchParams.get('DataType')
     const VerFWParam = event.url.searchParams.get('VerFW')
-    const APILang = event.url.searchParams.get('APILang') || 'ru'
-    if (!DataTypeParam || !VerFWParam || (!DevSNParam && !CatalogID)) {
+    const LangParam = event.url.searchParams.get('Language')
+    if (!DataTypeParam || !VerFWParam || !LangParam || (!DevSNParam && !CatalogID)) {
       return new Response(JSON.stringify(ResponseManager('ER_QUERY_DATA', lang)), { status: 400 })
     }
 
@@ -53,9 +53,13 @@ export const GET: RequestHandler = async (event) => {
       where: { CatalogID: DevID },
       include: {
         Versions: {
-          where: VerFWParam ? { VerFW: VerFWParam } : undefined,
+          where: { VerFW: VerFWParam },
+          take: 1,
           include: {
-            ApiFiles: DataTypeParam === 'API' ? true : undefined,
+            Localizations: {
+              where: { Language: LangParam },
+              take: 1,
+            },
           },
         },
       },
@@ -70,18 +74,26 @@ export const GET: RequestHandler = async (event) => {
     if (!selectedVersion && !VerFWParam) {
       // Если версия не указана, ищем последнюю
       const versions = await prisma.catalogVersion.findMany({
-        where: { DeviceID: device.CatalogID },
-        include: {
-          ApiFiles: DataTypeParam === 'API' ? true : undefined,
-        },
+        where: { DeviceID: DevID },
         orderBy: { VerFW: 'desc' },
         take: 1,
+        include: {
+          Localizations: {
+            where: { Language: lang },
+            take: 1,
+          },
+        },
       })
       selectedVersion = versions[0]
     }
 
     if (!selectedVersion) {
       return new Response(JSON.stringify(ResponseManager('ER_VERSION_NOT_FOUND', lang)), { status: 404 })
+    }
+
+    const localization = selectedVersion.Localizations[0]
+    if (!localization && DataTypeParam !== 'MetaData') {
+      return new Response(JSON.stringify(ResponseManager('ER_LOCALIZATION_NOT_FOUND', lang)), { status: 404 })
     }
 
     // Подготовка метаданных
@@ -94,7 +106,7 @@ export const GET: RequestHandler = async (event) => {
 
     const responseData = {
       CatalogID: device.CatalogID,
-      CRC32: selectedVersion.Firmware ? crc32(Buffer.from(selectedVersion.Firmware)) : null,
+      CRC32: localization.Firmware ? crc32(Buffer.from(localization.Firmware)) : null,
       VerFW: selectedVersion.VerFW,
       Versions: allVersions.map((v) => v.VerFW),
     }
@@ -106,20 +118,20 @@ export const GET: RequestHandler = async (event) => {
     /* Обработка типа данных */
     switch (DataTypeParam) {
       case 'Firmware':
-        if (!selectedVersion.Firmware) {
+        if (!localization.Firmware) {
           return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
         }
-        fileBuffer = Buffer.from(selectedVersion.Firmware)
-        fileName = `${device.CatalogID}-Firmware-v${selectedVersion.VerFW}.bin`
+        fileBuffer = Buffer.from(localization.Firmware)
+        fileName = `${device.CatalogID}-Firmware-v${selectedVersion.VerFW}-${LangParam}.bin`
         contentType = 'application/octet-stream'
         break
 
       case 'Manual':
-        if (!selectedVersion.Manual) {
+        if (!localization.Manual) {
           return new Response(JSON.stringify(ResponseManager('ER_FILE_NOT_FOUND', lang)), { status: 404 })
         }
-        fileBuffer = Buffer.from(selectedVersion.Manual)
-        fileName = `${device.CatalogID}-Manual-v${selectedVersion.VerFW}.pdf`
+        fileBuffer = Buffer.from(localization.Manual)
+        fileName = `${device.CatalogID}-Manual-v${selectedVersion.VerFW}-${LangParam}.pdf`
         contentType = 'application/pdf'
         break
 
@@ -130,12 +142,12 @@ export const GET: RequestHandler = async (event) => {
         break
 
       case 'API': {
-        const apiFile = selectedVersion.ApiFiles?.find((f) => f.Language === APILang)
+        const apiFile = localization.API
         if (!apiFile) {
           return new Response(JSON.stringify(ResponseManager('ER_API_LANGUAGE_NOT_FOUND', lang)), { status: 404 })
         }
-        fileBuffer = Buffer.from(apiFile.Content)
-        fileName = `${device.CatalogID}-API-${APILang}-v${selectedVersion.VerFW}.yaml`
+        fileBuffer = Buffer.from(apiFile)
+        fileName = `${device.CatalogID}-API-v${selectedVersion.VerFW}-${LangParam}.yaml`
         contentType = 'application/x-yaml'
         break
       }

@@ -5,7 +5,7 @@
   import { t, Language } from '$lib/locales/i18n'
   import { SmartRequest } from '$lib/utils/SmartRequest'
   import { ThemeStore, addMessage } from '../../../stores'
-  import { API_CatalogUpdateDevice, API_CatalogDeleteDevice, API_CatalogDevice } from '$lib/utils/API'
+  import { API_CatalogUpdateDevice, API_CatalogDeleteDevice, API_CatalogDevice, API_CatalogAddDevice } from '$lib/utils/API'
 
   import type { ICatalogDevice, IOptionUI, IUser } from '../../../stores/Interfaces'
   import {
@@ -109,7 +109,7 @@
     })
 
     try {
-      const responseData = await API_CatalogUpdateDevice(formData)
+      const responseData = isEditing ? await API_CatalogUpdateDevice(formData) : await API_CatalogAddDevice(formData)
       if (!responseData?.catalog) {
         throw new Error('Invalid Response Data')
       }

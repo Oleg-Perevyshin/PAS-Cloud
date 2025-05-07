@@ -46,11 +46,11 @@
       CatalogUpsertDevice(responseData.catalog)
       product = responseData.catalog
 
-      const matchedVersion = product.Versions?.find((version) => version.VerFW === product?.VerFW)
+      const matchedVersion = product.Versions?.find((version) => version.VerFW === product?.LatestFW)
       SelectedVerFWs = matchedVersion ? { id: matchedVersion.VerFW || '', name: matchedVersion.VerFW || 'Unknown Version', color: '' } : null
 
       /* Рендерим Markdown после загрузки продукта */
-      if (product) {
+      if (product && product.Description) {
         try {
           renderedDescription = await RenderMarkdown(product.Description)
         } catch (error) {
@@ -71,7 +71,7 @@
    */
   const downloadFile = async (type: 'Firmware' | 'Manual' | 'API') => {
     try {
-      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&DataType=${type}&VerFW=${SelectedVerFWs?.name}&APILanguage=${currentLang}`)
+      const response = await fetch(`/api/catalog_file?CatalogID=${CatalogID}&DataType=${type}&VerFW=${SelectedVerFWs?.name}&Language=${currentLang}`)
       if (!response.ok) {
         throw new Error('Ошибка получения файла: ' + response.statusText)
       }
@@ -80,11 +80,11 @@
       const a = document.createElement('a')
       a.href = url
       if (type === 'Firmware') {
-        a.download = `${product?.CatalogID}-Core-v${SelectedVerFWs?.name}.bin`
+        a.download = `${product?.CatalogID}-Firmware-v${SelectedVerFWs?.name}-${currentLang}.bin`
       } else if (type === 'Manual') {
-        a.download = `${product?.CatalogID}-Manual-v${SelectedVerFWs?.name}.pdf`
+        a.download = `${product?.CatalogID}-Manual-v${SelectedVerFWs?.name}-${currentLang}.pdf`
       } else if (type === 'API') {
-        a.download = `${product?.CatalogID}-${currentLang}-API-v${SelectedVerFWs?.name}.yaml`
+        a.download = `${product?.CatalogID}-API-v${SelectedVerFWs?.name}-${currentLang}.yaml`
       } else {
         console.error('Неизвестный тип данных для скачивания')
       }
@@ -173,7 +173,7 @@
             `}
             >
               <a
-                href={`/api/catalog_file?CatalogID=${CatalogID}&DataType=Manual&VerFW=${SelectedVerFWs?.name}`}
+                href={`/api/catalog_file?CatalogID=${CatalogID}&DataType=Manual&VerFW=${SelectedVerFWs?.name}&Language=${currentLang}`}
                 class="!text-blue-600 hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"

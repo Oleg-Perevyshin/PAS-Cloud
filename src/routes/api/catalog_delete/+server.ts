@@ -27,32 +27,19 @@ export const DELETE: RequestHandler = async (event) => {
     const result = await prisma.$transaction(async (prisma) => {
       if (VerFW) {
         /* Удаление конкретной версии */
-        await prisma.versionLocalization.deleteMany({
-          where: { Version: { DeviceID: CatalogID, VerFW } },
+        const deletedVersion = await prisma.catalogVersion.delete({
+          where: { IDX_DeviceVersion: { DeviceID: CatalogID, VerFW } },
         })
+        if (!deletedVersion) {
+          throw new Error('Версия не найдена')
+        }
 
-        await prisma.catalogVersion.delete({
-          where: { DeviceID_VerFW: { DeviceID: CatalogID, VerFW } },
-        })
-
-        /* Проверяем количество оставшихся версий */
+        /* Проверяем количество оставшихся версий (если версий не осталось - удаляем устройство полностью) */
         const remainingVersions = await prisma.catalogVersion.count({
           where: { DeviceID: CatalogID },
         })
-
-        /* Если версий не осталось - удаляем устройство полностью */
         if (remainingVersions === 0) {
-          await prisma.userDevice.deleteMany({
-            where: { Device: { DevID: CatalogID } },
-          })
-
-          await prisma.device.deleteMany({
-            where: { DevID: CatalogID },
-          })
-
-          await prisma.catalogDevice.delete({
-            where: { CatalogID },
-          })
+          await deleteDeviceCompletely(CatalogID)
           return null
         }
 
@@ -71,25 +58,7 @@ export const DELETE: RequestHandler = async (event) => {
         return await getDeviceWithVersions(CatalogID, lang)
       } else {
         /* Полное удаление устройства */
-        await prisma.versionLocalization.deleteMany({
-          where: { Version: { DeviceID: CatalogID } },
-        })
-
-        await prisma.catalogVersion.deleteMany({
-          where: { DeviceID: CatalogID },
-        })
-
-        await prisma.userDevice.deleteMany({
-          where: { Device: { DevID: CatalogID } },
-        })
-
-        await prisma.device.deleteMany({
-          where: { DevID: CatalogID },
-        })
-
-        await prisma.catalogDevice.delete({
-          where: { CatalogID },
-        })
+        await deleteDeviceCompletely(CatalogID)
         return null
       }
     })
@@ -116,11 +85,30 @@ export const DELETE: RequestHandler = async (event) => {
       },
     }
 
+    // return new Response(JSON.stringify(ResponseManager('OK_DELETE_DEVICE_VERSION', lang)), { status: 200 })
     return new Response(JSON.stringify(ResponseManager('OK_DELETE_DEVICE_VERSION', lang, responseData)), { status: 200 })
   } catch (error) {
     console.error('Ошибка удаления устройства:', error)
     return new Response(JSON.stringify(ResponseManager('ER_DELETE_DEVICE_FROM_CATALOG', lang)), { status: 500 })
   }
+}
+
+/* Вспомогательная функция для полного удаления устройства */
+async function deleteDeviceCompletely(CatalogID: string) {
+  // Удаление связей с пользователями
+  await prisma.userDevice.deleteMany({
+    where: { Device: { DevID: CatalogID } },
+  })
+
+  // Удаление физических устройств
+  await prisma.device.deleteMany({
+    where: { DevID: CatalogID },
+  })
+
+  // Удаление из каталога (каскадно удалит версии и локализации)
+  await prisma.catalogDevice.delete({
+    where: { CatalogID },
+  })
 }
 
 /* Вспомогательная функция для получения устройства с версиями */

@@ -6,6 +6,16 @@ import { ResponseManager } from '$lib/utils/ResponseManager'
 import { ValidateUser } from '$lib/utils/ValidateRequest'
 import { FormatDate } from '$lib/utils/Common'
 
+type CatalogDeviceWithRelations = Prisma.CatalogDeviceGetPayload<{
+  include: {
+    Versions: {
+      include: {
+        Localizations: true
+      }
+    }
+  }
+}>
+
 export const GET: RequestHandler = async (event) => {
   /* Получаем язык, проверяем токены запросившего пользователя и активацию аккаунте */
   const { lang, requester_user, status } = await ValidateUser(event)
@@ -66,7 +76,7 @@ export const GET: RequestHandler = async (event) => {
     }
 
     /* Получаем устройства из базы данных */
-    const devices = await prisma.catalogDevice.findMany(queryOptions)
+    const devices = (await prisma.catalogDevice.findMany(queryOptions)) as CatalogDeviceWithRelations[]
 
     /* Форматируем данные */
     const formattedDevices = devices.map((device) => {

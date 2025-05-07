@@ -48,6 +48,7 @@
   if (currentDevice?.Versions && currentDevice.Versions.length > 0) {
     const matchedVersion = currentDevice.Versions.find((version) => version.VerFW === currentDevice?.LatestFW)
     SelectedVerFWs = matchedVersion ? { id: matchedVersion.VerFW || '', name: matchedVersion.VerFW || 'Unknown Version', color: '' } : null
+    $CatalogStore.CurrentFW = matchedVersion?.VerFW
   }
 
   /* Собираем данные об устройстве для отправки на сервер */
@@ -151,6 +152,7 @@
     showNewVersionInput = value?.name === '+'
     SelectedVerFWs = value
     if (value && value.name !== '+') {
+      $CatalogStore.CurrentFW = value.name
       getCatalogDevice(value.name)
     }
   }

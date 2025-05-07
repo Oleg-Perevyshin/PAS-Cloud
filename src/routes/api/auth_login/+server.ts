@@ -112,6 +112,16 @@ export const POST: RequestHandler = async (event) => {
       Updated: FormatDate(user.Updated.toISOString()),
     }
     const responseData = { user: response }
+
+    // logger.info(
+    //   {
+    //     userId: user.UserID,
+    //     email: user.EMail,
+    //     role: user.Role,
+    //     durationMs: Date.now(),
+    //   },
+    //   'User logged in successfully',
+    // )
     return new Response(JSON.stringify(ResponseManager('OK_LOGIN', lang, responseData)), { status: 200 })
   } catch (error) {
     console.error('Ошибка auth_login', error)
