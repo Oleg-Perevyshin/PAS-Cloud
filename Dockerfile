@@ -10,7 +10,7 @@ LABEL app="PAS-Cloud"
 WORKDIR /app
 
 # Копируем package.json в контейнер и устанавливаем зависимости
-COPY package.json .
+COPY package.json package-lock.json* ./
 RUN npm install
 
 # Копируем файлы в контейнер
@@ -19,17 +19,17 @@ COPY . .
 # Генерируем Prisma клиент
 RUN npx prisma generate
 
-# Устанавливаем переменные окружения
-ARG JWT_ACCESS_SECRET
-ARG JWT_REFRESH_SECRET
-ARG DATABASE_URL
-ARG JWT_ACCESS_EXPIRE
-ARG JWT_REFRESH_EXPIRE
-ARG JWT_ACCESS_MAX_AGE
-ARG JWT_REFRESH_MAX_AGE
-
+# Устанавливаем только несекретные переменные окружения
 ENV BODY_SIZE_LIMIT=64M
 ENV NODE_ENV=production
+
+# Собираем проект (без секретов)
+RUN npm run build
+
+# Порт приложения
+EXPOSE 2005
+
+# Устанавливаем секретные переменные только на этапе запуска
 ENV JWT_ACCESS_SECRET=$JWT_ACCESS_SECRET
 ENV JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET
 ENV DATABASE_URL=$DATABASE_URL
@@ -37,12 +37,6 @@ ENV JWT_ACCESS_EXPIRE=$JWT_ACCESS_EXPIRE
 ENV JWT_REFRESH_EXPIRE=$JWT_REFRESH_EXPIRE
 ENV JWT_ACCESS_MAX_AGE=$JWT_ACCESS_MAX_AGE
 ENV JWT_REFRESH_MAX_AGE=$JWT_REFRESH_MAX_AGE
-
-# Собираем проект
-RUN npm run build
-
-# Порт приложения
-EXPOSE 2005
 
 # Команда запуска приложения
 CMD ["npm", "run", "preview"]
