@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           file: Dockerfile
-          push: true
+          push: false
           tags: mcmega/pas-cloud:latest
           build-args: |
             JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
