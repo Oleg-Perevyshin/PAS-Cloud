@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pas-cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pas-cloud
+  template:
+    metadata:
+      labels:
+        app: pas-cloud
+    spec:
+      containers:
+        - name: app
+          image: mcmega/pas-cloud:latest  # Будет переопределено в overlays
+          ports:
+          - containerPort: 2005
+          envFrom:
+          - secretRef:
+            name: pas-cloud-secrets

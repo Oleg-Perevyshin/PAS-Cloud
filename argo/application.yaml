@@ -1,0 +1,21 @@
+# Конфигурация Argo CD Application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pas-cloud
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/Oleg-Perevyshin/PAS-Cloud.git'
+    path: .k8s/overlays/production
+    targetRevision: HEAD
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: pas-cloud
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+    - CreateNamespace=true

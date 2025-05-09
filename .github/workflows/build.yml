@@ -1,33 +1,46 @@
-# Deploy to Server
-# https://github.com/jurassicjs/nuxt3-fullstack-tutorial/blob/main/.github/workflows/deploy-int.yaml
-
-name: Build Docker Container
+name: Build and Deploy
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/pas-cloud
+  K8S_MANIFESTS_DIR: .k8s/overlays/production
+
 jobs:
-  install:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and Push
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          file: Dockerfile
+          context: .
           push: true
-          tags: mcmega/pas-cloud:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
             JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
@@ -36,3 +49,21 @@ jobs:
             JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}
             JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}
             JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}
+
+  update-manifests:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Update K8s manifests
+        run: |
+          # Обновляем image tag в манифестах
+          TAG=${{ steps.meta.outputs.tags }}
+          sed -i "s|image:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$TAG|g" $K8S_MANIFESTS_DIR/kustomization.yaml
+          
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update image to $TAG"
+          git push

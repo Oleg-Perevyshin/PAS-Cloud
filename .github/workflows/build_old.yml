@@ -1,0 +1,38 @@
+# Deploy to Server
+# https://github.com/jurassicjs/nuxt3-fullstack-tutorial/blob/main/.github/workflows/deploy-int.yaml
+
+name: Build Docker Container
+
+on:
+  workflow_dispatch:
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          file: Dockerfile
+          push: true
+          tags: mcmega/pas-cloud:latest
+          build-args: |
+            JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
+            JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            JWT_ACCESS_EXPIRE=${{ secrets.JWT_ACCESS_EXPIRE }}
+            JWT_REFRESH_EXPIRE=${{ secrets.JWT_REFRESH_EXPIRE }}
+            JWT_ACCESS_MAX_AGE=${{ secrets.JWT_ACCESS_MAX_AGE }}
+            JWT_REFRESH_MAX_AGE=${{ secrets.JWT_REFRESH_MAX_AGE }}
