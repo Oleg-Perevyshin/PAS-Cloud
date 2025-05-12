@@ -25,7 +25,7 @@
   const wifiModeList: IOption[] = [
     { id: 1, name: 'Станция' },
     { id: 2, name: 'Точка доступа' },
-    { id: 3, name: 'Гибрид' },
+    { id: 3, name: 'Гибрид', color: 'amber' },
   ]
 
   const accessPoints: IOption[] = [
@@ -209,58 +209,10 @@
     <hr class="w-full border-t border-gray-400" />
   </div>
 
-  <ButtonGroup
-    id="TestButtonGroup-1"
-    label="Component - ButtonGroup"
-    className="m-4"
-    options={RadioGroupOption}
-    value={radioButtonValue}
-    onChange={handleRadioButton}
-    props={{ disabled: false }}
-  />
-
-  <ButtonGroup
-    id="TestButtonGroup-2"
-    label="Default Tags"
-    className="m-4"
-    options={DEFAULT_TAGS}
-    value={radioButtonValue}
-    onChange={handleRadioButton}
-    props={{ disabled: false }}
-  />
-
-  <br />
-
-  <div class="flex flex-row">
-    <Input id="TestInputHeader" bind:value={packHeader} props={{ autocomplete: 'on', maxLength: 8 }} className="m-1" />
-    <Input id="TestInputArgument" bind:value={packArgument} props={{ autocomplete: 'on', maxLength: 16 }} className="m-1" />
-    <Input id="TestInputValue" bind:value={packValue} props={{ autocomplete: 'on', maxLength: 32 }} className="m-1" />
-    <Button onClick={testCrypto} label="Отправить" props={{ bgColor: 'bg-lime-200' }} className="m-1 w-40 rounded-2xl" />
-  </div>
-
-  <br />
-
-  <ProgressBar id="testProgressBar" label="Component - ProgressBar" className="" bind:value={progressBarValue} />
-  <div class="mt-4 flex">
-    <Button onClick={decreaseProgressBar} label="-10" className="m-1" />
-    <Button onClick={resetProgressBar} label="Сбросить" className="m-1" />
-    <Button onClick={increaseProgressBar} label="+10" className="m-1" />
-  </div>
-
-  <br />
-
-  <ColorPicker id="ColorPicker" label="Test Color Picker" className="w-full" bind:value={colorValue} onUpdate={handleColorUpdate} />
-
-  <br />
-
-  <Switch id="Switch" label="Test Switch" value={switchValue} className="" onUpdate={toggleSwitch} />
-
-  <Separator visible={false} />
-
   <div class="flex flex-wrap items-start justify-center">
-    <Accordion id="acc1" label={{ text: 'Graph component (в разработке)' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+    <Accordion id="acc1" label={{ text: 'Graph component (в разработке)' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: false }}>
       <Graph {data} width={800} label="График" xLabel="Время" yLabel="Значение" />
-      <UIColorPicker id="ColorPicker" label={{ text: 'Test Color Picker' }} style={{ styleCSS: 'width: 25rem;' }} />
+      <UIColorPicker id="ColorPicker" label={{ text: 'Test Color Picker' }} style={{ styleCSS: 'width: 25rem;' }} value={[255, 100, 0]} />
       <Separator visible={false} />
       <UIButton
         id="button1"
@@ -270,16 +222,16 @@
       />
     </Accordion>
 
-    <Accordion id="acc2" label={{ text: 'Пример использования: Настройки WiFi' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+    <Accordion id="acc2" label={{ text: 'Пример использования: Настройки WiFi' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: true }}>
       <UIButton
         id="button2"
         label={{ text: 'Режимы wifi' }}
-        style={{ bgColor: 'blue', optionWidth: 'max-option' }}
+        style={{ bgColor: 'blue', optionsWidth: 'max-option' }}
         validation={{ options: wifiModeList, value: buttonItem }}
         onChange={(value) => (buttonItem = value)}
       />
 
-      <Accordion id="acc3" label={{ text: 'Настройки режима STA' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false, type: 'sub' }}>
+      <Accordion id="acc3" label={{ text: 'Настройки режима STA' }} style={{ inlineStyle: 'width: 100%;', type: 'sub' }} validation={{ initialState: false }}>
         <Select
           label="Точка доступа"
           options={accessPoints}
@@ -292,12 +244,11 @@
 
         <UIInput
           id="sta-psk"
-          label="Пароль"
-          styleCSS="width: 30%;"
-          Type="password"
+          label={{ text: 'Пароль' }}
+          style={{ inlineStyle: 'width: 30%;' }}
+          validation={{ type: 'password', RegExp: /^[0-9a-z]{0,5}$/ }}
           bind:value={inputString}
-          placeholder="Enter password"
-          RegExp={/^[0-9a-z]{0,5}$/}
+          help={{ placeholder: 'Enter password' }}
         />
 
         <Separator visible={false} />
@@ -305,79 +256,97 @@
         <UISwitch label="Режим IP" captionLeft="Статический" captionRight="Динамический" color="blue" />
         <Separator visible={false} />
         <UIInput
-          label="IP Address"
-          styleCSS="width: 30%;"
+          label={{ text: 'IP Address' }}
+          style={{ inlineStyle: 'width: 30%;' }}
           id="sta-ip"
-          autocomplete="on"
-          placeholder="XXX.XXX.XXX.XXX"
-          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+          validation={{
+            autocomplete: 'on',
+            RegExp:
+              /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+          }}
+          help={{ placeholder: 'XXX.XXX.XXX.XXX' }}
         />
 
         <UIInput
-          label="Mask"
-          styleCSS="width: 30%;"
+          label={{ text: 'Mask' }}
+          style={{ inlineStyle: 'width: 30%;' }}
           id="sta-ms"
-          autocomplete="on"
-          placeholder="XXX.XXX.XXX.XXX"
-          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+          help={{ placeholder: 'XXX.XXX.XXX.XXX' }}
+          validation={{
+            autocomplete: 'on',
+            RegExp:
+              /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+          }}
         />
 
         <UIInput
-          label="Gateway"
-          styleCSS="width: 30%;"
+          label={{ text: 'Gateway' }}
+          style={{ inlineStyle: 'width: 30%;' }}
           id="sta-gw"
-          autocomplete="on"
-          placeholder="XXX.XXX.XXX.XXX"
-          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+          help={{ placeholder: 'XXX.XXX.XXX.XXX' }}
+          validation={{
+            autocomplete: 'on',
+            RegExp:
+              /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+          }}
         />
       </Accordion>
 
-      <Accordion id="acc4" label={{ text: 'Настройки режима AP' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false, type: 'sub' }}>
+      <Accordion id="acc4" label={{ text: 'Настройки режима AP' }} style={{ inlineStyle: 'width: 100%;', type: 'sub' }} validation={{ initialState: true }}>
         <UIInput
           id="input-ap-ssid"
-          label="Имя точки доступа"
-          styleCSS="width: 30%;"
-          Type="text"
+          label={{ text: 'Имя точки доступа' }}
+          style={{ inlineStyle: 'width: 30%;', color: 'green' }}
+          validation={{ type: 'text', RegExp: /^[0-9a-z]{0,5}$/ }}
           bind:value={inputString}
-          placeholder="Enter string"
-          RegExp={/^[0-9a-z]{0,5}$/}
+          help={{ placeholder: 'Enter string' }}
         />
         <UIInput
           id="input-ap-psk"
-          label="Пароль точки доступа"
-          styleCSS="width: 30%;"
-          Type="password"
+          label={{ text: 'Пароль точки доступа' }}
+          style={{ inlineStyle: 'width: 30%;' }}
+          validation={{ type: 'password', RegExp: /^[0-9a-z]{0,5}$/ }}
           bind:value={inputString}
-          placeholder="Enter string"
-          RegExp={/^[0-9a-z]{0,5}$/}
+          help={{ placeholder: 'Enter password' }}
         />
 
         <Separator visible={false} />
+
         <UIInput
-          label="IP Address"
-          styleCSS="width: 20rem;"
+          label={{ text: 'IP Address' }}
+          style={{ inlineStyle: 'width: 20rem;' }}
           id="ap-ip"
-          autocomplete="on"
-          placeholder="XXX.XXX.XXX.XXX"
-          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+          validation={{
+            type: 'text',
+            autocomplete: 'on',
+            RegExp:
+              /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+          }}
+          help={{ placeholder: 'XXX.XXX.XXX.XXX' }}
         />
 
         <UIInput
-          label="Mask"
-          styleCSS="width: 20rem;"
+          label={{ text: 'Mask' }}
+          style={{ inlineStyle: 'width: 20rem;' }}
           id="ap-ms"
-          autocomplete="on"
-          placeholder="XXX.XXX.XXX.XXX"
-          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+          help={{ placeholder: 'XXX.XXX.XXX.XXX' }}
+          validation={{
+            autocomplete: 'on',
+            RegExp:
+              /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+          }}
         />
 
         <UIInput
-          label="Gateway"
-          styleCSS="width: 20rem;"
+          label={{ text: 'Gateway' }}
+          style={{ inlineStyle: 'width: 20rem;' }}
           id="ap-gw"
-          autocomplete="on"
-          placeholder="XXX.XXX.XXX.XXX"
-          RegExp={/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
+          help={{ placeholder: 'XXX.XXX.XXX.XXX' }}
+          validation={{
+            autocomplete: 'on',
+            RegExp:
+              /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+          }}
         />
       </Accordion>
       <UIButton
@@ -394,7 +363,7 @@
       />
     </Accordion>
 
-    <Accordion id="acc5" label={{ text: 'Button component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: true }}>
+    <Accordion id="acc5" label={{ text: 'Button component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: true }}>
       <div style="display: flex; flex-wrap: wrap; align-items: center;">
         <UIButton
           id="button4"
@@ -468,52 +437,58 @@
         />
         <p style="flex: 1;">Kнопка нажата <strong>{counter}</strong> раз</p>
       </div>
+
       <UIButton
         id="button15"
-        label={{ text: 'Режимы wifi' }}
-        style={{ bgColor: 'rose', optionWidth: 'max-option' }}
+        label={{ text: 'Режимы wifi (ширина по длинной опции)' }}
+        style={{ bgColor: 'rose', optionsWidth: 'max-option', level_1: 'width: 60%' }}
         validation={{ options: wifiModeList, value: buttonItem }}
         onChange={(value) => (buttonItem = value)}
       />
       <p style="flex: 1;">Bыбранный режим: {buttonItem.name}</p>
+      <Separator visible={false} />
+
+      <UIButton
+        id="button16"
+        label={{ text: 'Режимы wifi (автоматическая ширина)' }}
+        style={{ bgColor: 'white', optionsWidth: 'auto' }}
+        validation={{ options: wifiModeList, value: buttonItem }}
+        onChange={(value) => (buttonItem = value)}
+      />
     </Accordion>
 
-    <Accordion id="acc6" label={{ text: 'Input component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+    <Accordion id="acc6" label={{ text: 'Input component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: false }}>
       <UIInput
         id="input-string"
-        label="Поле ввода строки"
-        styleCSS="width: 60%;"
-        Type="password"
+        label={{ text: 'Поле ввода строки' }}
+        style={{ inlineStyle: 'width: 60%;' }}
+        validation={{ type: 'password', RegExp: /^[0-9a-z]{0,5}$/ }}
         bind:value={inputString}
-        placeholder="Enter string"
-        RegExp={/^[0-9a-z]{0,5}$/}
+        help={{ placeholder: 'Enter string' }}
       />
       <p style="margin-top: 0; width: 40%;">Введенная строка: {inputString}</p>
       <UIInput
         id="input-number"
-        label="Поле ввода числа"
-        styleCSS="width: 20%;"
-        Type="number"
+        label={{ text: 'Поле ввода числа' }}
+        style={{ inlineStyle: 'width: 20%;' }}
+        validation={{ type: 'number' }}
         bind:value={inputNumber}
-        Info=" Проблема в том, что груз задачи мешает работать. Мы ведь понимаем, что это надолго."
-        placeholder="Enter number"
+        help={{ placeholder: 'Enter number', info: 'Проблема в том, что груз задачи мешает работать. Мы ведь понимаем, что это надолго.' }}
       />
       <p style="margin-top: 0; width: 20%;">Введенное число: {inputNumber}</p>
       <Separator visible={false} />
 
       <UIInput
         id="input-text"
-        label="Поле ввода текста"
-        styleCSS="width: 50%;"
-        Info="info about this input"
-        Type="text-area"
+        label={{ text: 'Поле ввода текста' }}
+        style={{ inlineStyle: 'width: 50%;', rows: 5 }}
+        validation={{ type: 'text-area', disabled: false }}
         bind:value={text}
-        disabled
-        placeholder="Enter text"
+        help={{ placeholder: 'Enter text', info: 'info about this input' }}
       />
       <p style="margin-top: 0; width: 40%;">Введенный текст: {text}</p>
 
-      <Accordion id="acc7" validation={{ type: 'sub' }} label={{ text: 'File input' }} style={{ styleCSS: 'width: 100%;' }}>
+      <Accordion id="acc7" label={{ text: 'File input' }} style={{ inlineStyle: 'width: 100%;', type: 'sub' }}>
         <FileInput id="default-file-input" label={{ text: 'Upload document' }} style={{ styleCSS: 'width: 60%;' }} validation={{ accept: '.pdf,.doc,.docx' }} />
         <FileInput
           id="image-file-input"
@@ -524,7 +499,7 @@
       </Accordion>
     </Accordion>
 
-    <Accordion id="acc8" label={{ text: 'Slider component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+    <Accordion id="acc8" label={{ text: 'Slider component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: false }}>
       <!-- vertical -->
       <UISlider
         label="label"
@@ -632,11 +607,59 @@
       />
     </Accordion>
 
-    <Accordion id="acc9" label={{ text: 'Table component' }} style={{ styleCSS: 'width: 100%;' }} validation={{ state: false }}>
+    <Accordion id="acc9" label={{ text: 'Table component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: false }}>
       <Table {rows} {columns} label="Устройства" />
     </Accordion>
 
-    <Accordion id="acc10" label={{ text: 'Еще что то' }} style={{ styleCSS: 'width: 40%; margin: 1rem;' }} validation={{ state: false }}></Accordion>
-    <Accordion id="acc11" label={{ text: 'Еще что то' }} style={{ styleCSS: 'width: 40%; margin: 1rem;' }} validation={{ state: false }}></Accordion>
+    <Accordion id="acc10" label={{ text: 'Еще что то' }} style={{ inlineStyle: 'width: 40%; margin: 1rem;' }} validation={{ initialState: false }}></Accordion>
+    <Accordion id="acc11" label={{ text: 'Еще что то' }} style={{ inlineStyle: 'width: 40%; margin: 1rem;' }} validation={{ initialState: false }}></Accordion>
   </div>
+
+  <ButtonGroup
+    id="TestButtonGroup-1"
+    label="Component - ButtonGroup"
+    className="m-4"
+    options={RadioGroupOption}
+    value={radioButtonValue}
+    onChange={handleRadioButton}
+    props={{ disabled: false }}
+  />
+
+  <ButtonGroup
+    id="TestButtonGroup-2"
+    label="Default Tags"
+    className="m-4"
+    options={DEFAULT_TAGS}
+    value={radioButtonValue}
+    onChange={handleRadioButton}
+    props={{ disabled: false }}
+  />
+
+  <br />
+
+  <div class="flex flex-row">
+    <Input id="TestInputHeader" bind:value={packHeader} props={{ autocomplete: 'on', maxLength: 8 }} className="m-1" />
+    <Input id="TestInputArgument" bind:value={packArgument} props={{ autocomplete: 'on', maxLength: 16 }} className="m-1" />
+    <Input id="TestInputValue" bind:value={packValue} props={{ autocomplete: 'on', maxLength: 32 }} className="m-1" />
+    <Button onClick={testCrypto} label="Отправить" props={{ bgColor: 'bg-lime-200' }} className="m-1 w-40 rounded-2xl" />
+  </div>
+
+  <br />
+
+  <ProgressBar id="testProgressBar" label="Component - ProgressBar" className="" bind:value={progressBarValue} />
+  <div class="mt-4 flex">
+    <Button onClick={decreaseProgressBar} label="-10" className="m-1" />
+    <Button onClick={resetProgressBar} label="Сбросить" className="m-1" />
+    <Button onClick={increaseProgressBar} label="+10" className="m-1" />
+  </div>
+
+  <br />
+
+  <ColorPicker id="ColorPicker" label="Test Color Picker" className="w-full" bind:value={colorValue} onUpdate={handleColorUpdate} />
+
+  <br />
+
+  <Switch id="Switch" label="Test Switch" value={switchValue} className="" onUpdate={toggleSwitch} />
+
+  <Separator visible={false} />
 </div>

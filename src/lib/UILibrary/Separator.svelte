@@ -1,6 +1,14 @@
 <script lang="ts">
-  import type { SeparatorProps } from './Interface'
+  import type { Colors } from './Interface'
 
+  export interface SeparatorProps {
+    id?: string
+    label?: string
+    styleCSS?: string
+    labelAlign?: 'start' | 'center' | 'end'
+    color?: Colors
+    visible?: boolean
+  }
   let { id = '', label = '', styleCSS = '', labelAlign = 'center', color = 'primary', visible = true }: SeparatorProps = $props()
 </script>
 

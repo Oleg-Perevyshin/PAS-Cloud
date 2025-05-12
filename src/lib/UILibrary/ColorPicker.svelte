@@ -7,7 +7,7 @@
       text?: string
       align?: 'start' | 'center' | 'end'
     }
-    value?: boolean | string | number | number[] | object | null
+    value?: number[]
     style?: {
       styleCSS?: string
     }
@@ -149,8 +149,10 @@
       tabindex="0"
     >
       <!-- Градиент яркости -->
-      <!-- <div class="gradient" style="background: linear-gradient(white, black); mix-blend-mode: multiply;"></div> -->
-      <div class="gradient" style="background: linear-gradient(white, black); mix-blend-mode: screen;"></div>
+      <div
+        class="gradient"
+        style="background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,1))"
+      ></div>
 
       <!-- Область предпросмотра цвета -->
       <div class="color" style="left: {pointerPosition.x}%; top: {pointerPosition.y}%; background: rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, 1);"></div>

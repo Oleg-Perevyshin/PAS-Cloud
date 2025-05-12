@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Colors } from './Interface'
 
-  interface IColumn<T extends object> {
+  export interface IColumn<T extends object> {
     label: string
     key: keyof T
     width?: string
@@ -14,7 +14,7 @@
     }
   }
 
-  interface Props<T extends object> {
+  export interface Props<T extends object> {
     id?: string
     label?: string
     labelAlign?: 'start' | 'center' | 'end'

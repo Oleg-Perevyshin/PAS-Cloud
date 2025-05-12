@@ -110,7 +110,7 @@ export const GET: RequestHandler = async (event) => {
         LatestFW: device.LatestFW,
         Brief: latestVersionLocalization.Brief,
         Description: latestVersionLocalization.Description,
-        Versions: versionsWithLocalizations, // Все версии с локализациями
+        Versions: versionsWithLocalizations,
         Created: FormatDate(device.Created.toISOString()),
         Updated: FormatDate(device.Updated.toISOString()),
       }

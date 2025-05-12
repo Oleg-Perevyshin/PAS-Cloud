@@ -7,7 +7,7 @@
     label?: {
       text?: string
       align?: 'start' | 'center' | 'end'
-      itemColor?: Colors | null
+      color?: Colors | null
     }
     validation?: {
       disabled?: boolean
@@ -19,7 +19,7 @@
       level_1?: string
       level_2?: string
       bgColor?: Colors
-      optionWidth?: 'auto' | 'max-option'
+      optionsWidth?: 'auto' | 'max-option'
       icon?: (new (...args: any[]) => SvelteComponent) | null
       iconProps?: Record<string, unknown>
     }
@@ -33,7 +33,7 @@
     label = {
       text: '',
       align: 'center',
-      itemColor: null,
+      color: null,
     },
     validation = {
       text: '',
@@ -45,7 +45,7 @@
       level_1: '',
       level_2: '',
       bgColor: 'white',
-      optionWidth: 'auto',
+      optionsWidth: 'auto',
       icon: null,
       iconProps: {},
     },
@@ -71,19 +71,18 @@
   }
 
   onMount(() => {
-    if (validation.options && style.optionWidth === 'max-option') {
+    if (validation.options && style.optionsWidth === 'max-option') {
       const maxLength = validation.options.reduce((max, option) => {
         return Math.max(max, option.name!.length)
       }, 0)
-
-      maxWidth = `${maxLength * 0.9}rem`
+      maxWidth = `${maxLength}ch`
     }
   })
 </script>
 
 <div class="button-conteiner" style={style.level_1}>
   {#if label}
-    <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.itemColor ? label.itemColor : 'font'}-color);">{label.text}</label>
+    <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.color ? label.color : 'font'}-color);">{label.text}</label>
   {/if}
   {#if validation.options}
     <div class="group {validation.disabled ? 'disabled' : ''}" {id}>
@@ -98,7 +97,9 @@
           onclick={() => updateValue(item)}
           style="width: {maxWidth}; {style.bgColor == 'white'
             ? 'border: 1px solid var(--border-color);'
-            : 'color: white; border: 1px solid var(--color); margin: 0 1px;'} {validation.disabled ? 'cursor: not-allowed;' : ''}"
+            : 'color: white; border: 1px solid var(--color); margin: 0 1px;'} {item.color
+            ? `background-color: var(--${item.color}-color); color: white; border: 1px solid var(--${item.color}-color);`
+            : ''} {validation.disabled ? 'cursor: not-allowed;' : ''}"
           disabled={validation.disabled}
         >
           {item.name}
@@ -146,7 +147,6 @@
     padding: 0.25rem 1rem;
     cursor: pointer;
     user-select: none;
-    font-weight: 500;
     outline: none;
     color: black;
     transition: box-shadow 0.3s;
@@ -187,6 +187,8 @@
     padding: 0.25rem 0.5rem;
     user-select: none;
     background-color: var(--color);
+    box-sizing: content-box;
+    white-space: nowrap;
 
     &:hover {
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);

@@ -3,51 +3,42 @@
   import { slide } from 'svelte/transition'
   import type { Colors } from './Interface'
 
-  interface Props {
+  export interface AccordionProps {
     id: string
     label?: {
       text?: string
       align?: 'start' | 'center' | 'end'
-      bgColor?: Colors | null
+      color?: Colors
     }
     validation?: {
-      state?: boolean
-      type?: 'main' | 'sub'
+      initialState?: boolean
     }
     style?: {
-      styleCSS?: string
+      type?: 'main' | 'sub'
+      inlineStyle?: string
     }
     children?: Snippet
   }
 
-  const props: Props = $props()
+  const props: AccordionProps = $props()
 
-  let reactiveValidation = $state({
-    type: 'main',
-    state: false,
-    ...props.validation,
-  })
+  let isOpen = $state(props.validation?.initialState ?? false)
 
-  function toggle() {
-    reactiveValidation.state = !reactiveValidation.state
-  }
+  const toggle = () => (isOpen = !isOpen)
 </script>
 
-<div
-  id={props.id}
-  class="accordion-container {reactiveValidation.type === 'main' ? 'main' : 'sub'} {props.label?.bgColor}"
-  transition:slide={{ duration: 300 }}
-  style={props.style?.styleCSS}
->
+<div id={props.id} class="accordion-container {props.style?.type ?? 'main'}" transition:slide={{ duration: 300 }} style={props.style?.inlineStyle}>
   <button class="header-button" onclick={toggle}>
-    <span class="toggle" style="text-align: {props.label?.align};">{props.label?.text}</span>
+    <span class="toggle" style="text-align: {props.label?.align}; color: var(--{props.label?.color ? props.label.color : 'font'}-color);"
+      >{props.label?.text}</span
+    >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="arrow"
       width="1.1rem"
       height="1.1rem"
       viewBox="0 0 24 24"
-      style="transform: rotate({reactiveValidation.state ? 180 : 0}deg); transition: transform 0.3s;"
+      style="transform: rotate({isOpen ? 180 : 0}deg); transition: transform 0.3s;"
     >
       <path
         fill="none"
@@ -61,7 +52,7 @@
     </svg>
   </button>
 
-  {#if reactiveValidation.state}
+  {#if isOpen}
     <div class="wrapper" transition:slide={{ duration: 300 }}>
       <div class="content">
         {@render props.children?.()}

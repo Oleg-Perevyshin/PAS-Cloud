@@ -4,72 +4,90 @@
   import type { Colors } from './Interface'
 
   interface InputProps {
-    value?: boolean | string | number | number[] | object | null
     id: string
-    Type?: 'text' | 'password' | 'number' | 'text-area'
-    placeholder?: string
-    Info?: string
-    label?: string
-    labelAlign?: 'start' | 'center' | 'end'
-    styleCSS?: string
-    color?: Colors
-    disabled?: boolean
-    required?: boolean
-    readonly?: boolean
-    autocomplete?:
-      | 'on'
-      | 'off'
-      | 'given-name'
-      | 'family-name'
-      | 'name'
-      | 'email'
-      | 'username'
-      | 'new-password'
-      | 'current-password'
-      | 'tel'
-      | 'country-name'
-      | 'address-level1'
-      | 'address-level2'
-      | 'street-address'
-      | 'postal-code'
-      | 'cc-name'
-      | 'cc-number'
-      | 'cc-exp'
-      | 'cc-csc'
-      | null
+    value?: string | number | null
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+      color?: Colors
+    }
+    validation?: {
+      disabled?: boolean
+      required?: boolean
+      readonly?: boolean
+      autocomplete?:
+        | 'on'
+        | 'off'
+        | 'given-name'
+        | 'family-name'
+        | 'name'
+        | 'email'
+        | 'username'
+        | 'new-password'
+        | 'current-password'
+        | 'tel'
+        | 'country-name'
+        | 'address-level1'
+        | 'address-level2'
+        | 'street-address'
+        | 'postal-code'
+        | null
+      type?: 'text' | 'password' | 'number' | 'text-area'
+      RegExp?: RegExp
+      step?: number
+      minNum?: number
+      maxNum?: number
+    }
+    style?: {
+      inlineStyle?: string
+      color?: Colors
+      rows?: number
+    }
+    help?: {
+      placeholder?: string
+      info?: string
+    }
+
     onUpdate?: (value: string) => void
-    RegExp?: RegExp
-    step?: number
-    minNum?: number
-    maxNum?: number
-    rows?: number
   }
 
   let {
-    value = $bindable(null),
     id = '',
-    Type = 'text',
-    placeholder = '',
-    Info = '',
-    label = '',
-    labelAlign = 'center',
-    styleCSS = '',
-    color = 'blue',
-    disabled = false,
-    required = false,
-    readonly = false,
-    autocomplete = null,
+    value = $bindable(null),
+    label = {
+      text: '',
+      align: 'center',
+      color: 'blue',
+    },
+    validation = {
+      disabled: false,
+      required: false,
+      readonly: false,
+      autocomplete: null,
+      type: 'text',
+      RegExp: /./,
+      step: 1,
+      minNum: 1,
+      maxNum: 10,
+    },
+    style = {
+      inlineStyle: '',
+      color: 'blue',
+      rows: 5,
+    },
+    help = {
+      placeholder: '',
+      info: '',
+    },
+
     onUpdate = () => {},
-    RegExp = /./,
-    step = 0.1,
-    minNum = 1,
-    maxNum = 10,
-    rows = 5,
   }: InputProps = $props()
 
-  let showPassword = $state(Type === 'password')
+  let showPassword = $state(validation.type === 'password')
   let isValid = $state(true)
   let showInfo = $state(false)
+  let inputType = $state(validation.type ?? 'text')
+  let colorStyle = $state(style.color ?? 'blue')
 
   onMount(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -87,7 +105,7 @@
 
   function updateValue(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value
-    isValid = RegExp && RegExp.test(inputValue) ? true : false
+    isValid = validation.RegExp && validation.RegExp.test(inputValue) ? true : false
     value = inputValue
     onUpdate(value)
   }
@@ -101,21 +119,21 @@
   }
 
   function increment() {
-    if (typeof value === 'number') {
-      let newValue = value + step
-      newValue = Math.min(newValue, maxNum)
+    if (typeof value === 'number' && validation.step && validation.maxNum) {
+      let newValue = value + validation.step
+      newValue = Math.min(newValue, validation.maxNum)
 
-      const decimalPlaces = countDecimalPlaces(step)
+      const decimalPlaces = countDecimalPlaces(validation.step)
       value = parseFloat(newValue.toFixed(decimalPlaces))
     }
   }
 
   function decrement() {
-    if (typeof value === 'number') {
-      let newValue = value - step
-      newValue = Math.max(newValue, minNum)
+    if (typeof value === 'number' && validation.step && validation.minNum) {
+      let newValue = value - validation.step
+      newValue = Math.max(newValue, validation.minNum)
 
-      const decimalPlaces = countDecimalPlaces(step)
+      const decimalPlaces = countDecimalPlaces(validation.step)
       value = parseFloat(newValue.toFixed(decimalPlaces))
     }
   }
@@ -129,26 +147,26 @@
   }
 </script>
 
-<div class="input-container {color}" style={styleCSS}>
+<div class="input-container {colorStyle}" style={style.inlineStyle}>
   {#if label}
-    <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
+    <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.color ? label.color : 'font'}-color);">{label.text}</label>
   {/if}
   <div class="input-wrapper">
-    {#if Type === 'text' || Type === 'password' || Type === 'number'}
+    {#if inputType === 'text' || inputType === 'password' || inputType === 'number'}
       <input
-        class={`input ${disabled ? 'disabled' : ''} ${required ? 'required' : ''} ${!isValid ? 'invalid' : ''}`}
+        class={`input ${validation.disabled ? 'disabled' : ''} ${validation.required ? 'required' : ''} ${!isValid ? 'invalid' : ''}`}
         {id}
-        {placeholder}
+        placeholder={help.placeholder}
         bind:value
-        {autocomplete}
-        {disabled}
+        autocomplete={validation.autocomplete}
+        disabled={validation.disabled}
         oninput={updateValue}
-        type={Type === 'password' && showPassword ? 'password' : Type === 'number' ? 'number' : 'text'}
-        min={minNum}
-        max={maxNum}
-        {step}
+        type={inputType === 'password' && showPassword ? 'password' : inputType === 'number' ? 'number' : 'text'}
+        min={validation.minNum}
+        max={validation.maxNum}
+        step={validation.step}
       />
-      {#if Type === 'number'}
+      {#if inputType === 'number'}
         <div class="number-controls">
           <button type="button" class="number-btn up" aria-label="increment" onclick={increment}>
             <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
@@ -165,19 +183,19 @@
     {:else}
       <textarea
         name="area"
-        class="text-area {disabled ? 'disabled' : ''}"
+        class="text-area {validation.disabled ? 'disabled' : ''}"
         {id}
         bind:value
-        {readonly}
-        {autocomplete}
-        {disabled}
-        {rows}
-        style="padding: {Info ? '0.25rem 0.5rem 0.25rem 2.6rem' : '0.25rem 1rem'};"
+        readonly={validation.readonly}
+        autocomplete={validation.autocomplete}
+        disabled={validation.disabled}
+        rows={style.rows}
+        style="padding: {help.info ? '0.25rem 0.5rem 0.25rem 2.6rem' : '0.25rem 1rem'};"
         oninput={updateValue}
       ></textarea>
     {/if}
 
-    {#if Type === 'password'}
+    {#if inputType === 'password'}
       <button type="button" class="toggle-button" onclick={togglePasswordVisibility} aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}>
         {#if showPassword}
           <svg xmlns="http://www.w3.org/2000/svg" width="1.3rem" height="1.3rem" viewBox="0 0 24 24" class="icon-eye"
@@ -196,7 +214,7 @@
         {/if}
       </button>
     {/if}
-    {#if Info}
+    {#if help.info}
       <button type="button" class="button-info" onclick={toggleInfoVisibility} aria-label={showInfo ? 'Скрыть инфо' : 'Показать инфо'}>
         <svg xmlns="http://www.w3.org/2000/svg" class="info" height="1.5rem" width="1.5rem" viewBox="0 0 24 24"
           ><path
@@ -209,7 +227,7 @@
   </div>
   {#if showInfo}
     <div transition:fly={{ y: 15, duration: 300 }} class="info-container" style="top: {label ? '4.5rem' : '2.5rem'};">
-      {Info}
+      {help.info}
     </div>
   {/if}
 </div>

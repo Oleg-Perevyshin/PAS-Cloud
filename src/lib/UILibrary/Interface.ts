@@ -105,15 +105,7 @@ export interface IOption {
   id: number | string
   value?: string | number //| object
   name?: string
+  color?: Colors
 }
 
 export type Colors = 'primary' | 'white' | 'red' | 'orange' | 'amber' | 'lime' | 'green' | 'sky' | 'blue' | 'purple' | 'pink' | 'rose'
-
-export interface SeparatorProps {
-  id?: string
-  label?: string
-  styleCSS?: string
-  labelAlign?: 'start' | 'center' | 'end'
-  color?: Colors
-  visible?: boolean
-}
