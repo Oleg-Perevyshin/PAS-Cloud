@@ -3,18 +3,39 @@
 
   export interface SeparatorProps {
     id?: string
-    label?: string
-    styleCSS?: string
-    labelAlign?: 'start' | 'center' | 'end'
-    color?: Colors
-    visible?: boolean
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+      color?: Colors | null
+    }
+    style?: {
+      inlineStyle?: string
+      color?: Colors
+      visible?: boolean
+    }
   }
-  let { id = '', label = '', styleCSS = '', labelAlign = 'center', color = 'primary', visible = true }: SeparatorProps = $props()
+
+  const defaultLabel = {
+    text: '',
+    align: 'center' as const,
+    color: null,
+  }
+
+  const defaultStyle = {
+    inlineStyle: '',
+    color: 'blue' as Colors,
+    visible: true,
+  }
+
+  let { id = '', label = defaultLabel, style = defaultStyle }: SeparatorProps = $props()
+
+  label = { ...defaultLabel, ...label }
+  style = { ...defaultStyle, ...style }
 </script>
 
-<hr {id} class={color} style="{styleCSS} {visible ? '' : 'height: 1rem; border: none;'}" />
+<hr {id} class={style.color} style="{style.inlineStyle} {style.visible ? '' : 'height: 1rem; border: none;'}" />
 {#if label}
-  <label for={id} class="label" style="text-align: {labelAlign};">{label}</label>
+  <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.color ? label.color : 'font'}-color);">{label.text}</label>
 {/if}
 
 <style>

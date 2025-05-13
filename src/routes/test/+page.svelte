@@ -31,6 +31,9 @@
   const accessPoints: IOption[] = [
     { id: 1, name: 'point1' },
     { id: 2, name: 'point2' },
+    { id: 3, name: 'point3' },
+    { id: 4, name: 'point4' },
+    { id: 5, name: 'point5' },
   ]
   let ap: IOption = $state(accessPoints[0])
 
@@ -212,11 +215,11 @@
   <div class="flex flex-wrap items-start justify-center">
     <Accordion id="acc1" label={{ text: 'Graph component (в разработке)' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: false }}>
       <Graph {data} width={800} label="График" xLabel="Время" yLabel="Значение" />
-      <UIColorPicker id="ColorPicker" label={{ text: 'Test Color Picker' }} style={{ styleCSS: 'width: 25rem;' }} value={[255, 100, 0]} />
-      <Separator visible={false} />
+      <UIColorPicker id="ColorPicker" label={{ text: 'Test Color Picker' }} style={{ inlineStyle: 'width: 20rem; height: 14rem;' }} value={[255, 100, 0]} />
+      <Separator style={{ visible: false }} />
       <UIButton
         id="button1"
-        validation={{ text: 'Сохранить' }}
+        validation={{ text: 'Сохранить', disabled: true }}
         style={{ level_2: 'width: 10rem; margin: 0.5rem;', bgColor: 'green' }}
         onClick={() => counter++}
       />
@@ -231,15 +234,20 @@
         onChange={(value) => (buttonItem = value)}
       />
 
-      <Accordion id="acc3" label={{ text: 'Настройки режима STA' }} style={{ inlineStyle: 'width: 100%;', type: 'sub' }} validation={{ initialState: false }}>
+      <Accordion id="acc3" label={{ text: 'Настройки режима STA' }} style={{ inlineStyle: 'width: 100%;', type: 'sub' }} validation={{ initialState: true }}>
         <Select
-          label="Точка доступа"
-          options={accessPoints}
+          label={{ text: 'Точка доступа' }}
           value={ap}
-          styleCSS="width: 20rem;"
+          style={{ inlineStyle: 'width: 20rem;', color: 'white' }}
+          validation={{ options: accessPoints, showCustomOption: false }}
           onUpdate={(value) => (selectValue = value)}
-          showCustomOption
-          color="white"
+        />
+        <Select
+          label={{ text: 'Точка доступа' }}
+          value={ap}
+          style={{ inlineStyle: 'width: 30%;', color: 'green' }}
+          validation={{ options: accessPoints, showCustomOption: true }}
+          onUpdate={(value) => (selectValue = value)}
         />
 
         <UIInput
@@ -251,10 +259,17 @@
           help={{ placeholder: 'Enter password' }}
         />
 
-        <Separator visible={false} />
+        <Separator style={{ visible: false }} />
 
-        <UISwitch label="Режим IP" captionLeft="Статический" captionRight="Динамический" color="blue" />
-        <Separator visible={false} />
+        <UISwitch
+          id="ui-switch"
+          label={{ text: 'Режим IP', captionLeft: 'Статический', captionRight: 'Динамический', color: 'purple' }}
+          style={{ color: 'orange' }}
+          onChange={(value) => {
+            switchValue = value
+          }}
+        />
+        <Separator style={{ visible: false }} />
         <UIInput
           label={{ text: 'IP Address' }}
           style={{ inlineStyle: 'width: 30%;' }}
@@ -310,7 +325,7 @@
           help={{ placeholder: 'Enter password' }}
         />
 
-        <Separator visible={false} />
+        <Separator style={{ visible: false }} />
 
         <UIInput
           label={{ text: 'IP Address' }}
@@ -363,7 +378,7 @@
       />
     </Accordion>
 
-    <Accordion id="acc5" label={{ text: 'Button component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: true }}>
+    <Accordion id="acc5" label={{ text: 'Button component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: false }}>
       <div style="display: flex; flex-wrap: wrap; align-items: center;">
         <UIButton
           id="button4"
@@ -446,7 +461,7 @@
         onChange={(value) => (buttonItem = value)}
       />
       <p style="flex: 1;">Bыбранный режим: {buttonItem.name}</p>
-      <Separator visible={false} />
+      <Separator style={{ visible: false }} />
 
       <UIButton
         id="button16"
@@ -476,7 +491,7 @@
         help={{ placeholder: 'Enter number', info: 'Проблема в том, что груз задачи мешает работать. Мы ведь понимаем, что это надолго.' }}
       />
       <p style="margin-top: 0; width: 20%;">Введенное число: {inputNumber}</p>
-      <Separator visible={false} />
+      <Separator style={{ visible: false }} />
 
       <UIInput
         id="input-text"
@@ -489,17 +504,22 @@
       <p style="margin-top: 0; width: 40%;">Введенный текст: {text}</p>
 
       <Accordion id="acc7" label={{ text: 'File input' }} style={{ inlineStyle: 'width: 100%;', type: 'sub' }}>
-        <FileInput id="default-file-input" label={{ text: 'Upload document' }} style={{ styleCSS: 'width: 60%;' }} validation={{ accept: '.pdf,.doc,.docx' }} />
+        <FileInput
+          id="default-file-input"
+          label={{ text: 'Upload document' }}
+          style={{ inlineStyle: 'width: 60%;' }}
+          validation={{ accept: '.pdf,.doc,.docx' }}
+        />
         <FileInput
           id="image-file-input"
           validation={{ type: 'image', accept: 'image/*' }}
-          style={{ styleCSS: 'width: 30%;' }}
+          style={{ inlineStyle: 'width: 30%;' }}
           label={{ text: 'Profile picture' }}
         />
       </Accordion>
     </Accordion>
 
-    <Accordion id="acc8" label={{ text: 'Slider component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: false }}>
+    <Accordion id="acc8" label={{ text: 'Slider component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: true }}>
       <!-- vertical -->
       <UISlider
         label="label"
@@ -551,7 +571,7 @@
         onUpdate={(value) => (sliderValue = value)}
       />
 
-      <Separator visible={false} />
+      <Separator style={{ visible: false }} />
 
       <!-- horizontal -->
       <UISlider
@@ -579,7 +599,7 @@
         onUpdate={(value) => (sliderValue = value)}
       />
 
-      <Separator visible={false} />
+      <Separator style={{ visible: false }} />
 
       <UISlider
         label="label"
@@ -661,5 +681,5 @@
 
   <Switch id="Switch" label="Test Switch" value={switchValue} className="" onUpdate={toggleSwitch} />
 
-  <Separator visible={false} />
+  <Separator style={{ visible: false }} />
 </div>

@@ -1,32 +1,57 @@
 <script lang="ts">
   import type { Colors } from './Interface'
 
-  interface Props {
-    color?: Colors
-    checked?: boolean
-    disabled?: boolean
-    label?: string
-    textAlign?: 'center' | 'end' | 'start'
-    height?: string
-    captionLeft?: string
-    captionRight?: string
+  interface SwitchProps {
+    id: string
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+      color?: Colors | null
+      captionLeft?: string
+      captionRight?: string
+    }
+    style?: {
+      color?: Colors
+      height?: string
+    }
+    validation?: {
+      checked?: boolean
+      disabled?: boolean
+    }
+
     onChange?: (value: boolean) => void
   }
 
-  let {
-    color = 'primary',
-    checked = false,
-    disabled = false,
-    label = '',
-    textAlign = 'center',
-    height = '1.5rem',
-    captionLeft = '',
-    captionRight = '',
-    onChange,
-  }: Props = $props()
+  let defaultLabel = {
+    text: '',
+    align: 'center' as const,
+    color: null,
+    captionLeft: '',
+    captionRight: '',
+  }
+  let defaultStyle = {
+    color: 'blue' as Colors,
+    height: '1.5rem',
+  }
+  const defaultValidation = {
+    disabled: false,
+    checked: false,
+  }
+
+  let { id = '', label = defaultLabel, style = defaultStyle, validation = defaultValidation, onChange }: SwitchProps = $props()
+
+  label = { ...defaultLabel, ...label }
+  style = { ...defaultStyle, ...style }
+  validation = { ...defaultValidation, ...validation }
+
+  // Реактивное состояние для checked
+  let checked = $state(validation.checked)
+  $effect(() => {
+    checked = validation.checked ?? false
+  })
 
   const handleToggle = (event: Event) => {
-    if (disabled) return
+    if (validation.disabled) return
     checked = (event.target as HTMLInputElement).checked
     if (onChange) {
       onChange(checked)
@@ -40,33 +65,38 @@
     }
   }
 
-  let maxCaptionWidth: string = $derived(
-    (() => {
-      const leftWidth = captionLeft.length > 0 ? `${captionLeft.length}ch` : 'auto'
-      const rightWidth = captionRight.length > 0 ? `${captionRight.length}ch` : 'auto'
-      return captionLeft.length > captionRight.length ? leftWidth : rightWidth
-    })(),
+  const maxCaptionWidth = $derived(
+    Math.max(label.captionLeft?.length ?? 0, label.captionRight?.length ?? 0) > 0
+      ? `${Math.max(label.captionLeft?.length ?? 0, label.captionRight?.length ?? 0)}ch`
+      : 'auto',
   )
 </script>
 
 <div class="wrapper">
   {#if label}
-    <label class="label-container" style="justify-content: {textAlign};">
-      <span>{label}</span>
-      <input type="checkbox" class="checkbox" bind:checked {disabled} onchange={handleToggle} />
+    <label class="label-container" style="justify-content: {label.align}; color: var(--{label.color ? label.color : 'font'}-color);">
+      <span>{label.text}</span>
+      <input type="checkbox" class="checkbox" bind:checked disabled={validation.disabled} onchange={handleToggle} />
     </label>
   {/if}
 
-  <div style="display: flex; align-items: center;">
-    {#if captionLeft}
-      <button class="caption" style="margin-right: 1rem; width: {maxCaptionWidth}; text-align: end;" onclick={() => updateChecked(false)}>{captionLeft}</button>
+  <div style="display: flex; align-items: center;" {id}>
+    {#if label.captionLeft}
+      <button
+        class="caption"
+        style="margin-right: 1rem; width: {maxCaptionWidth}; text-align: end; color: var(--{label.color ? label.color : 'font'}-color);"
+        onclick={() => updateChecked(false)}>{label.captionLeft}</button
+      >
     {/if}
-    <label class="toggle-container {disabled ? 'disabled' : ''}">
-      <input type="checkbox" class="toggle-input" bind:checked {disabled} onchange={handleToggle} />
-      <span class="slider {color}" style="--switch-height: {height};"></span>
+    <label class="toggle-container {validation.disabled ? 'disabled' : ''}">
+      <input type="checkbox" class="toggle-input" bind:checked disabled={validation.disabled} onchange={handleToggle} />
+      <span class="slider {style.color}" style="--switch-height: {style.height};"></span>
     </label>
-    {#if captionRight}
-      <button class="caption" style="margin-left: 1rem; width: {maxCaptionWidth}; text-align: start;" onclick={() => updateChecked(true)}>{captionRight}</button
+    {#if label.captionRight}
+      <button
+        class="caption"
+        style="margin-left: 1rem; width: {maxCaptionWidth}; text-align: start; color: var(--{label.color ? label.color : 'font'}-color);"
+        onclick={() => updateChecked(true)}>{label.captionRight}</button
       >
     {/if}
   </div>

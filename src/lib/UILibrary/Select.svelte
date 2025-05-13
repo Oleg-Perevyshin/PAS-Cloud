@@ -4,32 +4,69 @@
   import type { Colors, IOption } from './Interface'
 
   interface SelectProps {
-    options?: IOption[]
-    value?: IOption | null
-    label?: string
     id?: string
-    styleCSS?: string
-    color?: Colors
-    Info?: string
-    disabled?: boolean
-    placeholder?: string
+    value?: IOption | null
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+      color?: Colors | null
+    }
+    validation?: {
+      disabled?: boolean
+      options?: IOption[] | null
+      showCustomOption?: boolean
+    }
+    style?: {
+      inlineStyle?: string
+      color?: Colors
+    }
+    help?: {
+      placeholder?: string
+      info?: string
+    }
+
     onUpdate?: (value: IOption) => void
-    showCustomOption?: boolean
   }
 
+  const defaultLabel = {
+    text: '',
+    align: 'center' as const,
+    color: null,
+  }
+
+  const defaultValidation = {
+    disabled: false,
+    value: null,
+    options: null,
+    showCustomOption: false,
+  }
+
+  const defaultStyle = {
+    inlineStyle: '',
+    color: 'blue' as Colors,
+  }
+
+  const defaultHelp = {
+    placeholder: '',
+    info: '',
+  }
+
+  // Деструктуризация с явным слиянием
   let {
-    options = [],
-    value = null,
-    label = '',
     id = '',
-    styleCSS = '',
-    color = 'white',
-    Info = '',
-    disabled = false,
-    placeholder = 'Choose option',
-    onUpdate,
-    showCustomOption = false,
+    value = null,
+    label = defaultLabel,
+    validation = defaultValidation,
+    style = defaultStyle,
+    help = defaultHelp,
+    onUpdate = () => {},
   }: SelectProps = $props()
+
+  // Явное слияние переданных пропсов с дефолтными значениями
+  label = { ...defaultLabel, ...label }
+  validation = { ...defaultValidation, ...validation }
+  style = { ...defaultStyle, ...style }
+  help = { ...defaultHelp, ...help }
 
   let isDropdownOpen = $state(false)
   let customOption = $state('')
@@ -59,13 +96,13 @@
   })
 
   const toggleDropdown = () => {
-    if (!disabled) {
+    if (!validation.disabled) {
       isDropdownOpen = !isDropdownOpen
     }
   }
 
   const selectOption = (option: IOption) => {
-    if (!disabled) {
+    if (!validation.disabled) {
       value = option
       isDropdownOpen = false
       if (onUpdate) {
@@ -75,13 +112,12 @@
   }
 
   const handleCustomInput = (event: Event) => {
-    customOption = (event.target as HTMLInputElement).value
-    value = { id: -1, name: customOption } as IOption
+    value = { id: -1, name: (event.target as HTMLInputElement).value } as IOption
     if (onUpdate) onUpdate(value)
   }
 
   const handleKeydown = (event: KeyboardEvent) => {
-    if (disabled) return
+    if (validation.disabled) return
     if (event.key === ' ') {
       toggleDropdown()
       event.preventDefault()
@@ -93,8 +129,10 @@
   }
 </script>
 
-<div class="select-container {color}" style="{styleCSS} --border: {color == 'white' ? 'var(--border-color)' : 'white'};">
-  <label for={id} class="select-label" style="margin: {label ? '0.25rem 0' : '0'}; color: var(--font-color);">{label}</label>
+<div class="select-container {style.color}" style="{style.inlineStyle} --border: {style.color == 'white' ? 'var(--border-color)' : 'white'};">
+  <label for={id} class="select-label" style="margin: {label ? '0.25rem 0' : '0'};  color: var(--{label.color ? label.color : 'font'}-color);"
+    >{label.text}</label
+  >
   <button
     {id}
     class="select-button"
@@ -102,12 +140,12 @@
     onkeydown={handleKeydown}
     aria-haspopup="true"
     aria-expanded={isDropdownOpen}
-    {disabled}
-    style="color: {color != 'white' ? 'white' : 'black'}; border: {color != 'white' ? 'none' : '1px solid var(--border)'};"
+    disabled={validation.disabled}
+    style="color: {style.color != 'white' ? 'white' : 'black'}; border: {style.color != 'white' ? 'none' : '1px solid var(--border)'};"
   >
-    {value?.name || placeholder}
+    {value?.name || help.placeholder}
   </button>
-  {#if Info}
+  {#if help.info}
     <button
       type="button"
       class="button-info"
@@ -115,7 +153,7 @@
       style="top: {label ? '1.6' : '0.2'}rem;"
       aria-label={showInfo ? 'Скрыть инфо' : 'Показать инфо'}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" height="1.5rem" width="1.5rem" color={color != 'white' ? 'white' : 'black'} viewBox="0 0 24 24"
+      <svg xmlns="http://www.w3.org/2000/svg" height="1.5rem" width="1.5rem" color={style.color != 'white' ? 'white' : 'black'} viewBox="0 0 24 24"
         ><path
           fill="currentColor"
           d="M12 16.5q.214 0 .357-.144T12.5 16v-4.5q0-.213-.144-.356T11.999 11t-.356.144t-.143.356V16q0 .213.144.356t.357.144M12 9.577q.262 0 .439-.177t.176-.438t-.177-.439T12 8.346t-.438.177t-.177.439t.177.438t.438.177M12.003 21q-1.867 0-3.51-.708q-1.643-.709-2.859-1.924t-1.925-2.856T3 12.003t.709-3.51Q4.417 6.85 5.63 5.634t2.857-1.925T11.997 3t3.51.709q1.643.708 2.859 1.922t1.925 2.857t.709 3.509t-.708 3.51t-1.924 2.859t-2.856 1.925t-3.509.709M12 20q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8"
@@ -125,33 +163,33 @@
   {/if}
   {#if showInfo}
     <div transition:fly={{ y: -15, duration: 300 }} class="info-container">
-      {Info}
+      {help.info}
     </div>
   {/if}
 
   {#if isDropdownOpen}
     <div class="select-dropdown" transition:slide={{ duration: 300 }}>
-      {#each options as option, index}
+      {#each validation.options ?? [] as option, index}
         <button
-          class={`select-option ${index === options.length - 1 && !showCustomOption ? 'last-option' : ''}`}
+          class={`select-option ${index === validation.options!.length - 1 && !validation.showCustomOption ? 'last-option' : ''}`}
           onclick={() => selectOption(option)}
-          {disabled}
-          style="color: {color != 'white' ? 'white' : 'black'};{color != 'white'
+          disabled={validation.disabled}
+          style="color: {style.color != 'white' ? 'white' : 'black'};{style.color != 'white'
             ? 'border-top: 1px solid var(--border); border-left: none; border-right: none; border-bottom: none;'
             : '    border: 1px solid var(--border); border-top: none;'}"
         >
           {option.name}
         </button>
       {/each}
-      {#if showCustomOption}
+      {#if validation.showCustomOption}
         <input
           type="text"
           bind:value={customOption}
           oninput={handleCustomInput}
           class={`select-option last-option`}
           placeholder="Enter value"
-          style={color != 'white'
-            ? 'border-top: 1px solid var(--border); border-left: none; border-right: none; border-bottom: none; background-color: color-mix(in srgb, var(--color) 70%, transparent);'
+          style={style.color != 'white'
+            ? 'border-top: 1px solid var(--border); border-left: none; border-right: none; border-bottom: none; background-color: color-mix(in srgb, var(--color) 70%, transparent); color: white'
             : 'border: 1px solid var(--border); border-top: none;'}
         />
       {/if}

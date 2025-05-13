@@ -1,15 +1,17 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import type { Colors } from './Interface'
 
   interface ColorPickerProps {
     id: string
     label?: {
       text?: string
       align?: 'start' | 'center' | 'end'
+      color?: Colors | null
     }
     value?: number[]
     style?: {
-      styleCSS?: string
+      inlineStyle?: string
     }
     onChange?: (value: number[]) => void
   }
@@ -19,10 +21,11 @@
     label = {
       text: '',
       align: 'center',
+      color: null,
     },
     value = $bindable([0, 0, 0]),
     style = {
-      styleCSS: '',
+      inlineStyle: '',
     },
     onChange = () => {},
   }: ColorPickerProps = $props()
@@ -121,10 +124,10 @@
 </script>
 
 <!-- Разметка компонента -->
-<div class="picker-conteiner" style={style.styleCSS}>
+<div class="picker-conteiner" style={style.inlineStyle}>
   <div class="picker-wrapper">
     {#if label}
-      <label for={id} class="label" style="text-align: {label.align};">{label.text}</label>
+      <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.color ? label.color : 'font'}-color);">{label.text}</label>
     {/if}
     <div
       {id}
@@ -169,12 +172,14 @@
   .picker-conteiner {
     display: inline-block;
     position: relative;
+    height: 10rem;
   }
 
   .picker-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100%;
   }
 
   .label {
@@ -183,7 +188,7 @@
 
   .field {
     position: relative;
-    height: 10rem;
+    height: 100%;
     width: 100%;
     cursor: pointer;
     border-radius: 1rem;

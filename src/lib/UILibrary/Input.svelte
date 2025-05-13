@@ -9,7 +9,7 @@
     label?: {
       text?: string
       align?: 'start' | 'center' | 'end'
-      color?: Colors
+      color?: Colors | null
     }
     validation?: {
       disabled?: boolean
@@ -51,37 +51,48 @@
     onUpdate?: (value: string) => void
   }
 
+  const defaultLabel = {
+    text: '',
+    align: 'center' as const,
+    color: null,
+  }
+  const defaultValidation = {
+    disabled: false,
+    required: false,
+    readonly: false,
+    autocomplete: null,
+    type: 'text' as const,
+    RegExp: /./,
+    step: 1,
+    minNum: 1,
+    maxNum: 10,
+  }
+  const defaultStyle = {
+    inlineStyle: '',
+    color: 'blue' as Colors,
+    rows: 5,
+  }
+  const defaultHelp = {
+    placeholder: '',
+    info: '',
+  }
+
+  // Деструктуризация с явным слиянием
   let {
     id = '',
     value = $bindable(null),
-    label = {
-      text: '',
-      align: 'center',
-      color: 'blue',
-    },
-    validation = {
-      disabled: false,
-      required: false,
-      readonly: false,
-      autocomplete: null,
-      type: 'text',
-      RegExp: /./,
-      step: 1,
-      minNum: 1,
-      maxNum: 10,
-    },
-    style = {
-      inlineStyle: '',
-      color: 'blue',
-      rows: 5,
-    },
-    help = {
-      placeholder: '',
-      info: '',
-    },
-
+    label = defaultLabel,
+    validation = defaultValidation,
+    style = defaultStyle,
+    help = defaultHelp,
     onUpdate = () => {},
   }: InputProps = $props()
+
+  // Явное слияние переданных пропсов с дефолтными значениями
+  label = { ...defaultLabel, ...label }
+  validation = { ...defaultValidation, ...validation }
+  style = { ...defaultStyle, ...style }
+  help = { ...defaultHelp, ...help }
 
   let showPassword = $state(validation.type === 'password')
   let isValid = $state(true)

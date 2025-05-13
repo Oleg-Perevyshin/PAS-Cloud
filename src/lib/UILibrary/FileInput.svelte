@@ -6,6 +6,7 @@
     label?: {
       text?: string
       align?: 'start' | 'center' | 'end'
+      color?: Colors | null
     }
     validation?: {
       disabled?: boolean
@@ -13,7 +14,7 @@
       type?: 'default' | 'image'
     }
     style?: {
-      styleCSS?: string
+      inlineStyle?: string
       color?: Colors
     }
     onFileChange?: (event: Event) => void
@@ -24,6 +25,7 @@
     label = {
       text: '',
       align: 'center',
+      color: null,
     },
     validation = {
       disabled: false,
@@ -31,7 +33,7 @@
       type: 'default',
     },
     style = {
-      styleCSS: '',
+      inlineStyle: '',
       color: 'blue',
     },
 
@@ -39,7 +41,7 @@
   }: FileInputProps = $props()
 
   style = {
-    styleCSS: '',
+    inlineStyle: '',
     color: 'blue',
     ...style,
   }
@@ -69,9 +71,9 @@
   }
 </script>
 
-<div class="file-input-container {style.color}" style={style.styleCSS}>
+<div class="file-input-container {style.color}" style={style.inlineStyle}>
   {#if label}
-    <label for={id} class="label" style="text-align: {label.align};">{label.text}</label>
+    <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.color ? label.color : 'font'}-color);">{label.text}</label>
   {/if}
 
   {#if validation.type === 'image'}
