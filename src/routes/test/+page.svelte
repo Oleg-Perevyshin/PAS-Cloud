@@ -522,52 +522,28 @@
     <Accordion id="acc8" label={{ text: 'Slider component' }} style={{ inlineStyle: 'width: 100%;' }} validation={{ initialState: true }}>
       <!-- vertical -->
       <UISlider
-        label="label"
-        value={[100, 500]}
-        min={50}
-        max={1200}
-        step={10}
-        orientation="vertical"
-        styleCSS="height: 20rem;"
-        thumbColor="purple"
-        sliderColor="sky"
-        onUpdate={(value) => (sliderValue = value)}
-        showStepButtons
-      />
-
-      <UISlider
-        label="label"
-        value={800}
-        min={50}
-        max={1200}
-        step={10}
-        styleCSS="height: 20rem;"
-        orientation="vertical"
-        onUpdate={(value) => (sliderValue = value)}
-        showStepButtons
-      />
-
-      <UISlider
-        label="label"
-        value={[100, 500]}
-        min={50}
-        max={1200}
-        step={10}
-        orientation="vertical"
-        styleCSS="height: 10rem;"
+        label={{ text: 'Цвета по умолчанию' }}
+        validation={{ value: 800, min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'height: 20rem;', orientation: 'vertical' }}
         onUpdate={(value) => (sliderValue = value)}
       />
 
       <UISlider
-        label="label"
-        value={800}
-        min={50}
-        max={1200}
-        step={10}
-        styleCSS="height: 15rem;"
-        orientation="vertical"
-        thumbColor="orange"
-        sliderColor="amber"
+        label={{ text: 'label' }}
+        validation={{ value: [100, 500], min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'height: 20rem;', orientation: 'vertical', thumbColor: 'purple', showStepButtons: true, sliderColor: 'sky' }}
+        onUpdate={(value) => (sliderValue = value)}
+      />
+
+      <UISlider
+        validation={{ value: [100, 500], min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'height: 10rem;', orientation: 'vertical' }}
+        onUpdate={(value) => (sliderValue = value)}
+      />
+
+      <UISlider
+        validation={{ value: 800, min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'height: 20rem;', orientation: 'vertical', thumbColor: 'orange', showStepButtons: true, sliderColor: 'amber' }}
         onUpdate={(value) => (sliderValue = value)}
       />
 
@@ -575,54 +551,29 @@
 
       <!-- horizontal -->
       <UISlider
-        label="label"
-        value={[500, 600]}
-        min={50}
-        max={1200}
-        step={10}
-        orientation="horizontal"
-        styleCSS="width: 20rem;"
+        validation={{ value: [500, 600], min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'width: 20rem;', orientation: 'horizontal' }}
         onUpdate={(value) => (sliderValue = value)}
-        showStepButtons
       />
 
       <UISlider
-        label="label"
-        value={150}
-        min={50}
-        max={1200}
-        step={10}
-        styleCSS="width: 20rem;"
-        orientation="horizontal"
-        thumbColor="green"
-        sliderColor="lime"
+        validation={{ value: 150, min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'width: 20rem;', thumbColor: 'green', sliderColor: 'lime', showStepButtons: true }}
         onUpdate={(value) => (sliderValue = value)}
       />
 
       <Separator style={{ visible: false }} />
 
       <UISlider
-        label="label"
-        value={[500, 1000]}
-        min={50}
-        max={1200}
-        step={10}
-        orientation="horizontal"
-        styleCSS="width: 30rem;"
-        sliderColor="sky"
+        validation={{ value: [500, 1000], min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'width: 30rem;', orientation: 'horizontal', showStepButtons: true, sliderColor: 'sky' }}
         onUpdate={(value) => (sliderValue = value)}
       />
 
       <UISlider
-        label="label"
-        value={800}
-        min={50}
-        max={1200}
-        step={10}
-        styleCSS="width: 12rem;"
-        orientation="horizontal"
-        thumbColor="rose"
-        sliderColor="red"
+        label={{ text: 'label', color: 'green' }}
+        validation={{ value: 800, min: 50, max: 1200, step: 10 }}
+        style={{ inlineStyle: 'width: 12rem;', thumbColor: 'rose', sliderColor: 'red' }}
         onUpdate={(value) => (sliderValue = value)}
       />
     </Accordion>

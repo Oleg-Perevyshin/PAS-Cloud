@@ -1,155 +1,218 @@
 <script lang="ts">
   import type { Colors } from './Interface'
 
-  interface Props {
+  interface SliderProps {
     id?: string
-    label?: string
-    value?: number | [number, number]
-    min?: number
-    max?: number
-    step?: number
-    disabled?: boolean
-    styleCSS?: string
-    thumbColor?: Colors
-    sliderColor?: Colors
-    orientation?: 'vertical' | 'horizontal'
-    showStepButtons?: boolean
+    label?: {
+      text?: string
+      align?: 'start' | 'center' | 'end'
+      color?: Colors | null
+    }
+    validation?: {
+      value?: number | [number, number]
+      min?: number
+      max?: number
+      step?: number
+      disabled?: boolean
+    }
+    style?: {
+      inlineStyle?: string
+      thumbColor?: Colors
+      sliderColor?: Colors
+      orientation?: 'vertical' | 'horizontal'
+      showStepButtons?: boolean
+    }
     onUpdate?: (value: number | [number, number]) => void
   }
 
-  let {
-    id = '',
-    label = '',
-    min = 0,
-    max = 100,
-    step = 1,
-    disabled = false,
-    value = 0,
-    styleCSS = '',
-    thumbColor = 'blue',
-    sliderColor = 'primary',
-    orientation = 'horizontal',
-    showStepButtons = false,
-    onUpdate = () => {},
-  }: Props = $props()
+  const defaultLabel = {
+    text: '',
+    align: 'center' as const,
+    color: null,
+  }
 
-  const isRange = Array.isArray(value) && value.length === 2
+  const defaultValidation = {
+    value: 0,
+    min: 0,
+    max: 100,
+    step: 1,
+    disabled: false,
+  }
 
-  let singleValue = $state(typeof value === 'number' ? value : 50)
-  let lowerValue = $state(isRange ? (value as [number, number])[0] : 25)
-  let upperValue = $state(isRange ? (value as [number, number])[1] : 75)
+  const defaultStyle = {
+    inlineStyle: '',
+    thumbColor: 'blue' as Colors,
+    sliderColor: 'primary' as Colors,
+    orientation: 'horizontal' as const,
+    showStepButtons: false,
+  }
 
-  let lowerPosition = $derived(((lowerValue - min) / (max - min)) * 100)
-  let upperPosition = $derived(((upperValue - min) / (max - min)) * 100)
+  let { id = '', label = defaultLabel, validation = defaultValidation, style = defaultStyle, onUpdate = () => {} }: SliderProps = $props()
 
-  function updateSingleValue(e: Event) {
+  // Объединяем с дефолтными значениями
+  label = { ...defaultLabel, ...label }
+  validation = { ...defaultValidation, ...validation }
+  style = { ...defaultStyle, ...style }
+
+  // Реактивные состояния
+  const isRange = $derived(Array.isArray(validation.value) && validation.value.length === 2)
+  const min = $derived(validation.min ?? 0)
+  const max = $derived(validation.max ?? 100)
+  const step = $derived(validation.step ?? 1)
+
+  let singleValue = $state(typeof validation.value === 'number' ? validation.value : 50)
+  let lowerValue = $derived(isRange ? (validation.value as [number, number])[0] : 25)
+  let upperValue = $derived(isRange ? (validation.value as [number, number])[1] : 75)
+
+  // Позиции для range слайдера
+  const lowerPosition = $derived(((lowerValue - min) / (max - min)) * 100)
+  const upperPosition = $derived(((upperValue - min) / (max - min)) * 100)
+
+  // Обновление значений
+  const updateSingleValue = (e: Event) => {
     singleValue = Number((e.target as HTMLInputElement).value)
+    validation = { ...validation, value: singleValue }
     onUpdate(singleValue)
   }
 
-  function updateLowerValue(e: Event) {
+  const updateLowerValue = (e: Event) => {
     const newValue = Math.min(Number((e.target as HTMLInputElement).value), upperValue)
     lowerValue = newValue
+    validation = { ...validation, value: [lowerValue, upperValue] }
     onUpdate([lowerValue, upperValue])
   }
 
-  function updateUpperValue(e: Event) {
+  const updateUpperValue = (e: Event) => {
     const newValue = Math.max(Number((e.target as HTMLInputElement).value), lowerValue)
     upperValue = newValue
+    validation = { ...validation, value: [lowerValue, upperValue] }
     onUpdate([lowerValue, upperValue])
   }
 
-  function adjustValue(target: 'lower' | 'upper' | 'single', direction: 'increment' | 'decrement') {
+  const adjustValue = (target: 'lower' | 'upper' | 'single', direction: 'increment' | 'decrement') => {
     const stepValue = direction === 'increment' ? step : -step
 
     if (isRange && target !== 'single') {
       if (target === 'lower') {
-        const newValue = Math.max(min, Math.min(lowerValue + stepValue, upperValue))
-        lowerValue = newValue
+        lowerValue = Math.max(min, Math.min(lowerValue + stepValue, upperValue))
       } else {
-        const newValue = Math.min(max, Math.max(upperValue + stepValue, lowerValue))
-        upperValue = newValue
+        upperValue = Math.min(max, Math.max(upperValue + stepValue, lowerValue))
       }
+      validation = { ...validation, value: [lowerValue, upperValue] }
       onUpdate([lowerValue, upperValue])
     } else {
-      const newValue = Math.max(min, Math.min(singleValue + stepValue, max))
-      singleValue = newValue
+      singleValue = Math.max(min, Math.min(singleValue + stepValue, max))
+      validation = { ...validation, value: singleValue }
       onUpdate(singleValue)
     }
   }
+
+  // Синхронизация с внешними изменениями
+  $effect(() => {
+    if (Array.isArray(validation.value)) {
+      lowerValue = validation.value[0]
+      upperValue = validation.value[1]
+    } else if (typeof validation.value === 'number') {
+      singleValue = validation.value
+    }
+  })
 </script>
 
 <div
-  {id}
-  class="wrapper {orientation}"
-  style={`--slider-color: var(--${sliderColor}-color); --thumb-color: var(--${thumbColor}-color); --thumb-hover-color: color-mix(in srgb, var(--${thumbColor}-color) 25%, transparent); --thumb-active-color: color-mix(in srgb, var(--${thumbColor}-color) 40%, transparent)`}
+  class="wrapper {style.orientation}"
+  style={`--slider-color: var(--${style.sliderColor}-color); --thumb-color: var(--${style.thumbColor}-color); --thumb-hover-color: color-mix(in srgb, var(--${style.thumbColor}-color) 25%, transparent); --thumb-active-color: color-mix(in srgb, var(--${style.thumbColor}-color) 40%, transparent)`}
 >
-  {#if label}
-    <p class="label">{label}</p>
+  {#if label?.text}
+    <label for={id} class="label" style="text-align: {label.align}; color: var(--{label.color ?? 'font'}-color);">
+      {label.text}
+    </label>
   {/if}
 
-  <div class="content-container {orientation}">
-    <div class="slider-container {orientation}" style={styleCSS}>
+  <div class="content-container {style.orientation}">
+    <div class="slider-container {style.orientation}" {id} style={style.inlineStyle}>
       {#if isRange}
-        <div class="slider-track {orientation}">
+        <div class="slider-track {style.orientation}">
           <div
-            class="slider-range {orientation}"
-            style={`
-            ${
-              orientation === 'horizontal'
-                ? `left: ${lowerPosition}%; right: ${100 - upperPosition}%`
-                : `top: ${100 - upperPosition}%; bottom: ${lowerPosition}%`
-            }`}
+            class="slider-range {style.orientation}"
+            style={style.orientation === 'horizontal'
+              ? `left: ${lowerPosition}%; right: ${100 - upperPosition}%`
+              : `top: ${100 - upperPosition}%; bottom: ${lowerPosition}%`}
           ></div>
         </div>
-        <input type="range" {min} {max} {step} {disabled} bind:value={lowerValue} oninput={updateLowerValue} class="slider-thumb lower {orientation}" />
-        <input type="range" {min} {max} {step} {disabled} bind:value={upperValue} oninput={updateUpperValue} class="slider-thumb upper {orientation}" />
+        <input
+          type="range"
+          {min}
+          {max}
+          {step}
+          bind:value={lowerValue}
+          oninput={updateLowerValue}
+          disabled={validation.disabled}
+          class="slider-thumb lower {style.orientation}"
+        />
+        <input
+          type="range"
+          {min}
+          {max}
+          {step}
+          bind:value={upperValue}
+          oninput={updateUpperValue}
+          disabled={validation.disabled}
+          class="slider-thumb upper {style.orientation}"
+        />
       {:else}
-        <div class="slider-track single {orientation}">
+        <div class="slider-track single {style.orientation}">
           <div
-            class="slider-range single {orientation}"
-            style={`
-            ${orientation === 'horizontal' ? `width: ${((singleValue - min) / (max - min)) * 100}%` : `height: ${((singleValue - min) / (max - min)) * 100}%`}`}
+            class="slider-range single {style.orientation}"
+            style={style.orientation === 'horizontal'
+              ? `width: ${((singleValue - min) / (max - min)) * 100}%`
+              : `height: ${((singleValue - min) / (max - min)) * 100}%`}
           ></div>
         </div>
-        <input type="range" {min} {max} {step} {disabled} bind:value={singleValue} oninput={updateSingleValue} class="slider-thumb single {orientation}" />
+        <input
+          type="range"
+          {min}
+          {max}
+          {step}
+          bind:value={singleValue}
+          oninput={updateSingleValue}
+          disabled={validation.disabled}
+          class="slider-thumb single {style.orientation}"
+        />
       {/if}
     </div>
 
-    {#if isRange}
-      <div class="values {orientation}" style={styleCSS}>
-        <div class="value {orientation}">
-          {#if showStepButtons}
-            <button class="change" onclick={() => adjustValue(isRange ? 'lower' : 'single', 'decrement')} disabled={disabled || lowerValue <= min}>-</button>
+    <div class="values {style.orientation}" style={style.inlineStyle}>
+      {#if isRange}
+        <div class="value {style.orientation}">
+          {#if style.showStepButtons}
+            <button class="change" onclick={() => adjustValue('lower', 'decrement')} disabled={validation.disabled || lowerValue <= min}>-</button>
           {/if}
           {lowerValue}
-          {#if showStepButtons}
-            <button class="change" onclick={() => adjustValue(isRange ? 'lower' : 'single', 'increment')} disabled={disabled || lowerValue >= upperValue}
-              >+</button
-            >
+          {#if style.showStepButtons}
+            <button class="change" onclick={() => adjustValue('lower', 'increment')} disabled={validation.disabled || lowerValue >= upperValue}>+</button>
           {/if}
         </div>
-        <div class="value {orientation}">
-          {#if showStepButtons}
-            <button class="change" onclick={() => adjustValue('upper', 'decrement')} disabled={disabled || upperValue <= lowerValue}>-</button>
+        <div class="value {style.orientation}">
+          {#if style.showStepButtons}
+            <button class="change" onclick={() => adjustValue('upper', 'decrement')} disabled={validation.disabled || upperValue <= lowerValue}>-</button>
           {/if}
           {upperValue}
-          {#if showStepButtons}
-            <button class="change" onclick={() => adjustValue('upper', 'increment')} disabled={disabled || upperValue >= max}>+</button>
+          {#if style.showStepButtons}
+            <button class="change" onclick={() => adjustValue('upper', 'increment')} disabled={validation.disabled || upperValue >= max}>+</button>
           {/if}
         </div>
-      </div>
-    {:else}
-      <div class="value {orientation}">
-        {#if showStepButtons}
-          <button class="change" onclick={() => adjustValue(isRange ? 'lower' : 'single', 'decrement')} disabled={disabled || singleValue <= min}>-</button>
-        {/if}
-        {singleValue}
-        {#if showStepButtons}
-          <button class="change" onclick={() => adjustValue(isRange ? 'lower' : 'single', 'increment')} disabled={disabled || singleValue >= max}>+</button>
-        {/if}
-      </div>
-    {/if}
+      {:else}
+        <div class="value {style.orientation}">
+          {#if style.showStepButtons}
+            <button class="change" onclick={() => adjustValue('single', 'decrement')} disabled={validation.disabled || singleValue <= min}>-</button>
+          {/if}
+          {singleValue}
+          {#if style.showStepButtons}
+            <button class="change" onclick={() => adjustValue('single', 'increment')} disabled={validation.disabled || singleValue >= max}>+</button>
+          {/if}
+        </div>
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -316,7 +379,6 @@
   .values.vertical {
     flex-direction: column-reverse;
     height: 100%;
-    justify-content: space-between;
     padding-top: 0;
     width: auto;
     margin-top: 0;
@@ -346,10 +408,10 @@
     font-weight: bold;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     height: max-content;
     &:hover {
-      transform: scale(1.3);
+      transform: scale(1.4);
     }
   }
 </style>
