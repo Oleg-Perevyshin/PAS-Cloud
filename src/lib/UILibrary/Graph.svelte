@@ -98,7 +98,7 @@
           show: true,
           x: mouseX,
           y: mouseY,
-          content: `X: ${point.x.toFixed(2)}, Y: ${point.y.toFixed(2)}`,
+          content: `${xLabel}: ${point.x.toFixed(2)}, ${yLabel}: ${point.y.toFixed(2)}`,
           pointX: x,
           pointY: y,
         }
@@ -230,10 +230,11 @@
       ctx.fillText(label, width / 2, 20)
     }
 
+    // Увеличение точки при наведении
     if (tooltip.show) {
       ctx.fillStyle = color
       ctx.beginPath()
-      ctx.arc(tooltip.pointX, tooltip.pointY, 6, 0, Math.PI * 2)
+      ctx.arc(tooltip.pointX, tooltip.pointY, 5, 0, Math.PI * 2)
       ctx.fill()
     }
   }

@@ -30,7 +30,6 @@
     align: 'center' as const,
     color: null,
   }
-
   const defaultValidation = {
     value: 0,
     min: 0,
@@ -38,7 +37,6 @@
     step: 1,
     disabled: false,
   }
-
   const defaultStyle = {
     inlineStyle: '',
     thumbColor: 'blue' as Colors,
